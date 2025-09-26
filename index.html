@@ -1,6 +1,81 @@
 <!DOCTYPE html>
+<html lang="en" id="top">
 <html lang="en">
 <head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>RMO 360 — Digital Milestones</title>
+<meta name="color-scheme" content="dark">
+<style>
+  :root{
+    --bg:#0b1014; --panel:#0f151a; --glass:rgba(255,255,255,.06);
+    --stroke:rgba(255,255,255,.12); --text:#eaf7f4; --muted:#9ab6b0;
+    --teal:#29ffd2; --blue:#00a8ff; --ok:#4ad66d; --pink:#ff7ad9;
+    --radius:20px;
+    --shadow:0 10px 30px rgba(0,0,0,.65), 0 0 0 1px rgba(255,255,255,.04) inset;
+    --card-glow:0 0 30px rgba(41,255,210,.25), 0 0 60px rgba(0,168,255,.12);
+    --grad:linear-gradient(135deg, rgba(41,255,210,1), rgba(0,168,255,1));
+    --grad2:linear-gradient(135deg, rgba(255,122,217,1), rgba(41,255,210,1));
+    --grad3:linear-gradient(135deg, rgba(255,200,122,1), rgba(255,122,217,1));
+    --gradDark:linear-gradient(135deg, rgba(20,30,40,1), rgba(10,15,20,1));
+    --fz-xxl:clamp(22px, 4.2vw, 30px);
+    --fz-xl:clamp(18px, 3vw, 22px);
+    --fz-lg:clamp(15px, 2.2vw, 17px);
+    --fz-md:clamp(14px, 2vw, 16px);
+    --fz-sm:clamp(12px, 1.6vw, 14px);
+  }
+  *{box-sizing:border-box}
+  body{margin:0; font-family:Inter, ui-sans-serif, -apple-system, Segoe UI, Roboto, Arial; background:var(--bg); color:var(--text); line-height:1.5; overflow-x:hidden}
+
+  header{position:sticky; top:0; z-index:5; backdrop-filter: blur(8px); background:linear-gradient(180deg, rgba(10,16,20,.9), rgba(10,16,20,.6)); border-bottom:1px solid var(--stroke)}
+  .wrap-head{max-width:1120px; margin:0 auto; padding:10px 16px; display:flex; align-items:center}
+  .brand{font-weight:800; letter-spacing:.2px}
+  .brand b{color:var(--teal); text-shadow:0 0 12px rgba(41,255,210,.5)}
+
+  .wrap{max-width:1120px; margin:20px auto 24px; padding:0 16px}
+
+  .cards{display:flex; flex-direction:column; gap:12px}
+  details.acc{border:1px solid var(--stroke); border-radius:16px; overflow:hidden; background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03)); box-shadow:var(--shadow), var(--card-glow)}
+  summary.acc-btn{list-style:none; display:grid; align-items:center; gap:10px; cursor:pointer; padding:12px 16px; grid-template-columns:auto 1fr auto auto}
+  summary::-webkit-details-marker{display:none}
+  .sum-ico{width:26px; height:26px; display:grid; place-items:center; border-radius:8px; background:var(--grad); color:#081215; font-weight:700; animation:iconGlow 2s infinite alternate}
+  @keyframes iconGlow{from{box-shadow:0 0 8px rgba(41,255,210,.5)} to{box-shadow:0 0 20px rgba(0,168,255,.7)}}
+  .sum-title{font-size:var(--fz-lg); font-weight:700; line-height:1.3}
+  .sum-date{display:inline-flex; align-items:center; gap:6px; color:var(--muted); font-size:var(--fz-sm)}
+  .caret{margin-left:10px; width:30px; height:30px; border-radius:999px; border:1px solid var(--stroke); display:grid; place-items:center; transition:.25s; background:rgba(255,255,255,.04)}
+  details[open] .caret{transform:rotate(90deg); box-shadow:0 0 14px rgba(41,255,210,.45)}
+
+  .acc-panel{padding:10px 16px 14px}
+  .divider{height:1px; background:var(--stroke); margin:10px 0}
+  .row{display:flex; flex-wrap:wrap; gap:6px; align-items:center; font-size:var(--fz-sm)}
+  .badge{display:inline-flex; align-items:center; gap:4px; padding:4px 8px; border-radius:999px; background:rgba(255,255,255,.06); border:1px solid var(--stroke); color:#cfeee7; font-weight:600}
+  .check{width:8px; height:8px; background:var(--ok); border-radius:50%; box-shadow:0 0 6px var(--ok), 0 0 12px rgba(74,214,109,.6)}
+  .loc{padding:4px 8px; border-radius:999px; font-size:var(--fz-sm); background:var(--gradDark); border:1px solid rgba(150,200,255,.22); color:#fff; font-weight:600; box-shadow:0 0 12px rgba(41,255,210,.35)}
+  .note{color:#c8e8e1; font-size:var(--fz-sm); margin:6px 0 8px}
+  .note .article-ico{display:inline-grid; place-items:center; width:18px; height:18px; margin-right:6px; border-radius:4px; background:var(--grad2); box-shadow:0 0 10px rgba(255,122,217,.45)}
+  .note .article-ico svg{width:12px; height:12px}
+
+  .files h4{margin:6px 0 6px; font-size:var(--fz-sm); color:#d6fbf3}
+  .chips{display:flex; flex-wrap:wrap; gap:8px}
+  .chip{display:flex; align-items:center; justify-content:space-between; gap:8px; padding:6px 10px; border-radius:999px; border:1px solid var(--stroke); background:var(--grad); color:#081215; font-weight:600; font-size:var(--fz-sm); box-shadow:0 0 12px rgba(41,255,210,.35)}
+  .chip svg{width:18px; height:18px; flex:0 0 auto; filter:drop-shadow(0 0 6px rgba(41,255,210,.6)); animation:iconGlow 2s infinite alternate}
+
+  /* Modern MS Office SVG icon helper */
+  .ms{width:18px; height:18px}
+  .ms-pp rect{fill:url(#gradPP)} .ms-pp text{font-weight:800; fill:#fff}
+  .ms-word rect{fill:url(#gradWord)} .ms-word text{font-weight:800; fill:#fff}
+  .ms-excel rect{fill:url(#gradExcel)} .ms-excel text{font-weight:800; fill:#fff}
+
+  .video-grid{display:grid; gap:14px; margin-top:12px}
+  @media (min-width:760px){ .video-grid{grid-template-columns:repeat(2,1fr)} }
+  .video-card{background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03)); border:1px solid var(--stroke); border-radius:16px; padding:12px; box-shadow:var(--shadow), var(--card-glow)}
+  .video-card h3{margin:6px 8px 10px; font-size:var(--fz-md)}
+  .video-box{position:relative; width:100%; padding-top:56.25%; border-radius:10px; overflow:hidden; border:1px solid var(--stroke); box-shadow:0 0 16px rgba(0,255,200,.28)}
+  .video-box iframe{position:absolute; inset:0; width:100%; height:100%; border:0; background:#000}
+  .source-files{margin-top:6px}
+  .source-files summary{cursor:pointer; font-size:var(--fz-sm); color:#muted}
+  .source-files .chips{margin-top:6px}
+</style>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>RMO 360 (pilot) — Voidage Balance Simulator</title>
@@ -74,6 +149,56 @@
   </style>
 </head>
 <body>
+<!-- SVG gradients for MS icons -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="gradPP" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#d24726"/>
+      <stop offset="100%" stop-color="#ff6a3a"/>
+    </linearGradient>
+    <linearGradient id="gradWord" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2b579a"/>
+      <stop offset="100%" stop-color="#3a78d2"/>
+    </linearGradient>
+    <linearGradient id="gradExcel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#217346"/>
+      <stop offset="100%" stop-color="#21c36a"/>
+    </linearGradient>
+  </defs>
+</svg>
+<header>
+  <div class="wrap-head">
+    <div class="brand"><b>RMO 360</b></div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="cards">
+
+    <!-- 1. Agentic AI Use Case PoC Close Out -->
+    <details class="acc" open>
+      <summary class="acc-btn">
+        <span class="sum-ico">⚡</span>
+        <span class="sum-title">Agentic AI Use Case PoC Close Out — RGS/RMO &amp; DBS/CON</span>
+        <span class="sum-date">📅 4th Week of September</span>
+        <span class="caret">▶</span>
+      </summary>
+      <div class="acc-panel">
+        <div class="row">
+          <span class="badge"><span class="check"></span> VP RGS</span>
+          <span class="badge"><span class="check"></span> VP DBS + Digital</span>
+          <span class="badge"><span class="check"></span> CEOs</span>
+        </div>
+        <p class="note"><span class="article-ico"><svg viewBox="0 0 24 24" fill="#081215"><path d="M6 3h9l3 3v15H6z"/><rect x="8" y="8" width="8" height="2"/><rect x="8" y="12" width="8" height="2"/><rect x="8" y="16" width="5" height="2"/></svg></span>MyNOC article after meeting; emphasize collaboration + 1st NOC use case.</p>
+        <div class="row"><span class="loc">Venue: F40 — CEO Meeting Room</span></div>
+        <div class="divider"></div>
+        <div class="files">
+          <h4>Reference Material</h4>
+          <div class="chips">
+            <span class="chip"><svg class="ms ms-pp" viewBox="0 0 24 24"><rect rx="4" width="24" height="24"></rect><text x="6.5" y="16" font-size="11">P</text></svg><span>PoC Close-Out</span></span>
+            <span class="chip"><svg class="ms ms-word" viewBox="0 0 24 24"><rect rx="4" width="24" height="24"></rect><text x="5" y="16" font-size="11">W</text></svg><span>Meeting Notes</span></span>
+            <span class="chip"><svg class="ms ms-excel" viewBox="0 0 24 24"><rect rx="4" width="24" height="24"></rect><text x="6.5" y="16" font-size="11">X</text></svg><span>KPI Sheet</span></span>
+          </div>
   <div class="wrap">
     <header>
       <a class="capsule" href="https://aldythsukapradja.github.io/Plan" target="_blank" rel="noopener">Milestones</a>
@@ -85,19 +210,41 @@
       <!-- Chart FIRST -->
       <section class="card" id="chartCard">
         <h2>VRR Trend</h2>
-        
+        <div id="alarm" class="alarm hidden"><span class="mark">!</span><span id="alarmText">Alarm</span></div>
         <div class="legend" style="margin-bottom:8px">
           <span><i class="key k-pressure"></i> VRR (%)</span>
           <span><i class="key k-target"></i> Target band</span>
         </div>
+      </div>
+    </details>
+
+    <!-- 2. Dashboard Factory Launch -->
+    <details class="acc">
+      <summary class="acc-btn">
+        <span class="sum-ico">📊</span>
+        <span class="sum-title">RMO Dashboard Factory Launch — RGS/RMO &amp; DBS/OPS</span>
+        <span class="sum-date">📅 1st or 2nd Week of October</span>
+        <span class="caret">▶</span>
+      </summary>
+      <div class="acc-panel">
+        <div class="row">
+          <span class="badge"><span class="check"></span> VP RGS</span>
+          <span class="badge"><span class="check"></span> VP DBS + Digital</span>
         <canvas id="chart" width="800" height="300" aria-label="VRR chart"></canvas>
-        <div class="chartFooter" style="display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-top:10px">
-          <div id="alarm" class="alarm" style="opacity:.35"><span class="mark">!</span><span id="alarmText">VRR OK (90–110%)</span></div>
+        <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:10px">
           <div class="pill">Target band: <strong id="bandText">90–110 %</strong></div>
-          <div class="pill">Fail limits: <strong>80 % / 120 %</strong></div>
           <div class="pill">Fail limits: <strong>80 % / 120 %</strong></div>
           <div class="pill">Disturbances: <strong>on</strong></div>
         </div>
+        <p class="note"><span class="article-ico"><svg viewBox="0 0 24 24" fill="#081215"><path d="M6 3h9l3 3v15H6z"/></svg></span>There are no articles need to be prepared.</p>
+        <div class="row"><span class="loc">Venue: F41 — Training Room</span></div>
+        <div class="divider"></div>
+        <div class="files">
+          <h4>Reference Material</h4>
+          <div class="chips">
+            <span class="chip"><svg class="ms ms-pp" viewBox="0 0 24 24"><rect rx="4" width="24" height="24"></rect><text x="6.5" y="16" font-size="11">P</text></svg><span>Launch Deck</span></span>
+            <span class="chip"><svg class="ms ms-word" viewBox="0 0 24 24"><rect rx="4" width="24" height="24"></rect><text x="5" y="16" font-size="11">W</text></svg><span>Ops Brief</span></span>
+            <span class="chip"><svg class="ms ms-excel" viewBox="0 0 24 24"><rect rx="4" width="24" height="24"></rect><text x="6.5" y="16" font-size="11">X</text></svg><span>Dash KPIs</span></span>
       </section>
 
       <!-- Controls SECOND (side-by-side on desktop, below on mobile) -->
@@ -118,22 +265,159 @@
             </div>
           </div>
         </div>
+      </div>
+    </details>
+
+    <!-- 3. Digital Initiatives — High Level -->
+    <details class="acc">
+      <summary class="acc-btn">
+        <span class="sum-ico">🚀</span>
+        <span class="sum-title">RMO Digital Initiatives — High Level</span>
+        <span class="sum-date">📅 15 October</span>
+        <span class="caret">▶</span>
+      </summary>
+      <div class="acc-panel">
+        <div class="row">
+          <span class="badge"><span class="check"></span> VP RGS</span>
+          <span class="badge"><span class="check"></span> CEOs</span>
+        </div>
+        <p class="note"><span class="article-ico"><svg viewBox="0 0 24 24" fill="#081215"><path d="M6 3h9l3 3v15H6z"/></svg></span>There are no articles need to be prepared.</p>
+        <div class="row"><span class="loc">Venue: Offsite Meeting</span></div>
+        <div class="divider"></div>
+        <div class="files">
+          <h4>Reference Material</h4>
+          <div class="chips">
+            <span class="chip"><svg class="ms ms-pp" viewBox="0 0 24 24"><rect rx="4" width="24" height="24"></rect><text x="6.5" y="16" font-size="11">P</text></svg><span>Vision Deck</span></span>
+            <span class="chip"><svg class="ms ms-word" viewBox="0 0 24 24"><rect rx="4" width="24" height="24"></rect><text x="5" y="16" font-size="11">W</text></svg><span>Exec Summary</span></span>
+            <span class="chip"><svg class="ms ms-excel" viewBox="0 0 24 24"><rect rx="4" width="24" height="24"></rect><text x="6.5" y="16" font-size="11">X</text></svg><span>Budget Model</span></span>
 
         <div class="meters" style="margin:10px 0 6px">
           <div class="meter">
             <div class="label">VRR (Voidage Replacement Ratio)</div>
             <div class="value"><span id="vrrNow">100</span> %</div>
           </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- 4. AI Factory Trial Close Out -->
+    <details class="acc">
+      <summary class="acc-btn">
+        <span class="sum-ico">🏭</span>
+        <span class="sum-title">RMO AI Factory Trial Close Out — RGS/RMO &amp; SLB</span>
+        <span class="sum-date">📅 2nd or 3rd Week of October</span>
+        <span class="caret">▶</span>
+      </summary>
+      <div class="acc-panel">
+        <div class="row">
+          <span class="badge"><span class="check"></span> VP RGS</span>
+          <span class="badge"><span class="check"></span> VP DBS + Digital</span>
+          <span class="badge"><span class="check"></span> CEOs</span>
+        </div>
+        <p class="note"><span class="article-ico"><svg viewBox="0 0 24 24" fill="#081215"><path d="M6 3h9l3 3v15H6z"/></svg></span>Article to be prepared: The Guard Family</p>
+        <div class="row"><span class="loc">Venue: F41 — Training Room</span></div>
+        <div class="divider"></div>
+        <div class="files">
+          <h4>Reference Material</h4>
+          <div class="chips">
+            <span class="chip"><svg class="ms ms-pp" viewBox="0 0 24 24"><rect rx="4" width="24" height="24"></rect><text x="6.5" y="16" font-size="11">P</text></svg><span>Trial Close-Out</span></span>
+            <span class="chip"><svg class="ms ms-word" viewBox="0 0 24 24"><rect rx="4" width="24" height="24"></rect><text x="5" y="16" font-size="11">W</text></svg><span>Guard Family Article</span></span>
+            <span class="chip"><svg class="ms ms-excel" viewBox="0 0 24 24"><rect rx="4" width="24" height="24"></rect><text x="6.5" y="16" font-size="11">X</text></svg><span>Results Sheet</span></span>
           <div class="meter">
             <div class="label">Score</div>
             <div class="value"><span id="score">0</span></div>
           </div>
         </div>
+      </div>
+    </details>
+
+    <!-- 5. RMO 360 Phase 1 Close Out & Kick-off Conceptualization -->
+    <details class="acc">
+      <summary class="acc-btn">
+        <span class="sum-ico">🧭</span>
+        <span class="sum-title">RMO 360 Ph1 Close Out &amp; Kick-off Conceptualization</span>
+        <span class="sum-date">📅 1st Week of November</span>
+        <span class="caret">▶</span>
+      </summary>
+      <div class="acc-panel">
+        <div class="row">
+          <span class="badge"><span class="check"></span> VP RGS</span>
+          <span class="badge"><span class="check"></span> VP DBS + Digital</span>
+          <span class="badge"><span class="check"></span> CEOs</span>
+        </div>
+        <p class="note"><span class="article-ico"><svg viewBox="0 0 24 24" fill="#081215"><path d="M6 3h9l3 3v15H6z"/></svg></span>There are no articles need to be prepared.</p>
+        <div class="row"><span class="loc">Venue: F40 — CEO Meeting Room</span></div>
+        <div class="divider"></div>
+        <div class="files">
+          <h4>Reference Material</h4>
+          <div class="chips">
+            <span class="chip"><svg class="ms ms-pp" viewBox="0 0 24 24"><rect rx="4" width="24" height="24"></rect><text x="6.5" y="16" font-size="11">P</text></svg><span>Kickoff Deck</span></span>
+            <span class="chip"><svg class="ms ms-word" viewBox="0 0 24 24"><rect rx="4" width="24" height="24"></rect><text x="5" y="16" font-size="11">W</text></svg><span>Concept Doc</span></span>
+            <span class="chip"><svg class="ms ms-excel" viewBox="0 0 24 24"><rect rx="4" width="24" height="24"></rect><text x="6.5" y="16" font-size="11">X</text></svg><span>Roadmap Sheet</span></span>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- 6. RGS Open Day with 4 video placeholders -->
+    <details class="acc">
+      <summary class="acc-btn">
+        <span class="sum-ico">🎪</span>
+        <span class="sum-title">RGS Open Day</span>
+        <span class="sum-date">📅 17 November</span>
+        <span class="caret">▶</span>
+      </summary>
+      <div class="acc-panel">
+        <div class="row">
+          <span class="badge"><span class="check"></span> VP RGS</span>
+          <span class="badge"><span class="check"></span> VP DBS + Digital</span>
+          <span class="badge"><span class="check"></span> CEOs</span>
 
         <div class="gauge" id="gauge">
           <div class="dot" id="gDot" style="background:var(--good)"></div>
           <span id="gText">Stable</span>
         </div>
+        <p class="note"><span class="article-ico"><svg viewBox="0 0 24 24" fill="#081215"><path d="M6 3h9l3 3v15H6z"/></svg></span>There are no articles need to be prepared.</p>
+        <div class="row"><span class="loc">Venue: F41 — Training Room</span></div>
+        <div class="divider"></div>
+        <h4 style="margin-top:12px">Videos Reference</h4>
+        <div class="video-grid">
+          <div class="video-card">
+            <h3>Reservoir Management</h3>
+            <div class="video-box"><iframe src="about:blank"></iframe></div>
+            <details class="source-files"><summary>PowerPoint Sources</summary>
+              <div class="chips">
+                <span class="chip"><svg class="ms ms-pp" viewBox="0 0 24 24"><rect rx="4" width="24" height="24"></rect><text x="6.5" y="16" font-size="11">P</text></svg><span>Reservoir Mgmt</span></span>
+              </div>
+            </details>
+          </div>
+          <div class="video-card">
+            <h3>Water Injectors</h3>
+            <div class="video-box"><iframe src="about:blank"></iframe></div>
+            <details class="source-files"><summary>PowerPoint Sources</summary>
+              <div class="chips">
+                <span class="chip"><svg class="ms ms-pp" viewBox="0 0 24 24"><rect rx="4" width="24" height="24"></rect><text x="6.5" y="16" font-size="11">P</text></svg><span>Injectors</span></span>
+              </div>
+            </details>
+          </div>
+          <div class="video-card">
+            <h3>Digital Material</h3>
+            <div class="video-box"><iframe src="about:blank"></iframe></div>
+            <details class="source-files"><summary>PowerPoint Sources</summary>
+              <div class="chips">
+                <span class="chip"><svg class="ms ms-pp" viewBox="0 0 24 24"><rect rx="4" width="24" height="24"></rect><text x="6.5" y="16" font-size="11">P</text></svg><span>Digital Deck</span></span>
+              </div>
+            </details>
+          </div>
+          <div class="video-card">
+            <h3>RGS Quarterly Meeting</h3>
+            <div class="video-box"><iframe src="about:blank"></iframe></div>
+            <details class="source-files"><summary>PowerPoint Sources</summary>
+              <div class="chips">
+                <span class="chip"><svg class="ms ms-pp" viewBox="0 0 24 24"><rect rx="4" width="24" height="24"></rect><text x="6.5" y="16" font-size="11">P</text></svg><span>Quarterly</span></span>
+              </div>
+            </details>
+          </div>
 
         <div class="health" style="margin-top:10px"><span id="healthBar"></span></div>
 
@@ -141,6 +425,8 @@
           <button id="startBtn">Start</button>
           <button id="resetBtn" class="secondary">Reset</button>
         </div>
+      </div>
+    </details>
 
         <div class="status" id="status"></div>
       </section>
@@ -150,6 +436,7 @@
       Tip: Keep injection near production to hold VRR ~100%. Scoring only while VRR stays in the green band.
     </footer>
   </div>
+</div>
 
   <script>
     // ----- Simulation constants (slower dynamics) -----
