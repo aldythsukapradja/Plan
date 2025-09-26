@@ -7,17 +7,17 @@
 <meta name="color-scheme" content="dark light">
 <style>
   :root{
-    --bg:#0a0f12; --panel:#0f151a; --glass:rgba(255,255,255,.06);
-    --line:rgba(0,255,200,.25); --teal:#29ffd2; --text:#e9f7f4; --muted:#9ab6b0;
+    --bg:#0a0f12; --text:#e9f7f4; --muted:#9ab6b0; --teal:#29ffd2;
     --ok:#4ad66d; --radius:20px;
     --shadow:0 10px 30px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.04) inset;
     --glow:0 0 25px rgba(41,255,210,.35), 0 0 2px rgba(41,255,210,.9);
-    --ring:0 0 0 3px rgba(41,255,210,.35);
   }
   *{box-sizing:border-box}
+  html,body{height:100%}
   body{margin:0; font-family:Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
        background:var(--bg); color:var(--text); line-height:1.45; overflow-x:hidden;}
-  /* Background */
+
+  /* background */
   .bg{position:fixed; inset:0; z-index:-2; pointer-events:none;
       background:radial-gradient(1200px 800px at 80% -20%, rgba(41,255,210,.08), transparent 60%),
                  radial-gradient(900px 600px at -10% 110%, rgba(41,150,255,.08), transparent 55%);}
@@ -26,37 +26,60 @@
   .dots{position:fixed; inset:0; z-index:-1; opacity:.35; pointer-events:none;
         background-image: radial-gradient(rgba(255,255,255,.05) 1px, transparent 1px);
         background-size:24px 24px;}
-  /* Page wrap */
+
   .wrap{max-width:1200px; margin:26px auto 24px; padding:0 20px}
   h1{font-size:clamp(24px,3.2vw,40px); margin:0 0 14px}
+
   .grid{display:grid; gap:18px}
   .cards{grid-template-columns: repeat(auto-fit, minmax(320px, 1fr))}
-  /* Cards */
-  .card{background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-        border:1px solid rgba(255,255,255,.12); border-radius:var(--radius); padding:18px; box-shadow:var(--shadow); overflow:hidden;}
+
+  /* cards – prevent clipping/wrapping issues */
+  .card{
+    background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:var(--radius);
+    padding:18px;
+    box-shadow:var(--shadow);
+    overflow:visible;             /* allow children to breathe inside */
+  }
+  .card *{min-width:0}            /* fix flex children shrinking */
   .title{font-weight:800; margin-bottom:6px}
   .meta{color:var(--muted); font-size:.95rem}
   .row{display:flex; flex-wrap:wrap; gap:8px; align-items:center}
   .spaced{display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap}
   .badge{display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px;
-         background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); color:#cfeee7}
+         background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); color:#cfeee7; flex:0 1 auto}
   .check{width:9px; height:9px; background:var(--ok); border-radius:50%; box-shadow:0 0 8px rgba(74,214,109,.6)}
   .pill{padding:6px 10px; border-radius:999px; background:rgba(41,255,210,.08);
-        border:1px solid rgba(41,255,210,.25); color:#9ffbe9}
-  .loc{padding:6px 10px; border-radius:999px; background:rgba(150,200,255,.06); border:1px solid rgba(150,200,255,.2)}
+        border:1px solid rgba(41,255,210,.25); color:#9ffbe9; flex:0 1 auto}
+  .loc{padding:6px 10px; border-radius:999px; background:rgba(150,200,255,.06); border:1px solid rgba(150,200,255,.2); flex:0 1 auto}
   .note{color:#c8e8e1; opacity:.9; font-size:.95rem}
-  .go{display:inline-flex; align-items:center; justify-content:center; gap:8px; border-radius:999px; padding:10px 18px;
-      text-decoration:none; color:var(--text); border:1px solid rgba(255,255,255,.16);
-      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03)); box-shadow:var(--shadow)}
-  .go:hover{box-shadow:var(--shadow), var(--glow)} .go:focus-visible{outline:none; box-shadow:var(--ring)}
-  /* Related files inside cards */
+
+  .go{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    border-radius:999px; padding:10px 18px; text-decoration:none; color:var(--text);
+    border:1px solid rgba(255,255,255,.16);
+    background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+    box-shadow:var(--shadow)
+  }
+  .go:hover{box-shadow:var(--shadow), var(--glow)} .go:focus-visible{outline:none; box-shadow:0 0 0 3px rgba(41,255,210,.35)}
+
+  /* related files */
   .files{margin-top:14px}
   .files h4{margin:0 0 8px; font-size:1rem; color:#d6fbf3}
-  .chips{display:flex; flex-wrap:wrap; gap:10px}
-  .chip{display:flex; align-items:center; gap:8px; padding:10px 12px; border-radius:999px;
-        border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.04); white-space:nowrap}
-  .chip .ext{opacity:.75; font-size:.95rem}
-  /* Videos Grid */
+  .chips{display:flex; flex-wrap:wrap; gap:10px; align-items:flex-start}
+  .chip{
+    display:inline-flex; flex-wrap:wrap; align-items:center; gap:8px;
+    padding:8px 10px; border-radius:999px;
+    border:1px solid rgba(255,255,255,.12);
+    background:rgba(255,255,255,.04);
+    max-width:100%;               /* never overflow card */
+    line-height:1.25;
+  }
+  .filename{overflow-wrap:anywhere; word-break:break-word} /* safe wrapping for long names */
+  .ext{opacity:.75; font-size:.92rem}
+
+  /* videos */
   h2{font-size:clamp(20px,2.4vw,30px); margin:28px 0 12px}
   .video-grid{display:grid; gap:18px; grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
   .video-card{background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
@@ -66,7 +89,8 @@
              border:1px solid rgba(255,255,255,.12); box-shadow:0 0 15px rgba(0,255,200,.25)}
   .video-box iframe{position:absolute; inset:0; width:100%; height:100%; border:0; background:#000}
   .video-actions{display:flex; justify-content:flex-end; padding:12px 6px 4px}
-  /* Up button */
+
+  /* up button */
   .up{position:fixed; left:50%; transform:translateX(-50%); bottom:24px; z-index:10; opacity:0; pointer-events:none;
       transition:.3s ease; box-shadow:var(--shadow), var(--glow)}
   .up.show{opacity:1; pointer-events:auto}
@@ -77,7 +101,7 @@
 </style>
 </head>
 <body>
-<!-- Background -->
+<!-- bg -->
 <div class="bg">
   <svg viewBox="0 0 1200 800" preserveAspectRatio="none" aria-hidden="true">
     <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
@@ -97,10 +121,8 @@
 <div class="wrap">
   <h1>RMO Timelines</h1>
 
-  <!-- ===== Six Cards ONLY (with merged related files) ===== -->
   <div class="grid cards">
-
-    <!-- 1) Agentic AI PoC Close Out -->
+    <!-- 1 -->
     <article class="card">
       <div class="title">Agentic AI Use Case PoC Close Out — RGS/RMO &amp; DBS/CON</div>
       <div class="meta">Date: <b>4th Week of September</b></div>
@@ -109,7 +131,7 @@
         <span class="badge"><span class="check"></span> VP DBS + Digital</span>
         <span class="badge"><span class="check"></span> CEOs</span>
       </div>
-      <p class="note" style="margin-top:10px">MyNOC Article: to be published after the meeting, emphasize on collaboration + 1st NOC use case.</p>
+      <p class="note" style="margin-top:10px">MyNOC article after meeting; emphasize collaboration + 1st NOC use case.</p>
       <div class="spaced" style="margin-top:12px">
         <span class="pill">Launch Event: —</span>
         <span class="loc">Venue: F40 — CEO Meeting Room</span>
@@ -119,13 +141,19 @@
       <div class="files">
         <h4>Related files</h4>
         <div class="chips">
-          <span class="chip"><strong>20250908</strong><span class="ext">StimAtlas_and_Dataiku_CloseOut.pptx</span> <a class="go" href="#" data-link="20250908_StimAtlas_and_Dataiku_CloseOut.pptx">GO</a></span>
-          <span class="chip"><strong>20250921</strong><span class="ext">RMO_Digital_Article.docx</span> <a class="go" href="#" data-link="20250921_RMO_Digital_Article.docx">GO</a></span>
+          <span class="chip">
+            <span class="filename">StimAtlas &amp; Dataiku Close-Out (PPTX)</span>
+            <a class="go" href="#" data-link="20250908_StimAtlas_and_Dataiku_CloseOut.pptx">GO</a>
+          </span>
+          <span class="chip">
+            <span class="filename">RMO Digital Article (DOCX)</span>
+            <a class="go" href="#" data-link="20250921_RMO_Digital_Article.docx">GO</a>
+          </span>
         </div>
       </div>
     </article>
 
-    <!-- 2) Dashboard Factory Launch -->
+    <!-- 2 -->
     <article class="card">
       <div class="title">RMO Dashboard Factory Launch — RGS/RMO &amp; DBS/OPS</div>
       <div class="meta">Date: <b>1st or 2nd Week of October</b></div>
@@ -133,7 +161,7 @@
         <span class="badge"><span class="check"></span> VP RGS</span>
         <span class="badge"><span class="check"></span> VP DBS + Digital</span>
       </div>
-      <p class="note" style="margin-top:10px">MyNOC Article: to be published after the meeting, emphasize on collaboration.</p>
+      <p class="note" style="margin-top:10px">MyNOC article after meeting; emphasize collaboration.</p>
       <div class="spaced" style="margin-top:12px">
         <span class="pill">Launch Event: Official launch to all RMO</span>
         <span class="loc">Venue: F41 — Training Room</span>
@@ -143,13 +171,19 @@
       <div class="files">
         <h4>Related files</h4>
         <div class="chips">
-          <span class="chip"><strong>20250831</strong><span class="ext">RMO_Dashboard_Industrialization_CloseOut_Material.pptx</span> <a class="go" href="#" data-link="20250831_RMO_Dashboard_Industrialization_CloseOut_Material.pptx">GO</a></span>
-          <span class="chip"><strong>20250925</strong><span class="ext">RGS_Meeting_Updates.pptx</span> <a class="go" href="#" data-link="20250925_RGS_Meeting_Updates.pptx">GO</a></span>
+          <span class="chip">
+            <span class="filename">Dashboard Industrialization Close-Out (PPTX)</span>
+            <a class="go" href="#" data-link="20250831_RMO_Dashboard_Industrialization_CloseOut_Material.pptx">GO</a>
+          </span>
+          <span class="chip">
+            <span class="filename">RGS Meeting Updates (PPTX)</span>
+            <a class="go" href="#" data-link="20250925_RGS_Meeting_Updates.pptx">GO</a>
+          </span>
         </div>
       </div>
     </article>
 
-    <!-- 3) Digital Initiatives High Level -->
+    <!-- 3 -->
     <article class="card">
       <div class="title">RMO Digital Initiatives — High Level</div>
       <div class="meta">Date: <b>15 October</b></div>
@@ -165,13 +199,19 @@
       <div class="files">
         <h4>Related files</h4>
         <div class="chips">
-          <span class="chip"><strong>20250925</strong><span class="ext">RGS_Meeting_Updates.pptx</span> <a class="go" href="#" data-link="20250925_RGS_Meeting_Updates.pptx">GO</a></span>
-          <span class="chip"><strong>20250916</strong><span class="ext">Digital_Initiatives_Values.xlsx</span> <a class="go" href="#" data-link="20250916_Digital_Initiatives_Values.xlsx">GO</a></span>
+          <span class="chip">
+            <span class="filename">RGS Meeting Updates (PPTX)</span>
+            <a class="go" href="#" data-link="20250925_RGS_Meeting_Updates.pptx">GO</a>
+          </span>
+          <span class="chip">
+            <span class="filename">Digital Initiatives Values (XLSX)</span>
+            <a class="go" href="#" data-link="20250916_Digital_Initiatives_Values.xlsx">GO</a>
+          </span>
         </div>
       </div>
     </article>
 
-    <!-- 4) AI Factory Trial Close Out -->
+    <!-- 4 -->
     <article class="card">
       <div class="title">RMO AI Factory Trial Close Out — RGS/RMO &amp; SLB</div>
       <div class="meta">Date: <b>2nd or 3rd Week of October</b></div>
@@ -188,20 +228,23 @@
       <div class="files">
         <h4>Related files</h4>
         <div class="chips">
-          <span class="chip"><strong>20250908</strong><span class="ext">StimAtlas_and_Dataiku_CloseOut.pptx</span> <a class="go" href="#" data-link="20250908_StimAtlas_and_Dataiku_CloseOut.pptx">GO</a></span>
+          <span class="chip">
+            <span class="filename">StimAtlas &amp; Dataiku Close-Out (PPTX)</span>
+            <a class="go" href="#" data-link="20250908_StimAtlas_and_Dataiku_CloseOut.pptx">GO</a>
+          </span>
         </div>
       </div>
     </article>
 
-    <!-- 5) RMO 360 Ph1 Close Out & Kickoff -->
+    <!-- 5 -->
     <article class="card">
-      <div class="title">RMO 360 Ph1 Close Out &amp; Kick off Conceptualization Stage</div>
+      <div class="title">RMO 360 Ph1 Close Out &amp; Kick-off Conceptualization</div>
       <div class="meta">Date: <b>1st Week of November</b></div>
       <div class="row" style="margin-top:8px;">
         <span class="badge"><span class="check"></span> VP RGS</span>
         <span class="badge"><span class="check"></span> VP DBS + Digital</span>
       </div>
-      <p class="note" style="margin-top:10px">MyNOC Article: to be published after the meeting, emphasize on collaboration + 1st NOC use case.</p>
+      <p class="note" style="margin-top:10px">MyNOC article after meeting; emphasize collaboration + 1st NOC use case.</p>
       <div class="spaced" style="margin-top:12px">
         <span class="pill">Launch Event: —</span>
         <span class="loc">Venue: F40 — CEO Meeting Room</span>
@@ -211,13 +254,19 @@
       <div class="files">
         <h4>Related files</h4>
         <div class="chips">
-          <span class="chip"><strong>20250925</strong><span class="ext">RMO_Digital_Initiatives_Engagement_Plan.pptx</span> <a class="go" href="#" data-link="20250925_RMO_Digital_Initiatives_Engagement_Plan.pptx">GO</a></span>
-          <span class="chip"><strong>20250914</strong><span class="ext">RGS_Open_Day_RMO_Digital.mov</span> <a class="go" href="#" data-link="20250914_RGS_Open_Day_RMO_Digital.mov">GO</a></span>
+          <span class="chip">
+            <span class="filename">Engagement Plan (PPTX)</span>
+            <a class="go" href="#" data-link="20250925_RMO_Digital_Initiatives_Engagement_Plan.pptx">GO</a>
+          </span>
+          <span class="chip">
+            <span class="filename">Open Day Digital (MOV)</span>
+            <a class="go" href="#" data-link="20250914_RGS_Open_Day_RMO_Digital.mov">GO</a>
+          </span>
         </div>
       </div>
     </article>
 
-    <!-- 6) RGS Open Day -->
+    <!-- 6 -->
     <article class="card">
       <div class="title">RGS Open Day</div>
       <div class="meta">Date: <b>17 November</b></div>
@@ -231,62 +280,52 @@
       <div class="files">
         <h4>Related files</h4>
         <div class="chips">
-          <span class="chip"><strong>20250918</strong><span class="ext">Digital_&_RGS_Open_Day_Planning.pptx</span> <a class="go" href="#" data-link="20250918_Digital_&_RGS_Open_Day_Planning.pptx">GO</a></span>
+          <span class="chip">
+            <span class="filename">Open Day Planning (PPTX)</span>
+            <a class="go" href="#" data-link="20250918_Digital_&_RGS_Open_Day_Planning.pptx">GO</a>
+          </span>
         </div>
       </div>
     </article>
-
   </div>
 
-  <!-- ===== Videos ONLY (2×2 iframe grid) ===== -->
+  <!-- videos -->
   <h2 id="videos">Videos Reference</h2>
   <div class="video-grid">
     <div class="video-card">
       <h3>Reservoir Management</h3>
-      <div class="video-box">
-        <!-- Replace with your Stream/SharePoint embed URL -->
-        <iframe src="about:blank" title="Reservoir Management" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
-      </div>
+      <div class="video-box"><iframe src="about:blank" title="Reservoir Management" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe></div>
       <div class="video-actions"><a class="go" href="#" data-link="20250914_RGS_Open_Day_Reservoir_Management_v3.mp4">GO</a></div>
     </div>
-
     <div class="video-card">
       <h3>Water Injectors</h3>
-      <div class="video-box">
-        <iframe src="about:blank" title="Water Injectors" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
-      </div>
+      <div class="video-box"><iframe src="about:blank" title="Water Injectors" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe></div>
       <div class="video-actions"><a class="go" href="#" data-link="20250915_RGS_openday_WI.mp4">GO</a></div>
     </div>
-
     <div class="video-card">
       <h3>Digital Material</h3>
-      <div class="video-box">
-        <iframe src="about:blank" title="Digital Material" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
-      </div>
+      <div class="video-box"><iframe src="about:blank" title="Digital Material" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe></div>
       <div class="video-actions"><a class="go" href="#" data-link="20250914_RGS_Open_Day_RMO_Digital.mov">GO</a></div>
     </div>
-
     <div class="video-card">
       <h3>RGS Quarterly Meeting</h3>
-      <div class="video-box">
-        <iframe src="about:blank" title="RGS Quarterly Meeting" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
-      </div>
+      <div class="video-box"><iframe src="about:blank" title="RGS Quarterly Meeting" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe></div>
       <div class="video-actions"><a class="go" href="#" data-link="20250925_RGS_Meeting_Updates.mp4">GO</a></div>
     </div>
   </div>
-  <p class="small" style="margin-top:10px">Tip: paste your Microsoft Stream/SharePoint <code>embed</code> URL into each iframe’s <code>src</code>. Keep the GO button for the file/open page.</p>
+  <p class="small" style="margin-top:10px">Replace each iframe <code>src</code> with your Stream/SharePoint embed URL. The GO button can link to the file/page.</p>
 </div>
 
-<!-- Up button -->
+<!-- up -->
 <div class="up" id="up"><a href="#top" aria-label="Back to top">↑</a></div>
 
 <script>
-  // Up button visibility
+  // Show "up" button
   const up=document.getElementById('up');
   const onScroll=()=>{(window.scrollY>320)?up.classList.add('show'):up.classList.remove('show')};
   document.addEventListener('scroll', onScroll, {passive:true}); onScroll();
 
-  // Prevent GO placeholder navigation (optional)
+  // Keep GO as placeholder until you add real hrefs
   document.querySelectorAll('a.go[href="#"]').forEach(a=>{
     a.addEventListener('click', e=>{
       e.preventDefault();
