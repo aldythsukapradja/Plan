@@ -85,14 +85,16 @@
       <!-- Chart FIRST -->
       <section class="card" id="chartCard">
         <h2>VRR Trend</h2>
-        <div id="alarm" class="alarm hidden"><span class="mark">!</span><span id="alarmText">Alarm</span></div>
+        
         <div class="legend" style="margin-bottom:8px">
           <span><i class="key k-pressure"></i> VRR (%)</span>
           <span><i class="key k-target"></i> Target band</span>
         </div>
         <canvas id="chart" width="800" height="300" aria-label="VRR chart"></canvas>
-        <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:10px">
+        <div class="chartFooter" style="display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-top:10px">
+          <div id="alarm" class="alarm" style="opacity:.35"><span class="mark">!</span><span id="alarmText">VRR OK (90–110%)</span></div>
           <div class="pill">Target band: <strong id="bandText">90–110 %</strong></div>
+          <div class="pill">Fail limits: <strong>80 % / 120 %</strong></div>
           <div class="pill">Fail limits: <strong>80 % / 120 %</strong></div>
           <div class="pill">Disturbances: <strong>on</strong></div>
         </div>
