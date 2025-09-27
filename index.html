@@ -13,253 +13,266 @@
 }
 *{box-sizing:border-box} html,body{height:100%}
 body{
-  margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;
-  color:var(--ink);
-  background:
-    radial-gradient(1200px 600px at 80% -50%, rgba(124,92,255,.12), transparent 60%),
-    radial-gradient(900px 500px at -10% 20%, rgba(37,194,255,.12), transparent 60%),
-    var(--bg);
+  margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial; color:var(--ink);
+  background: radial-gradient(1200px 600px at 80% -50%, rgba(124,92,255,.12), transparent 60%),
+              radial-gradient(900px 500px at -10% 20%, rgba(37,194,255,.12), transparent 60%),
+              var(--bg);
 }
-.app{display:grid;grid-template-columns:84px 1fr 360px;gap:24px;padding:24px}
-@media (max-width:1100px){.app{grid-template-columns:72px 1fr} aside.right{display:none}}
-aside.left{
-  background:linear-gradient(180deg,#141831,#101226);border-radius:24px;padding:16px 10px;
-  box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;gap:16px
-}
-.logo{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;
-  background:linear-gradient(135deg,#2b2f55 0%, #7c5cff 120%);font-weight:800}
-.rail-btn{width:48px;height:48px;border-radius:14px;border:1px solid #262c4b;
-  display:grid;place-items:center;color:#cfd3e9;background:#141831;cursor:pointer}
-main{display:grid;gap:24px}
+.wrapper{max-width:1200px;margin:0 auto;padding:20px}
 .header{
-  background:linear-gradient(180deg,#151936,#12152a);border-radius:24px;padding:20px 20px;
-  box-shadow:var(--shadow);display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between
+  background:linear-gradient(180deg,#151936,#12152a);border-radius:24px;padding:16px 18px;box-shadow:var(--shadow);
+  display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap
 }
 h1{margin:0;font-size:22px}
 .sub{color:var(--muted);font-size:13px}
+.controls{display:flex;gap:10px;align-items:center}
 select{
   background:#12152a;border:1px solid #2a3154;color:var(--ink);border-radius:12px;
   padding:10px 12px;font-weight:600
 }
-.kpis{display:grid;gap:14px;grid-template-columns:repeat(4,minmax(0,1fr))}
+/* Hamburger */
+.menu{position:relative}
+.burger{width:42px;height:42px;border-radius:12px;border:1px solid #262c4b;background:#141831;color:#cfd3e9;cursor:pointer}
+.menu-list{
+  position:absolute; right:0; top:50px; background:#11162b; border:1px solid #2a3154; border-radius:12px;
+  padding:8px; min-width:160px; box-shadow:var(--shadow); display:none
+}
+.menu-list a{display:block;padding:10px;border-radius:10px;color:#e7e8ee;text-decoration:none}
+.menu-list a:hover{background:#1a2143}
+
+/* KPI + overall */
+.kpis{display:grid;gap:14px;grid-template-columns:repeat(4,minmax(0,1fr));margin-top:16px}
 @media (max-width:900px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
-.kpi{background:var(--panel);border-radius:18px;padding:14px;box-shadow:var(--shadow);position:relative}
-.kpi .label{color:var(--muted);font-size:12px} .kpi .value{font-size:26px;font-weight:800;margin-top:4px}
-.grid-2{display:grid;gap:16px;grid-template-columns:1.2fr 1fr}
-@media (max-width:1100px){.grid-2{grid-template-columns:1fr}}
-.panel{background:var(--panel2);border-radius:20px;padding:16px;box-shadow:var(--shadow)}
+.kpi{background:var(--panel);border-radius:18px;padding:14px;box-shadow:var(--shadow)}
+.kpi .label{color:var(--muted);font-size:12px}
+.kpi .value{font-size:26px;font-weight:800;margin-top:4px}
+.overall{
+  margin-top:12px;background:linear-gradient(180deg,#151b36,#10162e);border:1px solid #273056;border-radius:16px;padding:12px 14px;
+}
+.overall h3{margin:4px 0 10px;font-size:16px}
+.overall table{width:100%;border-collapse:collapse}
+.overall th,.overall td{padding:8px;border-bottom:1px solid #263056;font-size:13px;text-align:left}
+.badge{display:inline-block;padding:6px 10px;border:1px solid #2b325a;border-radius:999px;background:#141937}
+
+/* Panels & charts */
+.panel{background:var(--panel2);border-radius:20px;padding:16px;box-shadow:var(--shadow);margin-top:18px}
 .panel h3{margin:6px 0 12px;font-size:16px}
+.tabrow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
 canvas{width:100%;height:320px;max-height:42vh}
 details.acc{margin-top:10px;border:1px solid #273056;border-radius:12px;overflow:hidden}
-details.acc > summary{
-  list-style:none;cursor:pointer;padding:12px 14px;background:#11162b;color:#d8ddff;
-  font-weight:700;border-bottom:1px solid #273056
-}
+details.acc > summary{list-style:none;cursor:pointer;padding:12px 14px;background:#11162b;color:#d8ddff;font-weight:700;border-bottom:1px solid #273056}
 details.acc[open] > summary{background:#151b36}
 .acc-body{padding:12px 14px;color:#c9ceea;font-size:13px;line-height:1.55;overflow:auto}
 .acc-body table{width:100%;border-collapse:collapse;min-width:640px}
 .acc-body th,.acc-body td{padding:6px 8px;border-bottom:1px solid #262d4a;font-size:12px;text-align:left}
-.badge{display:inline-block;padding:6px 10px;border:1px solid #2b325a;border-radius:999px;background:#141937}
-aside.right{background:linear-gradient(180deg,#151936,#12162d);border-radius:24px;padding:16px;box-shadow:var(--shadow)}
-.goal{background:var(--panel);border-radius:18px;padding:14px;margin-top:10px}
+
+/* Metabolic grid */
+.grid-2{display:grid;gap:16px;grid-template-columns:1.2fr 1fr}
+@media (max-width:1100px){.grid-2{grid-template-columns:1fr}}
+
+/* Gauges (sidebar) */
+.side{display:grid;gap:16px;margin-top:18px}
+.goal{background:var(--panel);border-radius:18px;padding:14px}
 .gauge{--size:140px;width:var(--size);height:var(--size);border-radius:50%;position:relative;
   background:conic-gradient(var(--cyan) calc(var(--val)*1%), #343a55 0);display:grid;place-items:center;margin:auto}
 .gauge::after{content:"";position:absolute;width:calc(var(--size) - 40px);height:calc(var(--size) - 40px);
   border-radius:50%;background:linear-gradient(180deg,#171b34,#121527);box-shadow:inset 0 0 0 1px #2a3154}
 .gauge > span{position:relative;font-weight:800;font-size:20px}
-table.master{width:100%;border-collapse:collapse}
-table.master th, table.master td{padding:8px;border-bottom:1px solid #263056;font-size:12px;vertical-align:top}
+
+/* Segmental SVG */
 .sil{width:100%;height:auto;max-height:520px}
 .sil .lbl{font-size:12px;fill:#d9ddff} .sil .v1{font-size:16px;font-weight:800;fill:#fff} .sil .v2{font-size:12px;fill:#aab1d7}
-.tabrow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
-.tab{padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:#12162b;color:#e7e8ee;font-weight:700;cursor:pointer}
-.tab.active{background:#1d2343}
 hr.sep{border:none;border-top:1px solid #273056;margin:12px 0}
+
+/* Master table */
+table.master{width:100%;border-collapse:collapse}
+table.master th, table.master td{padding:8px;border-bottom:1px solid #263056;font-size:12px;vertical-align:top}
+
+/* Layout splits (no left rail now) */
+.layout{display:grid;grid-template-columns:1fr 340px;gap:24px}
+@media (max-width:1100px){.layout{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<div class="app">
-  <!-- Left Rail -->
-  <aside class="left">
-    <div class="logo">RMO</div>
-    <div class="rail-btn" title="Overview">🏠</div>
-    <div class="rail-btn" title="Segmental">🧍</div>
-    <div class="rail-btn" title="Table">📋</div>
-    <div style="flex:1"></div>
-    <div class="rail-btn" title="Settings">⚙️</div>
-  </aside>
-
-  <!-- Main -->
-  <main>
-    <!-- Header -->
-    <div class="header">
-      <div>
-        <h1>InBody Tracker</h1>
-        <div class="sub">Last scan: <b id="last-date">—</b></div>
-      </div>
-      <div>
-        <label class="sub">Select scan: </label>
-        <select id="scan-select"></select>
+<div class="wrapper">
+  <!-- Header -->
+  <div class="header">
+    <div>
+      <h1>InBody Tracker</h1>
+      <div class="sub">Last scan: <b id="last-date">—</b></div>
+    </div>
+    <div class="controls">
+      <label class="sub">Select scan: </label>
+      <select id="scan-select"></select>
+      <div class="menu">
+        <button class="burger" id="burger">☰</button>
+        <div class="menu-list" id="menu-list">
+          <a href="#kpis">Overview</a>
+          <a href="#panel-combined">Charts</a>
+          <a href="#panel-seg">Segmental</a>
+          <a href="#panel-master">Data Table</a>
+        </div>
       </div>
     </div>
+  </div>
 
-    <!-- KPI Row -->
-    <section class="kpis">
-      <div class="kpi"><div class="label">Weight</div><div id="kpi-weight" class="value">—</div></div>
-      <div class="kpi"><div class="label">PBF</div><div id="kpi-pbf" class="value">—</div></div>
-      <div class="kpi"><div class="label">Visceral Fat</div><div id="kpi-visc" class="value">—</div></div>
-      <div class="kpi"><div class="label">InBody Score</div><div id="kpi-score" class="value">—</div></div>
-    </section>
+  <div class="layout">
+    <!-- MAIN COLUMN -->
+    <div>
+      <!-- KPI Row -->
+      <section class="kpis" id="kpis">
+        <div class="kpi"><div class="label">Weight</div><div id="kpi-weight" class="value">—</div></div>
+        <div class="kpi"><div class="label">PBF</div><div id="kpi-pbf" class="value">—</div></div>
+        <div class="kpi"><div class="label">Visceral Fat</div><div id="kpi-visc" class="value">—</div></div>
+        <div class="kpi"><div class="label">InBody Score</div><div id="kpi-score" class="value">—</div></div>
+      </section>
 
-    <!-- Overall I-O-R (under KPIs) -->
-    <details class="acc" id="ior-overall">
-      <summary>Overall Insight • Observation • Recommendation</summary>
-      <div class="acc-body">
-        <table><thead><tr><th>Insight</th><th>Observation</th><th>Recommendation</th></tr></thead>
-          <tbody id="overall-row"></tbody></table>
-      </div>
-    </details>
-
-    <!-- Combined Charts Panel -->
-    <section class="panel">
-      <h3>Composition + BMI/PBF</h3>
-      <div class="tabrow">
-        <span class="badge">Line: Weight • SMM • Fat</span>
-        <span class="badge">Scatter: BMI vs PBF</span>
-      </div>
-      <canvas id="chart-comp"></canvas>
-      <hr class="sep" />
-      <canvas id="chart-bmi-pbf"></canvas>
-
-      <details class="acc" id="ior-comp-bmi">
-        <summary>Chart Insights • Observation • Recommendation</summary>
-        <div class="acc-body">
-          <table>
-            <thead><tr><th>Section</th><th>Insight</th><th>Observation</th><th>Recommendation</th></tr></thead>
-            <tbody id="ior-compbmi-rows"></tbody>
-          </table>
-        </div>
-      </details>
-    </section>
-
-    <!-- Metabolic & Fluids -->
-    <section class="grid-2">
-      <div class="panel">
-        <h3>BMR & Obesity Degree</h3>
-        <canvas id="chart-bmr-ob"></canvas>
-      </div>
-      <div class="panel">
-        <h3>ECW/TBW</h3>
-        <canvas id="chart-ecw"></canvas>
-      </div>
-    </section>
-    <details class="acc" id="ior-bmr-ecw">
-      <summary>Metabolic & Fluids — I • O • R</summary>
-      <div class="acc-body">
+      <!-- Overall I-O-R (ALWAYS VISIBLE) -->
+      <section class="overall" id="overall">
+        <h3>Overall Insight • Observation • Recommendation</h3>
         <table>
-          <thead><tr><th>Section</th><th>Insight</th><th>Observation</th><th>Recommendation</th></tr></thead>
-          <tbody id="ior-bmrecw-rows"></tbody>
+          <thead><tr><th>Insight</th><th>Observation</th><th>Recommendation</th></tr></thead>
+          <tbody id="overall-row"></tbody>
         </table>
+      </section>
+
+      <!-- Combined Charts Panel -->
+      <section class="panel" id="panel-combined">
+        <h3>Composition + BMI/PBF</h3>
+        <div class="tabrow">
+          <span class="badge">Line: Weight • SMM • Fat</span>
+          <span class="badge">Scatter: BMI vs PBF</span>
+        </div>
+        <canvas id="chart-comp"></canvas>
+        <hr class="sep" />
+        <canvas id="chart-bmi-pbf"></canvas>
+
+        <details class="acc" id="ior-comp-bmi">
+          <summary>Chart Insights • Observation • Recommendation</summary>
+          <div class="acc-body">
+            <table>
+              <thead><tr><th>Section</th><th>Insight</th><th>Observation</th><th>Recommendation</th></tr></thead>
+              <tbody id="ior-compbmi-rows"></tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <!-- Metabolic & Fluids -->
+      <section class="panel" id="panel-met">
+        <h3>Metabolic & Fluids</h3>
+        <div class="tabrow">
+          <span class="badge">Left: BMR & Obesity</span>
+          <span class="badge">Right: ECW/TBW</span>
+        </div>
+        <div class="grid-2">
+          <canvas id="chart-bmr-ob"></canvas>
+          <canvas id="chart-ecw"></canvas>
+        </div>
+        <details class="acc" id="ior-bmr-ecw">
+          <summary>I • O • R</summary>
+          <div class="acc-body">
+            <table>
+              <thead><tr><th>Section</th><th>Insight</th><th>Observation</th><th>Recommendation</th></tr></thead>
+              <tbody id="ior-bmrecw-rows"></tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <!-- Segmental Panel -->
+      <section class="panel" id="panel-seg">
+        <h3>Segmental Analysis (Lean)</h3>
+        <svg id="silhouette" class="sil" viewBox="0 0 520 600" aria-labelledby="title">
+          <title>Human Silhouette</title>
+          <rect x="0" y="0" width="520" height="600" rx="14" fill="#12162b" stroke="#232a49"/>
+          <g transform="translate(260,300)">
+            <!-- body -->
+            <path d="M-55 -165 C -75 -200, 75 -200, 55 -165 L 68 -120 60 -40 C 62 40, 55 85, 40 140 C 20 190, -20 190, -40 140 C -55 85, -62 40, -60 -40 L -68 -120 Z"
+                  fill="#1a1f3a" stroke="#2b345e" stroke-width="2"/>
+            <circle cx="0" cy="-205" r="28" fill="#1a1f3a" stroke="#2b345e" stroke-width="2"/>
+            <!-- arms -->
+            <path d="M-68 -120 C -120 -110, -140 -60, -130 -40 C -120 -20, -100 -10, -80 -20" fill="none" stroke="#2b345e" stroke-width="10" stroke-linecap="round"/>
+            <path d="M68 -120 C 120 -110, 140 -60, 130 -40 C 120 -20, 100 -10, 80 -20" fill="none" stroke="#2b345e" stroke-width="10" stroke-linecap="round"/>
+            <!-- limb label boxes -->
+            <rect x="-180" y="-80" width="110" height="70" rx="12" fill="#151b36" stroke="#2b345e"/>
+            <rect x="70" y="-80" width="110" height="70" rx="12" fill="#151b36" stroke="#2b345e"/>
+            <rect x="-90" y="0" width="180" height="70" rx="12" fill="#151b36" stroke="#2b345e"/>
+            <rect x="-150" y="150" width="120" height="70" rx="12" fill="#151b36" stroke="#2b345e"/>
+            <rect x="30" y="150" width="120" height="70" rx="12" fill="#151b36" stroke="#2b345e"/>
+            <!-- labels -->
+            <text class="lbl" x="-125" y="-92">Left Arm</text>
+            <text id="la-kg" class="v1" x="-125" y="-68">—</text>
+            <text id="la-pct" class="v2" x="-125" y="-48">—</text>
+            <text class="lbl" x="125" y="-92" text-anchor="middle">Right Arm</text>
+            <text id="ra-kg" class="v1" x="125" y="-68" text-anchor="middle">—</text>
+            <text id="ra-pct" class="v2" x="125" y="-48" text-anchor="middle">—</text>
+            <text class="lbl" x="0" y="-8" text-anchor="middle">Trunk</text>
+            <text id="tr-kg" class="v1" x="0" y="16" text-anchor="middle">—</text>
+            <text id="tr-pct" class="v2" x="0" y="36" text-anchor="middle">—</text>
+            <text class="lbl" x="-90" y="142" text-anchor="middle">Left Leg</text>
+            <text id="ll-kg" class="v1" x="-90" y="166" text-anchor="middle">—</text>
+            <text id="ll-pct" class="v2" x="-90" y="186" text-anchor="middle">—</text>
+            <text class="lbl" x="90" y="142" text-anchor="middle">Right Leg</text>
+            <text id="rl-kg" class="v1" x="90" y="166" text-anchor="middle">—</text>
+            <text id="rl-pct" class="v2" x="90" y="186" text-anchor="middle">—</text>
+          </g>
+        </svg>
+
+        <details class="acc" id="ior-segmental">
+          <summary>Segmental — I • O • R</summary>
+          <div class="acc-body">
+            <table>
+              <thead><tr><th>Insight</th><th>Observation</th><th>Recommendation</th></tr></thead>
+              <tbody id="ior-seg-row"></tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <!-- Master Table (accordion) -->
+      <section class="panel" id="panel-master">
+        <h3>Data Repository (All Scans)</h3>
+        <details class="acc" id="master-accordion">
+          <summary>Show / Hide Master Table (incl. 5+1 I-O-R per scan)</summary>
+          <div class="acc-body">
+            <table class="master" id="master-table">
+              <thead>
+                <tr>
+                  <th>Date</th><th>Weight</th><th>PBF%</th><th>BMI</th><th>Score</th><th>Visc</th><th>SMM</th><th>Fat</th>
+                  <th>Comp I-O-R</th><th>BMI/PBF I-O-R</th><th>BMR/Obesity I-O-R</th><th>ECW/TBW I-O-R</th><th>Segmental I-O-R</th><th>Overall I-O-R</th>
+                </tr>
+              </thead>
+              <tbody id="master-body"></tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+    </div>
+
+    <!-- SIDE COLUMN -->
+    <div class="side">
+      <div class="goal">
+        <h4 style="margin:0 0 6px">InBody Score</h4>
+        <div class="gauge" id="scoreGauge" style="--val:0"><span id="scoreText">—</span></div>
       </div>
-    </details>
-
-    <!-- Segmental Panel -->
-    <section class="panel">
-      <h3>Segmental Analysis (Lean)</h3>
-      <div class="tabrow"><button class="tab active" id="seg-lean">Lean</button><button class="tab" id="seg-fat">Fat (placeholder)</button></div>
-      <svg id="silhouette" class="sil" viewBox="0 0 520 600" aria-labelledby="title">
-        <title>Human Silhouette</title>
-        <rect x="0" y="0" width="520" height="600" rx="14" fill="#12162b" stroke="#232a49"/>
-        <g transform="translate(260,300)">
-          <!-- body -->
-          <path d="M-55 -165 C -75 -200, 75 -200, 55 -165 L 68 -120 60 -40 C 62 40, 55 85, 40 140 C 20 190, -20 190, -40 140 C -55 85, -62 40, -60 -40 L -68 -120 Z"
-                fill="#1a1f3a" stroke="#2b345e" stroke-width="2"/>
-          <circle cx="0" cy="-205" r="28" fill="#1a1f3a" stroke="#2b345e" stroke-width="2"/>
-          <!-- arms -->
-          <path d="M-68 -120 C -120 -110, -140 -60, -130 -40 C -120 -20, -100 -10, -80 -20" fill="none" stroke="#2b345e" stroke-width="10" stroke-linecap="round"/>
-          <path d="M68 -120 C 120 -110, 140 -60, 130 -40 C 120 -20, 100 -10, 80 -20" fill="none" stroke="#2b345e" stroke-width="10" stroke-linecap="round"/>
-          <!-- limb label boxes -->
-          <rect x="-180" y="-80" width="110" height="70" rx="12" fill="#151b36" stroke="#2b345e"/>
-          <rect x="70" y="-80" width="110" height="70" rx="12" fill="#151b36" stroke="#2b345e"/>
-          <rect x="-90" y="0" width="180" height="70" rx="12" fill="#151b36" stroke="#2b345e"/>
-          <rect x="-150" y="150" width="120" height="70" rx="12" fill="#151b36" stroke="#2b345e"/>
-          <rect x="30" y="150" width="120" height="70" rx="12" fill="#151b36" stroke="#2b345e"/>
-          <!-- labels -->
-          <text class="lbl" x="-125" y="-92">Left Arm</text>
-          <text id="la-kg" class="v1" x="-125" y="-68">—</text>
-          <text id="la-pct" class="v2" x="-125" y="-48">—</text>
-
-          <text class="lbl" x="125" y="-92" text-anchor="middle">Right Arm</text>
-          <text id="ra-kg" class="v1" x="125" y="-68" text-anchor="middle">—</text>
-          <text id="ra-pct" class="v2" x="125" y="-48" text-anchor="middle">—</text>
-
-          <text class="lbl" x="0" y="-8" text-anchor="middle">Trunk</text>
-          <text id="tr-kg" class="v1" x="0" y="16" text-anchor="middle">—</text>
-          <text id="tr-pct" class="v2" x="0" y="36" text-anchor="middle">—</text>
-
-          <text class="lbl" x="-90" y="142" text-anchor="middle">Left Leg</text>
-          <text id="ll-kg" class="v1" x="-90" y="166" text-anchor="middle">—</text>
-          <text id="ll-pct" class="v2" x="-90" y="186" text-anchor="middle">—</text>
-
-          <text class="lbl" x="90" y="142" text-anchor="middle">Right Leg</text>
-          <text id="rl-kg" class="v1" x="90" y="166" text-anchor="middle">—</text>
-          <text id="rl-pct" class="v2" x="90" y="186" text-anchor="middle">—</text>
-        </g>
-      </svg>
-
-      <details class="acc" id="ior-segmental">
-        <summary>Segmental — I • O • R</summary>
-        <div class="acc-body">
-          <table>
-            <thead><tr><th>Insight</th><th>Observation</th><th>Recommendation</th></tr></thead>
-            <tbody id="ior-seg-row"></tbody>
-          </table>
-        </div>
-      </details>
-    </section>
-
-    <!-- Master Table (accordion) -->
-    <section class="panel">
-      <h3>Data Repository (All Scans)</h3>
-      <details class="acc" id="master-accordion">
-        <summary>Show / Hide Master Table (incl. 5+1 I-O-R per scan)</summary>
-        <div class="acc-body">
-          <table class="master" id="master-table">
-            <thead>
-              <tr>
-                <th>Date</th><th>Weight</th><th>PBF%</th><th>BMI</th><th>Score</th><th>Visc</th><th>SMM</th><th>Fat</th>
-                <th>Comp I-O-R</th><th>BMI/PBF I-O-R</th><th>BMR/Obesity I-O-R</th><th>ECW/TBW I-O-R</th><th>Segmental I-O-R</th><th>Overall I-O-R</th>
-              </tr>
-            </thead>
-            <tbody id="master-body"></tbody>
-          </table>
-        </div>
-      </details>
-    </section>
-  </main>
-
-  <!-- Right Sidebar -->
-  <aside class="right">
-    <div class="goal">
-      <h4 style="margin:0 0 6px">InBody Score</h4>
-      <div class="gauge" id="scoreGauge" style="--val:0"><span id="scoreText">—</span></div>
+      <div class="goal">
+        <h4 style="margin:0 0 6px">Visceral Fat</h4>
+        <div class="gauge" id="visGauge" style="--val:0"><span id="visText">—</span></div>
+      </div>
+      <div class="goal">
+        <h4 style="margin:0 0 6px">Tips</h4>
+        <div id="tips"></div>
+      </div>
     </div>
-    <div class="goal">
-      <h4 style="margin:0 0 6px">Visceral Fat</h4>
-      <div class="gauge" id="visGauge" style="--val:0"><span id="visText">—</span></div>
-    </div>
-    <div class="goal">
-      <h4 style="margin:0 0 6px">Tips</h4>
-      <div id="tips"></div>
-    </div>
-  </aside>
+  </div>
 </div>
 
-<!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<!-- Chart.js (CDN). If it fails, charts are skipped but the page still works. -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
 <script>
 /* ===========================
-   DATA (all inline)
+   DATA (inline)
    =========================== */
 const scans = [
   {
@@ -330,100 +343,67 @@ const scans = [
 ];
 
 /* ===========================
-   Helpers
+   Helpers & Rendering
    =========================== */
-const fmt = (n,unit="") => (n===null||n===undefined||Number.isNaN(n)) ? "—" : (unit ? `${n}${unit}` : n);
-let active = scans.length - 1;
+let active = scans.length - 1; // default latest
+
+const $ = (id)=>document.getElementById(id);
+const gridColor="#2d355a";
 
 function fillSelect(){
-  const sel = document.getElementById('scan-select');
-  scans.forEach((s,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=s.label; sel.appendChild(o); });
-  sel.value = String(active);
-  sel.addEventListener('change', e => { active = +e.target.value; renderAll(); });
+  const sel = $('scan-select');
+  scans.forEach((s,i)=>{const o=document.createElement('option');o.value=i;o.textContent=s.label;sel.appendChild(o);});
+  sel.value=String(active);
+  sel.addEventListener('change',e=>{active=+e.target.value;renderAll();});
 }
 
 function setKPIs(s){
-  document.getElementById('last-date').textContent = s.label;
-  document.getElementById('kpi-weight').textContent = `${s.metrics.weight.toFixed(1)} kg`;
-  document.getElementById('kpi-pbf').textContent = `${s.metrics.pbf.toFixed(1)}%`;
-  document.getElementById('kpi-visc').textContent = `${s.metrics.visceral}`;
-  document.getElementById('kpi-score').textContent = `${s.metrics.score}`;
-  // Gauges (sidebar)
-  document.getElementById('scoreGauge').style.setProperty('--val', s.metrics.score);
-  document.getElementById('scoreText').textContent = s.metrics.score;
-  document.getElementById('visGauge').style.setProperty('--val', s.metrics.visceral*5);
-  document.getElementById('visText').textContent = s.metrics.visceral;
-  document.getElementById('tips').innerHTML = `
-    <div class="badge">Hydration ${s.metrics.ecwtbw.toFixed(3)}</div>
-    <div style="height:8px"></div>
-    <div class="badge">SMM ${s.metrics.smm.toFixed(1)} kg</div>
-  `;
+  $('last-date').textContent = s.label;
+  $('kpi-weight').textContent = `${s.metrics.weight.toFixed(1)} kg`;
+  $('kpi-pbf').textContent = `${s.metrics.pbf.toFixed(1)}%`;
+  $('kpi-visc').textContent = `${s.metrics.visceral}`;
+  $('kpi-score').textContent = `${s.metrics.score}`;
+  // Gauges
+  $('scoreGauge').style.setProperty('--val', s.metrics.score);
+  $('scoreText').textContent = s.metrics.score;
+  $('visGauge').style.setProperty('--val', s.metrics.visceral*5);
+  $('visText').textContent = s.metrics.visceral;
+  $('tips').innerHTML = `<div class="badge">Hydration ${s.metrics.ecwtbw.toFixed(3)}</div>
+                         <div style="height:8px"></div>
+                         <div class="badge">SMM ${s.metrics.smm.toFixed(1)} kg</div>`;
 }
 
 function setOverallIOR(s){
-  const tr = `<tr><td>${s.ior.overall.insight}</td><td>${s.ior.overall.observation}</td><td>${s.ior.overall.recommendation}</td></tr>`;
-  document.getElementById('overall-row').innerHTML = tr;
+  $('overall-row').innerHTML = `<tr><td>${s.ior.overall.insight}</td><td>${s.ior.overall.observation}</td><td>${s.ior.overall.recommendation}</td></tr>`;
 }
 
-/* Build arrays for charts */
-function series(){
-  return {
-    labels: scans.map(s=>s.label),
-    weight: scans.map(s=>s.metrics.weight),
-    smm: scans.map(s=>s.metrics.smm),
-    fat: scans.map(s=>s.metrics.fat),
-    bmi: scans.map(s=>s.metrics.bmi),
-    pbf: scans.map(s=>s.metrics.pbf),
-    bmr: scans.map(s=>s.metrics.bmr),
-    obesity: scans.map(s=>s.metrics.obesity),
-    ecw: scans.map(s=>s.metrics.ecwtbw)
-  };
-}
-
-/* Fill combined panel IOR rows (active scan) */
 function setCompBmiIOR(s){
-  const rows = [
+  $('ior-compbmi-rows').innerHTML = [
     ["Composition", s.ior.composition.insight, s.ior.composition.observation, s.ior.composition.recommendation],
     ["BMI/PBF", s.ior.bmi_pbf.insight, s.ior.bmi_pbf.observation, s.ior.bmi_pbf.recommendation]
-  ];
-  document.getElementById('ior-compbmi-rows').innerHTML =
-    rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join("");
+  ].map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join("");
 }
 
-/* Fill metabolic & fluids IOR (active scan) */
 function setBmrecwIOR(s){
-  const rows = [
+  $('ior-bmrecw-rows').innerHTML = [
     ["BMR/Obesity", s.ior.bmr_obesity.insight, s.ior.bmr_obesity.observation, s.ior.bmr_obesity.recommendation],
     ["ECW/TBW", s.ior.ecwtbw.insight, s.ior.ecwtbw.observation, s.ior.ecwtbw.recommendation],
-  ];
-  document.getElementById('ior-bmrecw-rows').innerHTML =
-    rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join("");
+  ].map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join("");
 }
 
-/* Segmental */
 function setSegmental(s){
-  const {la,ra,tr,ll,rl} = s.segments;
-  const f2 = x => x.toFixed(2);
-  document.getElementById('la-kg').textContent = `${f2(la.kg)} kg`;
-  document.getElementById('la-pct').textContent = `${la.pct.toFixed(1)}%`;
-  document.getElementById('ra-kg').textContent = `${f2(ra.kg)} kg`;
-  document.getElementById('ra-pct').textContent = `${ra.pct.toFixed(1)}%`;
-  document.getElementById('tr-kg').textContent = `${f2(tr.kg)} kg`;
-  document.getElementById('tr-pct').textContent = `${tr.pct.toFixed(1)}%`;
-  document.getElementById('ll-kg').textContent = `${f2(ll.kg)} kg`;
-  document.getElementById('ll-pct').textContent = `${ll.pct.toFixed(1)}%`;
-  document.getElementById('rl-kg').textContent = `${f2(rl.kg)} kg`;
-  document.getElementById('rl-pct').textContent = `${rl.pct.toFixed(1)}%`;
-
-  document.getElementById('ior-seg-row').innerHTML =
-    `<tr><td>${s.ior.segmental.insight}</td><td>${s.ior.segmental.observation}</td><td>${s.ior.segmental.recommendation}</td></tr>`;
+  const {la,ra,tr,ll,rl}=s.segments, f2=x=>x.toFixed(2);
+  $('la-kg').textContent=`${f2(la.kg)} kg`; $('la-pct').textContent=`${la.pct.toFixed(1)}%`;
+  $('ra-kg').textContent=`${f2(ra.kg)} kg`; $('ra-pct').textContent=`${ra.pct.toFixed(1)}%`;
+  $('tr-kg').textContent=`${f2(tr.kg)} kg`; $('tr-pct').textContent=`${tr.pct.toFixed(1)}%`;
+  $('ll-kg').textContent=`${f2(ll.kg)} kg`; $('ll-pct').textContent=`${ll.pct.toFixed(1)}%`;
+  $('rl-kg').textContent=`${f2(rl.kg)} kg`; $('rl-pct').textContent=`${rl.pct.toFixed(1)}%`;
+  $('ior-seg-row').innerHTML = `<tr><td>${s.ior.segmental.insight}</td><td>${s.ior.segmental.observation}</td><td>${s.ior.segmental.recommendation}</td></tr>`;
 }
 
-/* Master table build (incl 5+1 IOR per scan) */
 function buildMaster(){
-  const body = document.getElementById('master-body');
-  body.innerHTML = scans.map(s=>{
-    function pack(obj){ return `<b>${obj.insight}</b><br><i>${obj.observation}</i><br>${obj.recommendation}` }
+  $('master-body').innerHTML = scans.map(s=>{
+    const pack = o=>`<b>${o.insight}</b><br><i>${o.observation}</i><br>${o.recommendation}`;
     return `<tr>
       <td>${s.label}</td>
       <td>${s.metrics.weight.toFixed(1)}</td>
@@ -443,87 +423,87 @@ function buildMaster(){
   }).join("");
 }
 
-/* ===========================
-   Charts
-   =========================== */
-let compChart, bmiChart, bmrObChart, ecwChart;
+/* ===== Charts (guarded) ===== */
+let compChart,bmiChart,bmrObChart,ecwChart;
+function series(){
+  return {
+    labels: scans.map(s=>s.label),
+    weight: scans.map(s=>s.metrics.weight),
+    smm: scans.map(s=>s.metrics.smm),
+    fat: scans.map(s=>s.metrics.fat),
+    bmi: scans.map(s=>s.metrics.bmi),
+    pbf: scans.map(s=>s.metrics.pbf),
+    bmr: scans.map(s=>s.metrics.bmr),
+    obesity: scans.map(s=>s.metrics.obesity),
+    ecw: scans.map(s=>s.metrics.ecwtbw)
+  };
+}
 function renderCharts(){
-  const S = series();
-  const gridColor = "#2d355a";
-  const border = 2.4;
+  if (typeof window.Chart === 'undefined'){ console.warn('Chart.js not available. Skipping charts.'); return; }
+  const S=series(), border=2.4;
 
   if (!compChart){
-    compChart = new Chart(document.getElementById('chart-comp'), {
+    compChart=new Chart($('chart-comp'),{
       type:'line',
-      data:{labels:S.labels, datasets:[
-        {label:'Weight', data:S.weight, tension:.35, borderColor:'#7c5cff', backgroundColor:'rgba(124,92,255,.12)', fill:true, borderWidth:border},
-        {label:'SMM',    data:S.smm,    tension:.35, borderColor:'#25c2ff', backgroundColor:'rgba(37,194,255,.12)',  fill:true, borderWidth:border},
-        {label:'Body Fat', data:S.fat,  tension:.35, borderColor:'#ff6b6b', backgroundColor:'rgba(255,107,107,.10)', fill:true, borderWidth:border},
+      data:{labels:S.labels,datasets:[
+        {label:'Weight',data:S.weight,tension:.35,borderColor:'#7c5cff',backgroundColor:'rgba(124,92,255,.12)',fill:true,borderWidth:border},
+        {label:'SMM',data:S.smm,tension:.35,borderColor:'#25c2ff',backgroundColor:'rgba(37,194,255,.12)',fill:true,borderWidth:border},
+        {label:'Body Fat',data:S.fat,tension:.35,borderColor:'#ff6b6b',backgroundColor:'rgba(255,107,107,.10)',fill:true,borderWidth:border}
       ]},
       options:{plugins:{legend:{labels:{color:'#cfd3e9'}}},
-        scales:{x:{grid:{color:gridColor},ticks:{color:'#cfd3e9'}},
-                y:{grid:{color:gridColor},ticks:{color:'#cfd3e9'}}}
+        scales:{x:{grid:{color:gridColor},ticks:{color:'#cfd3e9'}},y:{grid:{color:gridColor},ticks:{color:'#cfd3e9'}}}
     });
-  } else {
-    compChart.data.labels=S.labels; compChart.data.datasets[0].data=S.weight;
-    compChart.data.datasets[1].data=S.smm; compChart.data.datasets[2].data=S.fat; compChart.update();
-  }
+  } else { compChart.data.labels=S.labels; compChart.data.datasets[0].data=S.weight; compChart.data.datasets[1].data=S.smm; compChart.data.datasets[2].data=S.fat; compChart.update(); }
 
   if (!bmiChart){
-    bmiChart = new Chart(document.getElementById('chart-bmi-pbf'), {
+    bmiChart=new Chart($('chart-bmi-pbf'),{
       type:'scatter',
-      data:{datasets:[{label:'BMI vs PBF', data:S.labels.map((d,i)=>({x:S.bmi[i],y:S.pbf[i],label:d})),
-                       borderColor:'#ffb547', backgroundColor:'rgba(255,181,71,.28)', pointRadius:6}]},
+      data:{datasets:[{label:'BMI vs PBF',data:S.labels.map((d,i)=>({x:S.bmi[i],y:S.pbf[i],label:d})),
+                       borderColor:'#ffb547',backgroundColor:'rgba(255,181,71,.28)',pointRadius:6}]},
       options:{plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${S.labels[c.dataIndex]} — BMI ${c.parsed.x}, PBF ${c.parsed.y}%`}}},
-               scales:{x:{title:{display:true,text:'BMI',color:'#cfd3e9'},grid:{color:gridColor},ticks:{color:'#cfd3e9'}},
-                       y:{title:{display:true,text:'PBF %',color:'#cfd3e9'},grid:{color:gridColor},ticks:{color:'#cfd3e9'}}}}
+        scales:{x:{title:{display:true,text:'BMI',color:'#cfd3e9'},grid:{color:gridColor},ticks:{color:'#cfd3e9'}},
+                y:{title:{display:true,text:'PBF %',color:'#cfd3e9'},grid:{color:gridColor},ticks:{color:'#cfd3e9'}}}
     });
-  } else {
-    bmiChart.data.datasets[0].data = S.labels.map((d,i)=>({x:S.bmi[i],y:S.pbf[i],label:d})); bmiChart.update();
-  }
+  } else { bmiChart.data.datasets[0].data=S.labels.map((d,i)=>({x:S.bmi[i],y:S.pbf[i],label:d})); bmiChart.update(); }
 
   if (!bmrObChart){
-    bmrObChart = new Chart(document.getElementById('chart-bmr-ob'), {
+    bmrObChart=new Chart($('chart-bmr-ob'),{
       type:'line',
-      data:{labels:S.labels, datasets:[
-        {label:'BMR (kcal)', data:S.bmr, yAxisID:'y1', tension:.35, borderColor:'#25c2ff', backgroundColor:'rgba(37,194,255,.12)', fill:true, borderWidth:border},
-        {label:'Obesity Degree %', data:S.obesity, yAxisID:'y2', tension:.35, borderColor:'#7c5cff', backgroundColor:'rgba(124,92,255,.10)', fill:true, borderWidth:border},
+      data:{labels:S.labels,datasets:[
+        {label:'BMR (kcal)',data:S.bmr,yAxisID:'y1',tension:.35,borderColor:'#25c2ff',backgroundColor:'rgba(37,194,255,.12)',fill:true,borderWidth:border},
+        {label:'Obesity Degree %',data:S.obesity,yAxisID:'y2',tension:.35,borderColor:'#7c5cff',backgroundColor:'rgba(124,92,255,.10)',fill:true,borderWidth:border}
       ]},
       options:{plugins:{legend:{labels:{color:'#cfd3e9'}}},
         scales:{x:{grid:{color:gridColor},ticks:{color:'#cfd3e9'}},
                 y1:{position:'left',grid:{color:gridColor},ticks:{color:'#cfd3e9'}},
                 y2:{position:'right',grid:{drawOnChartArea:false},ticks:{color:'#cfd3e9'}}}
     });
-  } else {
-    bmrObChart.data.labels=S.labels; bmrObChart.data.datasets[0].data=S.bmr; bmrObChart.data.datasets[1].data=S.obesity; bmrObChart.update();
-  }
+  } else { bmrObChart.data.labels=S.labels; bmrObChart.data.datasets[0].data=S.bmr; bmrObChart.data.datasets[1].data=S.obesity; bmrObChart.update(); }
 
   if (!ecwChart){
-    ecwChart = new Chart(document.getElementById('chart-ecw'), {
+    ecwChart=new Chart($('chart-ecw'),{
       type:'line',
-      data:{labels:S.labels, datasets:[{label:'ECW/TBW', data:S.ecw, tension:.35, borderColor:'#5ad39e', backgroundColor:'rgba(90,211,158,.12)', fill:true, borderWidth:border}]},
+      data:{labels:S.labels,datasets:[{label:'ECW/TBW',data:S.ecw,tension:.35,borderColor:'#5ad39e',backgroundColor:'rgba(90,211,158,.12)',fill:true,borderWidth:border}]},
       options:{plugins:{legend:{labels:{color:'#cfd3e9'}}},
-        scales:{x:{grid:{color:gridColor},ticks:{color:'#cfd3e9'}},
-                y:{min:0.36,max:0.40,grid:{color:gridColor},ticks:{color:'#cfd3e9'}}}
+        scales:{x:{grid:{color:gridColor},ticks:{color:'#cfd3e9'}},y:{min:0.36,max:0.40,grid:{color:gridColor},ticks:{color:'#cfd3e9'}}}
     });
-  } else {
-    ecwChart.data.labels=S.labels; ecwChart.data.datasets[0].data=S.ecw; ecwChart.update();
-  }
+  } else { ecwChart.data.labels=S.labels; ecwChart.data.datasets[0].data=S.ecw; ecwChart.update(); }
 }
 
 /* ===========================
-   Render all
+   Init & Events
    =========================== */
 function renderAll(){
-  const s = scans[active];
-  setKPIs(s);
-  setOverallIOR(s);
-  setCompBmiIOR(s);
-  setBmrecwIOR(s);
-  setSegmental(s);
+  const s=scans[active];
+  setKPIs(s); setOverallIOR(s); setCompBmiIOR(s); setBmrecwIOR(s); setSegmental(s);
   renderCharts();
 }
 function init(){
+  // Hamburger
+  const burger=$('burger'), menu=$('menu-list');
+  burger.addEventListener('click',()=>{menu.style.display = (menu.style.display==='block'?'none':'block')});
+  document.addEventListener('click',e=>{ if(!burger.contains(e.target) && !menu.contains(e.target)) menu.style.display='none'; });
+
   fillSelect(); buildMaster(); renderAll();
 }
 document.addEventListener('DOMContentLoaded', init);
