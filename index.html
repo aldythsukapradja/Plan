@@ -1,597 +1,451 @@
 <!DOCTYPE html>
-<html lang="en" id="top">
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>RMO 360 — Digital Milestones</title>
-<meta name="color-scheme" content="dark">
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>InBody Dashboard — RMO Style</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0b1014; --panel:#0f151a; --glass:rgba(255,255,255,.06);
-    --stroke:rgba(255,255,255,.12); --text:#eaf7f4; --muted:#9ab6b0;
-    --teal:#29ffd2; --blue:#00a8ff; --ok:#4ad66d; --pink:#ff7ad9;
-    --radius:20px;
-    --shadow:0 10px 30px rgba(0,0,0,.65), 0 0 0 1px rgba(255,255,255,.04) inset;
-    --card-glow:0 0 30px rgba(41,255,210,.25), 0 0 60px rgba(0,168,255,.12);
-    --grad:linear-gradient(135deg, rgba(41,255,210,1), rgba(0,168,255,1));
-    --grad2:linear-gradient(135deg, rgba(255,122,217,1), rgba(41,255,210,1));
-    --grad3:linear-gradient(135deg, rgba(255,200,122,1), rgba(255,122,217,1));
-    --gradDark:linear-gradient(135deg, rgba(20,30,40,1), rgba(10,15,20,1));
-    --fz-xxl:clamp(22px, 4.2vw, 30px);
-    --fz-xl:clamp(18px, 3vw, 22px);
-    --fz-lg:clamp(15px, 2.2vw, 17px);
-    --fz-md:clamp(14px, 2vw, 16px);
-    --fz-sm:clamp(12px, 1.6vw, 14px);
+    --bg:#0f1220;           /* deep night */
+    --panel:#161a2b;        /* card bg */
+    --panel-2:#1b2035;      /* alt card */
+    --text:#e7e8ee;         /* primary text */
+    --muted:#9aa0b7;
+    --accent:#7c5cff;       /* purple */
+    --accent-2:#25c2ff;     /* cyan */
+    --accent-3:#ffb547;     /* amber */
+    --accent-4:#ff6b6b;     /* coral */
+    --good:#5ad39e;         /* green */
+    --warn:#ffb547;
+    --bad:#ff6b6b;
+    --shadow: 0 12px 30px rgba(0,0,0,.35);
+    --radius:16px;
   }
   *{box-sizing:border-box}
-  body{margin:0; font-family:Inter, ui-sans-serif, -apple-system, Segoe UI, Roboto, Arial; background:var(--bg); color:var(--text); line-height:1.5; overflow-x:hidden}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;
+    background: radial-gradient(1200px 600px at 80% -50%, rgba(124,92,255,.12), transparent 60%),
+                radial-gradient(900px 500px at -10% 20%, rgba(37,194,255,.12), transparent 60%),
+                var(--bg);
+    color:var(--text);
+  }
 
-  header{position:sticky; top:0; z-index:5; backdrop-filter: blur(8px); background:linear-gradient(180deg, rgba(10,16,20,.9), rgba(10,16,20,.6)); border-bottom:1px solid var(--stroke)}
-  .wrap-head{max-width:1120px; margin:0 auto; padding:10px 16px; display:flex; align-items:center}
-  .brand{font-weight:800; letter-spacing:.2px}
-  .brand b{color:var(--teal); text-shadow:0 0 12px rgba(41,255,210,.5)}
+  /* Layout */
+  .app{
+    display:grid;
+    grid-template-columns: 84px 1fr 360px;
+    gap:24px;
+    padding:24px;
+  }
+  @media (max-width:1100px){
+    .app{grid-template-columns: 72px 1fr}
+    aside.right{display:none}
+  }
 
-  .wrap{max-width:1120px; margin:20px auto 24px; padding:0 16px}
+  /* Left rail */
+  aside.left{
+    background:linear-gradient(180deg,#141831,#101226);
+    border-radius:24px;
+    padding:16px 10px;
+    box-shadow:var(--shadow);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:16px;
+  }
+  .logo{
+    width:40px;height:40px;border-radius:12px;
+    display:grid;place-items:center;
+    background:linear-gradient(135deg,#2b2f55 0%, #7c5cff 120%);
+    color:white;font-weight:800;letter-spacing:.5px;
+  }
+  .rail-btn{
+    width:48px;height:48px;border-radius:14px;border:1px solid #262c4b;
+    display:grid;place-items:center;color:#cfd3e9;background:#141831;cursor:pointer;
+    transition:.2s transform,.2s background;
+  }
+  .rail-btn:hover{transform:translateY(-2px);background:#192042}
+  .rail-spacer{flex:1}
 
-  .cards{display:flex; flex-direction:column; gap:12px}
-  details.acc{border:1px solid var(--stroke); border-radius:16px; overflow:hidden; background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03)); box-shadow:var(--shadow), var(--card-glow)}
-  summary.acc-btn{list-style:none; display:grid; align-items:center; gap:10px; cursor:pointer; padding:12px 16px; grid-template-columns:auto 1fr auto auto}
-  summary::-webkit-details-marker{display:none}
-  .sum-ico{width:26px; height:26px; display:grid; place-items:center; border-radius:8px; background:var(--grad); color:#081215; font-weight:700; animation:iconGlow 2s infinite alternate}
-  @keyframes iconGlow{from{box-shadow:0 0 8px rgba(41,255,210,.5)} to{box-shadow:0 0 20px rgba(0,168,255,.7)}}
-  .sum-title{font-size:var(--fz-lg); font-weight:700; line-height:1.3}
-  .sum-date{display:inline-flex; align-items:center; gap:6px; color:var(--muted); font-size:var(--fz-sm)}
-  .caret{margin-left:10px; width:30px; height:30px; border-radius:999px; border:1px solid var(--stroke); display:grid; place-items:center; transition:.25s; background:rgba(255,255,255,.04)}
-  details[open] .caret{transform:rotate(90deg); box-shadow:0 0 14px rgba(41,255,210,.45)}
+  /* Main content */
+  main{
+    display:grid;gap:24px;
+    grid-template-rows:auto auto 1fr;
+  }
+  .header{
+    background:linear-gradient(180deg,#151936,#12152a);
+    border-radius:24px;padding:28px;
+    box-shadow:var(--shadow);
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;
+  }
+  .title h1{margin:0;font-size:28px;letter-spacing:.2px}
+  .subtitle{color:var(--muted);font-size:14px;margin-top:6px}
+  .tabs{
+    display:flex;gap:8px;flex-wrap:wrap
+  }
+  .tab{
+    padding:10px 14px;border-radius:999px;border:1px solid #2a3154;color:#cfd3e9;
+    background:#151936;cursor:pointer;font-weight:600;font-size:13px
+  }
+  .tab.active{background:#1d2343;color:white;border-color:#3a3f6a}
 
-  .acc-panel{padding:10px 16px 14px}
-  .divider{height:1px; background:var(--stroke); margin:10px 0}
-  .row{display:flex; flex-wrap:wrap; gap:6px; align-items:center; font-size:var(--fz-sm)}
-  .badge{display:inline-flex; align-items:center; gap:4px; padding:4px 8px; border-radius:999px; background:rgba(255,255,255,.06); border:1px solid var(--stroke); color:#cfeee7; font-weight:600}
-  .check{width:8px; height:8px; background:var(--ok); border-radius:50%; box-shadow:0 0 6px var(--ok), 0 0 12px rgba(74,214,109,.6)}
-  .loc{padding:4px 8px; border-radius:999px; font-size:var(--fz-sm); background:var(--gradDark); border:1px solid rgba(150,200,255,.22); color:#fff; font-weight:600; box-shadow:0 0 12px rgba(41,255,210,.35)}
-  .note{color:#c8e8e1; font-size:var(--fz-sm); margin:6px 0 8px}
-  .note .article-ico{display:inline-grid; place-items:center; width:18px; height:18px; margin-right:6px; border-radius:4px; background:var(--grad2); box-shadow:0 0 10px rgba(255,122,217,.45)}
-  .note .article-ico svg{width:12px; height:12px}
+  /* KPI cards */
+  .kpis{
+    display:grid;gap:16px;
+    grid-template-columns: repeat(4, minmax(0,1fr));
+  }
+  @media (max-width:900px){.kpis{grid-template-columns: repeat(2, minmax(0,1fr));}}
+  @media (max-width:520px){.kpis{grid-template-columns: 1fr;}}
+  .kpi{
+    background:var(--panel);border-radius:18px;padding:18px 18px 16px;box-shadow:var(--shadow);
+    position:relative;overflow:hidden;isolation:isolate
+  }
+  .kpi .label{color:var(--muted);font-size:12px}
+  .kpi .value{font-size:28px;font-weight:800;margin:6px 0 2px}
+  .kpi .delta{font-size:12px}
+  .chip{
+    position:absolute;right:12px;top:12px;font-size:11px;font-weight:700;
+    padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.08);
+    background:rgba(255,255,255,.06)
+  }
+  .kpi.orange{background:linear-gradient(180deg,#2a1a10,#1a1410)}
+  .kpi.purple{background:linear-gradient(180deg,#1c1640,#161334)}
+  .kpi.amber{background:linear-gradient(180deg,#2a1f10,#1a1510)}
+  .kpi.cyan{background:linear-gradient(180deg,#10323e,#0e2331)}
 
-  .files h4{margin:6px 0 6px; font-size:var(--fz-sm); color:#d6fbf3}
-  .chips{display:flex; flex-wrap:wrap; gap:8px}
-  .chip{display:flex; align-items:center; justify-content:space-between; gap:8px; padding:6px 10px; border-radius:999px; border:1px solid var(--stroke); background:var(--grad); color:#081215; font-weight:600; font-size:var(--fz-sm); box-shadow:0 0 12px rgba(41,255,210,.35)}
-  .chip svg{width:18px; height:18px; flex:0 0 auto; filter:drop-shadow(0 0 6px rgba(41,255,210,.6)); animation:iconGlow 2s infinite alternate}
+  /* Panels */
+  .grid-2{
+    display:grid;gap:16px;grid-template-columns: 1.2fr 1fr;
+  }
+  @media (max-width:1100px){.grid-2{grid-template-columns:1fr}}
+  .panel{
+    background:var(--panel-2);border-radius:20px;padding:18px;box-shadow:var(--shadow);
+  }
+  .panel h3{margin:4px 0 14px;font-size:16px}
+  .panel small{color:var(--muted)}
+  canvas{width:100%;height:320px;max-height:38vh}
 
-  /* Modern MS Office SVG icon helper */
-  .ms{width:18px; height:18px}
-  .ms-pp rect{fill:url(#gradPP)} .ms-pp text{font-weight:800; fill:#fff}
-  .ms-word rect{fill:url(#gradWord)} .ms-word text{font-weight:800; fill:#fff}
-  .ms-excel rect{fill:url(#gradExcel)} .ms-excel text{font-weight:800; fill:#fff}
+  /* Right sidebar */
+  aside.right{
+    background:linear-gradient(180deg,#151936,#12162d);
+    border-radius:24px;padding:20px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:16px;
+  }
+  .profile{
+    display:flex;align-items:center;gap:12px;margin-bottom:8px
+  }
+  .avatar{width:44px;height:44px;border-radius:50%;
+    background:linear-gradient(135deg,#7c5cff,#25c2ff);}
+  .goal{
+    background:var(--panel);border-radius:18px;padding:16px
+  }
+  .goal h4{margin:0 0 8px}
+  /* Gauge */
+  .gauge{
+    --size:160px; width:var(--size); height:var(--size); border-radius:50%; position:relative;
+    background:conic-gradient(var(--accent) calc(var(--val)*1%), #343a55 0);
+    display:grid;place-items:center;margin:auto;
+  }
+  .gauge::after{
+    content:""; position:absolute; width:calc(var(--size) - 46px); height:calc(var(--size) - 46px);
+    border-radius:50%; background:linear-gradient(180deg,#171b34,#121527); box-shadow:inset 0 0 0 1px #2a3154;
+  }
+  .gauge > span{position:relative; font-weight:800; font-size:22px}
 
-  .video-grid{display:grid; gap:14px; margin-top:12px}
-  @media (min-width:760px){ .video-grid{grid-template-columns:repeat(2,1fr)} }
-  .video-card{background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03)); border:1px solid var(--stroke); border-radius:16px; padding:12px; box-shadow:var(--shadow), var(--card-glow)}
-  .video-card h3{margin:6px 8px 10px; font-size:var(--fz-md)}
-  .video-box{position:relative; width:100%; padding-top:56.25%; border-radius:10px; overflow:hidden; border:1px solid var(--stroke); box-shadow:0 0 16px rgba(0,255,200,.28)}
-  .video-box iframe{position:absolute; inset:0; width:100%; height:100%; border:0; background:#000}
-  .source-files{margin-top:6px}
-  .source-files summary{cursor:pointer; font-size:var(--fz-sm); color:#muted}
-  .source-files .chips{margin-top:6px}
+  /* Raw data toggle */
+  details{background:#12152a;border:1px solid #273056;border-radius:14px;padding:14px}
+  details > summary{cursor:pointer;font-weight:700;color:#cfd3e9}
+  table{width:100%;border-collapse:collapse;margin-top:10px}
+  th,td{padding:10px;border-bottom:1px solid #262d4a;font-size:13px}
+  th{color:#b7bdd6;text-align:left}
+  .tag{display:inline-block;padding:6px 10px;border-radius:999px;background:#1b2140;border:1px solid #2b325a;font-size:12px}
 </style>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>RMO 360 (pilot) — Voidage Balance Simulator</title>
-  <style>
-    :root{ --bg:#0a0f14; --panel:#0f1720; --ink:#e5f4ee; --muted:#93a3a1; --accent1:#00d68f; --accent2:#1cf5b2; --warn:#ffbe0b; --bad:#ff3b30; --good:#35ff9a; --grid:#11212b; }
-    *{box-sizing:border-box}
-    body{margin:0;background:radial-gradient(1200px 800px at 70% -10%, rgba(28,245,178,0.15), transparent 60%),radial-gradient(900px 600px at 10% 110%, rgba(0,214,143,0.12), transparent 60%),#0a0f14;color:var(--ink);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}
-    .wrap{max-width:1100px;margin:32px auto;padding:16px}
-    header{position:relative;padding:20px;border-radius:20px;background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));backdrop-filter: blur(6px);border:1px solid rgba(255,255,255,.06)}
-    h1{margin:8px 0 0;font-size:28px;letter-spacing:.4px}
-    .tagline{color:var(--muted);margin-top:6px}
-    .capsule{position:absolute;top:-14px;left:20px;padding:8px 14px;border-radius:999px;font-weight:600;letter-spacing:.3px;font-size:14px;background:linear-gradient(135deg,#0f3d2e,#0b2b22);box-shadow:0 0 0 1px rgba(0,214,143,.2) inset,0 0 20px rgba(28,245,178,.35);text-decoration:none;color:#b6ffe5;transition:transform .18s,box-shadow .18s}
-    .capsule:hover{transform:translateY(-1px);box-shadow:0 0 0 1px rgba(28,245,178,.5) inset,0 8px 26px rgba(28,245,178,.45)}
-
-    /* Layout: chart first, controls second; side-by-side on desktop, stacked on mobile */
-    .grid{display:grid;grid-template-columns:1fr;gap:16px;margin-top:16px}
-    @media (min-width: 980px){ .grid{grid-template-columns:1fr 360px} }
-
-    .card{background:var(--panel);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:16px;position:relative;overflow:hidden}
-    .card h2{margin:0 0 12px;font-size:16px;letter-spacing:.4px;color:#ccffee}
-
-    .row{display:flex;align-items:center;justify-content:space-between;gap:12px}
-    .pill{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid rgba(255,255,255,.08);border-radius:999px;font-size:12px;color:#c9fbe9}
-
-    .meters{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-    .meter{background:#0b131a;border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:10px}
-    .meter .label{font-size:12px;color:#a8c7bd;margin-bottom:4px}
-    .meter .value{font-weight:700;font-size:18px}
-
-    .health{height:14px;background:#0b131a;border:1px solid rgba(255,255,255,.06);border-radius:999px;overflow:hidden}
-    .health>span{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--accent1),var(--accent2));transition:width .2s}
-
-    .gauge{display:flex;align-items:center;gap:8px;font-size:13px}
-    .dot{width:10px;height:10px;border-radius:50%}
-
-    canvas{display:block;width:100%;height:300px;background:linear-gradient(0deg,transparent 24px,var(--grid) 25px),linear-gradient(90deg,transparent 24px,var(--grid) 25px);background-size:100% 50px,50px 100%;border-radius:12px;border:1px solid rgba(255,255,255,.06)}
-
-    .controls{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    @media (max-width:980px){.controls{grid-template-columns:1fr}}
-    button{appearance:none;border:none;background:#0f1e18;color:#caffef;padding:10px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.08);font-weight:600;letter-spacing:.3px;cursor:pointer}
-    button:hover{filter:brightness(1.15)}
-    button.secondary{background:#131722}
-
-    .status{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
-    .badge{font-size:12px;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.1)}
-    .badge.good{color:#0f0;border-color:rgba(0,255,128,.35);background:rgba(0,255,128,.06)}
-    .badge.warn{color:#ffbe0b;border-color:rgba(255,190,11,.35);background:rgba(255,190,11,.08)}
-    .badge.bad{color:#ff3b30;border-color:rgba(255,59,48,.35);background:rgba(255,59,48,.08)}
-
-    .legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:#b8d7cd}
-    .legend span{display:inline-flex;align-items:center;gap:6px}
-    .key{width:14px;height:3px;border-radius:2px;display:inline-block}
-    .k-pressure{background:#9bfdd7}
-    .k-target{background:linear-gradient(90deg,transparent 40%,rgba(0,214,143,.5) 40%,rgba(0,214,143,.5) 60%,transparent 60%)}
-
-    footer{margin-top:20px;color:#88b7aa;font-size:12px;text-align:center}
-    a{color:#8bf7d1}
-
-    /* Mobile-friendly pads */
-    .controlPads{display:grid;grid-template-columns:1fr;gap:12px}
-    .pad{background:#0b131a;border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:12px}
-    .padGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
-    .bigBtn{appearance:none;border:none;background:#0f1e18;color:#eafff6;padding:18px 0;border-radius:12px;border:1px solid rgba(255,255,255,.08);font-weight:800;letter-spacing:.6px;font-size:22px;cursor:pointer;user-select:none;touch-action:manipulation}
-    .bigBtn:active{transform:translateY(1px)}
-    @media (pointer:coarse){.bigBtn{padding:22px 0;font-size:26px}}
-  
-    /* Alarm capsule */
-    .alarm{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:linear-gradient(135deg,#3d0f10,#2b0b0d);color:#ffd7d7;border:1px solid rgba(255,59,48,.55);box-shadow:0 0 18px rgba(255,59,48,.35);font-weight:700}
-    .alarm .mark{width:18px;height:18px;line-height:18px;border-radius:999px;background:#ff3b30;color:#fff;text-align:center;font-size:12px;font-weight:900}
-    .hidden{display:none}
-  </style>
 </head>
 <body>
-<!-- SVG gradients for MS icons -->
-<svg width="0" height="0" style="position:absolute">
-  <defs>
-    <linearGradient id="gradPP" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#d24726"/>
-      <stop offset="100%" stop-color="#ff6a3a"/>
-    </linearGradient>
-    <linearGradient id="gradWord" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#2b579a"/>
-      <stop offset="100%" stop-color="#3a78d2"/>
-    </linearGradient>
-    <linearGradient id="gradExcel" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#217346"/>
-      <stop offset="100%" stop-color="#21c36a"/>
-    </linearGradient>
-  </defs>
-</svg>
-<header>
-  <div class="wrap-head">
-    <div class="brand"><b>RMO 360</b></div>
-  </div>
-</header>
+<div class="app">
+  <!-- Left Rail -->
+  <aside class="left">
+    <div class="logo">RMO</div>
+    <div class="rail-btn" title="Dashboard">🏠</div>
+    <div class="rail-btn" title="Trends">📈</div>
+    <div class="rail-btn" title="Balance">🧭</div>
+    <div class="rail-btn" title="Hydration">💧</div>
+    <div class="rail-spacer"></div>
+    <div class="rail-btn" title="Settings">⚙️</div>
+  </aside>
 
-<div class="wrap">
-  <div class="cards">
-
-    <!-- 1. Agentic AI Use Case PoC Close Out -->
-    <details class="acc" open>
-      <summary class="acc-btn">
-        <span class="sum-ico">⚡</span>
-        <span class="sum-title">Agentic AI Use Case PoC Close Out — RGS/RMO &amp; DBS/CON</span>
-        <span class="sum-date">📅 4th Week of September</span>
-        <span class="caret">▶</span>
-      </summary>
-      <div class="acc-panel">
-        <div class="row">
-          <span class="badge"><span class="check"></span> VP RGS</span>
-          <span class="badge"><span class="check"></span> VP DBS + Digital</span>
-          <span class="badge"><span class="check"></span> CEOs</span>
-        </div>
-        <p class="note"><span class="article-ico"><svg viewBox="0 0 24 24" fill="#081215"><path d="M6 3h9l3 3v15H6z"/><rect x="8" y="8" width="8" height="2"/><rect x="8" y="12" width="8" height="2"/><rect x="8" y="16" width="5" height="2"/></svg></span>MyNOC article after meeting; emphasize collaboration + 1st NOC use case.</p>
-        <div class="row"><span class="loc">Venue: F40 — CEO Meeting Room</span></div>
-        <div class="divider"></div>
-        <div class="files">
-          <h4>Reference Material</h4>
-          <div class="chips">
-            <span class="chip"><svg class="ms ms-pp" viewBox="0 0 24 24"><rect rx="4" width="24" height="24"></rect><text x="6.5" y="16" font-size="11">P</text></svg><span>PoC Close-Out</span></span>
-            <span class="chip"><svg class="ms ms-word" viewBox="0 0 24 24"><rect rx="4" width="24" height="24"></rect><text x="5" y="16" font-size="11">W</text></svg><span>Meeting Notes</span></span>
-            <span class="chip"><svg class="ms ms-excel" viewBox="0 0 24 24"><rect rx="4" width="24" height="24"></rect><text x="6.5" y="16" font-size="11">X</text></svg><span>KPI Sheet</span></span>
-          </div>
-  <div class="wrap">
-    <header>
-      <a class="capsule" href="https://aldythsukapradja.github.io/Plan" target="_blank" rel="noopener">Milestones</a>
-      <h1>RMO 360 (pilot) — Voidage Balance Simulator</h1>
-      <div class="tagline">Keep <strong>VRR</strong> (Voidage Replacement Ratio) in the sweet spot by adjusting <strong>injection</strong>. Producer fluctuates ±3000 BOPD. Score climbs while VRR stays in the green band.</div>
-    </header>
-
-    <div class="grid">
-      <!-- Chart FIRST -->
-      <section class="card" id="chartCard">
-        <h2>VRR Trend</h2>
-        <div id="alarm" class="alarm hidden"><span class="mark">!</span><span id="alarmText">Alarm</span></div>
-        <div class="legend" style="margin-bottom:8px">
-          <span><i class="key k-pressure"></i> VRR (%)</span>
-          <span><i class="key k-target"></i> Target band</span>
-        </div>
+  <!-- Main -->
+  <main>
+    <div class="header">
+      <div class="title">
+        <h1>Weight Loss Program · InBody Tracker</h1>
+        <div class="subtitle">Last scan: <b>24 Sep 2025</b> · Day 210 (since Mar 2025)</div>
       </div>
-    </details>
-
-    <!-- 2. Dashboard Factory Launch -->
-    <details class="acc">
-      <summary class="acc-btn">
-        <span class="sum-ico">📊</span>
-        <span class="sum-title">RMO Dashboard Factory Launch — RGS/RMO &amp; DBS/OPS</span>
-        <span class="sum-date">📅 1st or 2nd Week of October</span>
-        <span class="caret">▶</span>
-      </summary>
-      <div class="acc-panel">
-        <div class="row">
-          <span class="badge"><span class="check"></span> VP RGS</span>
-          <span class="badge"><span class="check"></span> VP DBS + Digital</span>
-        <canvas id="chart" width="800" height="300" aria-label="VRR chart"></canvas>
-        <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:10px">
-          <div class="pill">Target band: <strong id="bandText">90–110 %</strong></div>
-          <div class="pill">Fail limits: <strong>80 % / 120 %</strong></div>
-          <div class="pill">Disturbances: <strong>on</strong></div>
-        </div>
-        <p class="note"><span class="article-ico"><svg viewBox="0 0 24 24" fill="#081215"><path d="M6 3h9l3 3v15H6z"/></svg></span>There are no articles need to be prepared.</p>
-        <div class="row"><span class="loc">Venue: F41 — Training Room</span></div>
-        <div class="divider"></div>
-        <div class="files">
-          <h4>Reference Material</h4>
-          <div class="chips">
-            <span class="chip"><svg class="ms ms-pp" viewBox="0 0 24 24"><rect rx="4" width="24" height="24"></rect><text x="6.5" y="16" font-size="11">P</text></svg><span>Launch Deck</span></span>
-            <span class="chip"><svg class="ms ms-word" viewBox="0 0 24 24"><rect rx="4" width="24" height="24"></rect><text x="5" y="16" font-size="11">W</text></svg><span>Ops Brief</span></span>
-            <span class="chip"><svg class="ms ms-excel" viewBox="0 0 24 24"><rect rx="4" width="24" height="24"></rect><text x="6.5" y="16" font-size="11">X</text></svg><span>Dash KPIs</span></span>
-      </section>
-
-      <!-- Controls SECOND (side-by-side on desktop, below on mobile) -->
-      <section class="card" id="controlsCard">
-        <h2>Controls</h2>
-        <div class="controlPads">
-          <div class="pad">
-            <div class="row">
-              <label>Injector rate</label>
-              <div class="pill"><span id="injVal">7000</span> BWIPD</div>
-            </div>
-            <div class="padGrid">
-              <button class="bigBtn" id="injUp" aria-label="Increase injector">▲</button>
-              <button class="bigBtn" id="injDown" aria-label="Decrease injector">▼</button>
-            </div>
-            <div class="row" style="margin-top:8px">
-              <div class="pill">Producer (variable): <strong id="prodFixedVal">7000</strong> BWOPD</div>
-            </div>
-          </div>
-        </div>
+      <div class="tabs">
+        <button class="tab active">exercise</button>
+        <button class="tab">food plan</button>
+        <button class="tab">daily habits</button>
+        <button class="tab">water intake</button>
       </div>
-    </details>
-
-    <!-- 3. Digital Initiatives — High Level -->
-    <details class="acc">
-      <summary class="acc-btn">
-        <span class="sum-ico">🚀</span>
-        <span class="sum-title">RMO Digital Initiatives — High Level</span>
-        <span class="sum-date">📅 15 October</span>
-        <span class="caret">▶</span>
-      </summary>
-      <div class="acc-panel">
-        <div class="row">
-          <span class="badge"><span class="check"></span> VP RGS</span>
-          <span class="badge"><span class="check"></span> CEOs</span>
-        </div>
-        <p class="note"><span class="article-ico"><svg viewBox="0 0 24 24" fill="#081215"><path d="M6 3h9l3 3v15H6z"/></svg></span>There are no articles need to be prepared.</p>
-        <div class="row"><span class="loc">Venue: Offsite Meeting</span></div>
-        <div class="divider"></div>
-        <div class="files">
-          <h4>Reference Material</h4>
-          <div class="chips">
-            <span class="chip"><svg class="ms ms-pp" viewBox="0 0 24 24"><rect rx="4" width="24" height="24"></rect><text x="6.5" y="16" font-size="11">P</text></svg><span>Vision Deck</span></span>
-            <span class="chip"><svg class="ms ms-word" viewBox="0 0 24 24"><rect rx="4" width="24" height="24"></rect><text x="5" y="16" font-size="11">W</text></svg><span>Exec Summary</span></span>
-            <span class="chip"><svg class="ms ms-excel" viewBox="0 0 24 24"><rect rx="4" width="24" height="24"></rect><text x="6.5" y="16" font-size="11">X</text></svg><span>Budget Model</span></span>
-
-        <div class="meters" style="margin:10px 0 6px">
-          <div class="meter">
-            <div class="label">VRR (Voidage Replacement Ratio)</div>
-            <div class="value"><span id="vrrNow">100</span> %</div>
-          </div>
-        </div>
-      </div>
-    </details>
-
-    <!-- 4. AI Factory Trial Close Out -->
-    <details class="acc">
-      <summary class="acc-btn">
-        <span class="sum-ico">🏭</span>
-        <span class="sum-title">RMO AI Factory Trial Close Out — RGS/RMO &amp; SLB</span>
-        <span class="sum-date">📅 2nd or 3rd Week of October</span>
-        <span class="caret">▶</span>
-      </summary>
-      <div class="acc-panel">
-        <div class="row">
-          <span class="badge"><span class="check"></span> VP RGS</span>
-          <span class="badge"><span class="check"></span> VP DBS + Digital</span>
-          <span class="badge"><span class="check"></span> CEOs</span>
-        </div>
-        <p class="note"><span class="article-ico"><svg viewBox="0 0 24 24" fill="#081215"><path d="M6 3h9l3 3v15H6z"/></svg></span>Article to be prepared: The Guard Family</p>
-        <div class="row"><span class="loc">Venue: F41 — Training Room</span></div>
-        <div class="divider"></div>
-        <div class="files">
-          <h4>Reference Material</h4>
-          <div class="chips">
-            <span class="chip"><svg class="ms ms-pp" viewBox="0 0 24 24"><rect rx="4" width="24" height="24"></rect><text x="6.5" y="16" font-size="11">P</text></svg><span>Trial Close-Out</span></span>
-            <span class="chip"><svg class="ms ms-word" viewBox="0 0 24 24"><rect rx="4" width="24" height="24"></rect><text x="5" y="16" font-size="11">W</text></svg><span>Guard Family Article</span></span>
-            <span class="chip"><svg class="ms ms-excel" viewBox="0 0 24 24"><rect rx="4" width="24" height="24"></rect><text x="6.5" y="16" font-size="11">X</text></svg><span>Results Sheet</span></span>
-          <div class="meter">
-            <div class="label">Score</div>
-            <div class="value"><span id="score">0</span></div>
-          </div>
-        </div>
-      </div>
-    </details>
-
-    <!-- 5. RMO 360 Phase 1 Close Out & Kick-off Conceptualization -->
-    <details class="acc">
-      <summary class="acc-btn">
-        <span class="sum-ico">🧭</span>
-        <span class="sum-title">RMO 360 Ph1 Close Out &amp; Kick-off Conceptualization</span>
-        <span class="sum-date">📅 1st Week of November</span>
-        <span class="caret">▶</span>
-      </summary>
-      <div class="acc-panel">
-        <div class="row">
-          <span class="badge"><span class="check"></span> VP RGS</span>
-          <span class="badge"><span class="check"></span> VP DBS + Digital</span>
-          <span class="badge"><span class="check"></span> CEOs</span>
-        </div>
-        <p class="note"><span class="article-ico"><svg viewBox="0 0 24 24" fill="#081215"><path d="M6 3h9l3 3v15H6z"/></svg></span>There are no articles need to be prepared.</p>
-        <div class="row"><span class="loc">Venue: F40 — CEO Meeting Room</span></div>
-        <div class="divider"></div>
-        <div class="files">
-          <h4>Reference Material</h4>
-          <div class="chips">
-            <span class="chip"><svg class="ms ms-pp" viewBox="0 0 24 24"><rect rx="4" width="24" height="24"></rect><text x="6.5" y="16" font-size="11">P</text></svg><span>Kickoff Deck</span></span>
-            <span class="chip"><svg class="ms ms-word" viewBox="0 0 24 24"><rect rx="4" width="24" height="24"></rect><text x="5" y="16" font-size="11">W</text></svg><span>Concept Doc</span></span>
-            <span class="chip"><svg class="ms ms-excel" viewBox="0 0 24 24"><rect rx="4" width="24" height="24"></rect><text x="6.5" y="16" font-size="11">X</text></svg><span>Roadmap Sheet</span></span>
-          </div>
-        </div>
-      </div>
-    </details>
-
-    <!-- 6. RGS Open Day with 4 video placeholders -->
-    <details class="acc">
-      <summary class="acc-btn">
-        <span class="sum-ico">🎪</span>
-        <span class="sum-title">RGS Open Day</span>
-        <span class="sum-date">📅 17 November</span>
-        <span class="caret">▶</span>
-      </summary>
-      <div class="acc-panel">
-        <div class="row">
-          <span class="badge"><span class="check"></span> VP RGS</span>
-          <span class="badge"><span class="check"></span> VP DBS + Digital</span>
-          <span class="badge"><span class="check"></span> CEOs</span>
-
-        <div class="gauge" id="gauge">
-          <div class="dot" id="gDot" style="background:var(--good)"></div>
-          <span id="gText">Stable</span>
-        </div>
-        <p class="note"><span class="article-ico"><svg viewBox="0 0 24 24" fill="#081215"><path d="M6 3h9l3 3v15H6z"/></svg></span>There are no articles need to be prepared.</p>
-        <div class="row"><span class="loc">Venue: F41 — Training Room</span></div>
-        <div class="divider"></div>
-        <h4 style="margin-top:12px">Videos Reference</h4>
-        <div class="video-grid">
-          <div class="video-card">
-            <h3>Reservoir Management</h3>
-            <div class="video-box"><iframe src="about:blank"></iframe></div>
-            <details class="source-files"><summary>PowerPoint Sources</summary>
-              <div class="chips">
-                <span class="chip"><svg class="ms ms-pp" viewBox="0 0 24 24"><rect rx="4" width="24" height="24"></rect><text x="6.5" y="16" font-size="11">P</text></svg><span>Reservoir Mgmt</span></span>
-              </div>
-            </details>
-          </div>
-          <div class="video-card">
-            <h3>Water Injectors</h3>
-            <div class="video-box"><iframe src="about:blank"></iframe></div>
-            <details class="source-files"><summary>PowerPoint Sources</summary>
-              <div class="chips">
-                <span class="chip"><svg class="ms ms-pp" viewBox="0 0 24 24"><rect rx="4" width="24" height="24"></rect><text x="6.5" y="16" font-size="11">P</text></svg><span>Injectors</span></span>
-              </div>
-            </details>
-          </div>
-          <div class="video-card">
-            <h3>Digital Material</h3>
-            <div class="video-box"><iframe src="about:blank"></iframe></div>
-            <details class="source-files"><summary>PowerPoint Sources</summary>
-              <div class="chips">
-                <span class="chip"><svg class="ms ms-pp" viewBox="0 0 24 24"><rect rx="4" width="24" height="24"></rect><text x="6.5" y="16" font-size="11">P</text></svg><span>Digital Deck</span></span>
-              </div>
-            </details>
-          </div>
-          <div class="video-card">
-            <h3>RGS Quarterly Meeting</h3>
-            <div class="video-box"><iframe src="about:blank"></iframe></div>
-            <details class="source-files"><summary>PowerPoint Sources</summary>
-              <div class="chips">
-                <span class="chip"><svg class="ms ms-pp" viewBox="0 0 24 24"><rect rx="4" width="24" height="24"></rect><text x="6.5" y="16" font-size="11">P</text></svg><span>Quarterly</span></span>
-              </div>
-            </details>
-          </div>
-
-        <div class="health" style="margin-top:10px"><span id="healthBar"></span></div>
-
-        <div class="controls" style="margin-top:12px">
-          <button id="startBtn">Start</button>
-          <button id="resetBtn" class="secondary">Reset</button>
-        </div>
-      </div>
-    </details>
-
-        <div class="status" id="status"></div>
-      </section>
     </div>
 
-    <footer>
-      Tip: Keep injection near production to hold VRR ~100%. Scoring only while VRR stays in the green band.
-    </footer>
-  </div>
+    <!-- KPI Cards -->
+    <section class="kpis">
+      <div class="kpi orange">
+        <div class="chip">Weight</div>
+        <div class="label">Current</div>
+        <div class="value">76.8 kg</div>
+        <div class="delta" style="color:var(--good)">↓ 13.2 kg vs Mar</div>
+      </div>
+      <div class="kpi purple">
+        <div class="chip">Goal</div>
+        <div class="label">Target Weight</div>
+        <div class="value">72.0 kg</div>
+        <div class="delta" style="color:var(--muted)">~4.8 kg to go</div>
+      </div>
+      <div class="kpi amber">
+        <div class="chip">Avg Fat ↓</div>
+        <div class="label">Body Fat Mass</div>
+        <div class="value">22.8 kg</div>
+        <div class="delta" style="color:var(--good)">↓ 15.2 kg vs Mar</div>
+      </div>
+      <div class="kpi cyan">
+        <div class="chip">Daily Workout</div>
+        <div class="label">Assumed</div>
+        <div class="value">—</div>
+        <div class="delta" style="color:var(--muted)">Add later</div>
+      </div>
+    </section>
+
+    <!-- Charts -->
+    <section class="grid-2">
+      <div class="panel">
+        <h3>Weight • SMM • Body Fat (kg)</h3>
+        <canvas id="compChart"></canvas>
+        <small>Keep SMM stable while reducing Body Fat. Good trajectory.</small>
+      </div>
+      <div class="panel">
+        <h3>BMI & PBF% (scatter, by date)</h3>
+        <canvas id="bmiPbfChart"></canvas>
+      </div>
+    </section>
+
+    <section class="grid-2">
+      <div class="panel">
+        <h3>BMR & Obesity Degree %</h3>
+        <canvas id="bmrObChart"></canvas>
+      </div>
+      <div class="panel">
+        <h3>ECW/TBW (hydration balance)</h3>
+        <canvas id="ecwChart"></canvas>
+        <small>Healthy band ~0.36–0.39. You’re trending within zone.</small>
+      </div>
+    </section>
+
+    <section class="grid-2">
+      <div class="panel">
+        <h3>Segmental Lean Balance — 24 Sep 2025 (%)</h3>
+        <canvas id="radarChart"></canvas>
+      </div>
+      <div class="panel">
+        <h3>Raw Data</h3>
+        <details>
+          <summary>Show / hide table</summary>
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th><th>Weight</th><th>SMM</th><th>Body Fat</th><th>PBF%</th><th>BMI</th><th>Score</th><th>Visceral</th><th>BMR</th><th>TBW</th><th>Protein</th><th>Minerals</th><th>FFM</th><th>Obesity%</th><th>ECW/TBW</th>
+              </tr>
+            </thead>
+            <tbody id="dataRows"></tbody>
+          </table>
+        </details>
+      </div>
+    </section>
+  </main>
+
+  <!-- Right Sidebar -->
+  <aside class="right">
+    <div class="profile">
+      <div class="avatar"></div>
+      <div>
+        <div style="font-weight:800">Aldyth Sukapradja</div>
+        <div style="color:var(--muted);font-size:12px">Joined • health journey</div>
+      </div>
+    </div>
+
+    <div class="goal">
+      <h4>InBody Score</h4>
+      <div class="gauge" id="scoreGauge" style="--val:68">
+        <span id="scoreText">68</span>
+      </div>
+      <div style="text-align:center;margin-top:10px;color:var(--muted);font-size:13px">Great progress • keep trend ↑</div>
+    </div>
+
+    <div class="goal">
+      <h4>Visceral Fat</h4>
+      <div class="gauge" id="visGauge" style="--val:45">
+        <span id="visText">9</span>
+      </div>
+      <div style="text-align:center;margin-top:10px;color:var(--muted);font-size:13px">Lower risk zone</div>
+    </div>
+
+    <div class="goal">
+      <h4>Tips</h4>
+      <div class="tag">Hydration steady (ECW/TBW ~0.387)</div>
+      <div style="height:8px"></div>
+      <div class="tag">Preserve SMM ~30.2 kg</div>
+      <div style="height:8px"></div>
+      <div class="tag">Body fat trending ↓</div>
+    </div>
+  </aside>
 </div>
 
-  <script>
-    // ----- Simulation constants (slower dynamics) -----
-    const dt = 0.05; // sim step (s)
-    const stepsPerFrame = 1; // slower update
+<!-- Charts: Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+/* -------------------- DATA -------------------- */
+const dates   = ["Mar '25 (est)","Mid-Apr '25 (est)","13 Jun '25","11 Sep '25","24 Sep '25"];
+const weight  = [90.0, 84.7, 80.6, 79.0, 76.8];
+const smm     = [32.0, 31.2, 30.4, 30.4, 30.2];
+const fat     = [38.0, 33.5, 26.2, 24.8, 22.8];
+const pbf     = [42.0, 39.6, 32.6, 31.3, 29.7];
+const bmi     = [31.9, 30.0, 28.6, 28.0, 27.2];
+const score   = [62,63,65,66,68];
+const visceral= [15,14,12,10,9];
+const bmr     = [1750,1700,1544,1542,1536]; // ~ for first two
+const tbw     = [42.5,41.0,39.9,39.8,39.6];
+const protein = [11.2,10.9,10.7,10.6,10.6];
+const minerals= [3.8,3.7,3.75,3.75,3.75];
+const ffm     = [52.0,51.2,54.4,54.2,54.0];
+const obesity = [145,139,130,127.9,124.8];
+const ecwtbw  = [0.390,0.389,0.388,0.388,0.387];
 
-    // VRR setup
-    const INJ_MIN = 2500; // BWIPD
-    const INJ_MAX = 10000; // BWIPD
-    const PROD_BASE = 7000; // BOPD
-    const PROD_MIN = PROD_BASE - 3000; // 4000
-    const PROD_MAX = PROD_BASE + 3000; // 10000
-    const PROD_NOISE = 60; // stronger jitter per step for challenge // smaller jitter per step for slower feel
-    const STEP = 100; // BWIPD per tap/interval
+// Raw table build
+const rows = [
+  ["Mar 2025 (est.)",90.0,32.0,38.0,42.0,31.9,62,15,"~1750",42.5,11.2,3.8,52.0,145,0.390],
+  ["Mid-Apr 2025 (est.)",84.7,31.2,33.5,39.6,30.0,63,14,"~1700",41.0,10.9,3.7,51.2,139,0.389],
+  ["13 Jun 2025 (scan)",80.6,30.4,26.2,32.6,28.6,65,12,1544,39.9,10.7,3.75,54.4,130,0.388],
+  ["11 Sep 2025 (scan)",79.0,30.4,24.8,31.3,28.0,66,10,1542,39.8,10.6,3.75,54.2,127.9,0.388],
+  ["24 Sep 2025 (scan)",76.8,30.2,22.8,29.7,27.2,68,9,1536,39.6,10.6,3.75,54.0,124.8,0.387],
+];
+document.getElementById("dataRows").innerHTML = rows.map(r =>
+  `<tr>${r.map(c=>`<td>${c}</td>`).join("")}</tr>`
+).join("");
 
-    const noiseAmp = 0.8; // VRR % jitter amplitude (reduced)
+// Gauges: convert to %
+document.getElementById("scoreGauge").style.setProperty('--val', (score.at(-1)));
+document.getElementById("scoreText").textContent = score.at(-1);
+document.getElementById("visGauge").style.setProperty('--val', (visceral.at(-1)*5));
+document.getElementById("visText").textContent = visceral.at(-1);
 
-    // bands (in % VRR)
-    const BAND_MIN = 90, BAND_MAX = 110;
-    const FAIL_MIN = 80, FAIL_MAX = 120;
+/* -------------------- CHARTS -------------------- */
+const gridColor = "#2d355a";
+const border = 2.5;
 
-    // ----- State -----
-    let inj = 7000; // BWIPD
-    let prod = PROD_BASE; // BOPD (randomly varies)
-    let P = 100; // VRR %
-    let score = 0;
-    let playing = false;
-    let outOfBoundsFor = 0; // seconds out of fail bounds
-    let tElapsed = 0; // seconds since start
-
-    // UI elements
-    const injVal = document.getElementById('injVal');
-    const prodFixedValEl = document.getElementById('prodFixedVal');
-    const vrrNow = document.getElementById('vrrNow');
-    const scoreEl = document.getElementById('score');
-    const startBtn = document.getElementById('startBtn');
-    const resetBtn = document.getElementById('resetBtn');
-    const statusEl = document.getElementById('status');
-    const gText = document.getElementById('gText');
-    const gDot = document.getElementById('gDot');
-    const bandText = document.getElementById('bandText');
-    const healthBar = document.getElementById('healthBar');
-    const alarmEl = document.getElementById('alarm');
-    const alarmText = document.getElementById('alarmText');
-
-    // Chart
-    const canvas = document.getElementById('chart');
-    const ctx = canvas.getContext('2d');
-    const history = []; const maxPoints = 800;
-
-    function setBadge(msg, type){
-      const span = document.createElement('span');
-      span.className = `badge ${type||''}`.trim();
-      span.textContent = msg; statusEl.prepend(span);
-      while(statusEl.children.length>5){ statusEl.removeChild(statusEl.lastChild); }
+const ctxComp = document.getElementById('compChart');
+new Chart(ctxComp, {
+  type:'line',
+  data:{
+    labels:dates,
+    datasets:[
+      {label:'Weight', data:weight, tension:.35, borderColor:'#7c5cff', backgroundColor:'rgba(124,92,255,.12)', fill:true, borderWidth:border},
+      {label:'SMM',    data:smm,    tension:.35, borderColor:'#25c2ff', backgroundColor:'rgba(37,194,255,.12)',  fill:true, borderWidth:border},
+      {label:'Body Fat',data:fat,   tension:.35, borderColor:'#ff6b6b', backgroundColor:'rgba(255,107,107,.10)', fill:true, borderWidth:border}
+    ]
+  },
+  options:{
+    plugins:{legend:{labels:{color:'#cfd3e9'}}},
+    scales:{
+      x:{grid:{color:gridColor}, ticks:{color:'#cfd3e9'}},
+      y:{grid:{color:gridColor}, ticks:{color:'#cfd3e9'}}
     }
+  }
+});
 
-    function clampInj(v){ return Math.max(INJ_MIN, Math.min(INJ_MAX, v)); }
-
-    function updateUI(){
-      injVal.textContent = Math.round(inj);
-      prodFixedValEl.textContent = Math.round(prod);
-      vrrNow.textContent = Math.round(P);
-      scoreEl.textContent = Math.round(score);
-
-      let st = 'Stable', col = 'var(--good)';
-      if(P < BAND_MIN) { st='Low'; col='var(--warn)'; }
-      if(P > BAND_MAX) { st='High'; col='var(--warn)'; }
-      if(P < FAIL_MIN || P > FAIL_MAX){ st='Critical'; col='var(--bad)'; }
-      gText.textContent = st; gDot.style.background = getComputedStyle(document.documentElement).getPropertyValue(col);
-
-      // health vs 100%
-      const norm = Math.max(0, 100 - Math.abs(P - 100));
-      healthBar.style.width = Math.max(0, Math.min(100, norm)) + '%';
-
-      // alarm capsule
-      if(P < FAIL_MIN){
-        alarmText.textContent = '⚠ Excessive Gas Production (VRR < 80%)';
-        alarmEl.classList.remove('hidden');
-      } else if(P > FAIL_MAX){
-        alarmText.textContent = '⚠ Excessive Water Production (VRR > 120%)';
-        alarmEl.classList.remove('hidden');
-      } else {
-        alarmEl.classList.add('hidden');
-      }
+const ctxScatter = document.getElementById('bmiPbfChart');
+new Chart(ctxScatter, {
+  type:'scatter',
+  data:{
+    datasets:[{
+      label:"BMI vs PBF",
+      data: dates.map((d,i)=>({x:bmi[i], y:pbf[i], label:d})),
+      borderColor:'#ffb547', backgroundColor:'rgba(255,181,71,.25)', pointRadius:6, pointHoverRadius:8
+    }]
+  },
+  options:{
+    plugins:{
+      legend:{display:false},
+      tooltip:{callbacks:{label:(ctx)=> `${rows[ctx.dataIndex][0]}: BMI ${ctx.parsed.x}, PBF ${ctx.parsed.y}%`}}
+    },
+    scales:{
+      x:{title:{display:true,text:'BMI',color:'#cfd3e9'}, grid:{color:gridColor}, ticks:{color:'#cfd3e9'}},
+      y:{title:{display:true,text:'PBF %',color:'#cfd3e9'}, grid:{color:gridColor}, ticks:{color:'#cfd3e9'}}
     }
+  }
+});
 
-    function physicsStep(){
-      // time
-      tElapsed += dt;
-
-      // producer random walk around base with gentle, bounded drift; volatility increases slowly over time
-      const effNoise = PROD_NOISE * (1 + 1.0 * (1 - Math.exp(-tElapsed/35))); // ramps to 2x base
-      prod += (PROD_BASE - prod) * 0.01 + (Math.random()*2-1) * effNoise;
-      if(prod < PROD_MIN) prod = PROD_MIN + Math.random()*100;
-      if(prod > PROD_MAX) prod = PROD_MAX - Math.random()*100;
-
-      const desired = (inj / prod) * 100; // target VRR based on current producer
-      const noise = (Math.random()*2-1) * noiseAmp;
-
-      // response gain increases over time (faster as the game goes on), capped
-      const responseGain = 0.06 + 0.10 * (1 - Math.exp(-tElapsed/30)); // -> ~0.16 max
-      P += (desired - P) * responseGain + noise * dt * 5;
-
-      if(P >= BAND_MIN && P <= BAND_MAX) score += dt * 8; // scoring
-
-      if(P < FAIL_MIN || P > FAIL_MAX) outOfBoundsFor += dt; else outOfBoundsFor = Math.max(0, outOfBoundsFor - dt*0.5);
-
-      history.push(P); if(history.length > maxPoints) history.shift();
+const ctxBmr = document.getElementById('bmrObChart');
+new Chart(ctxBmr, {
+  type:'line',
+  data:{
+    labels:dates,
+    datasets:[
+      {label:'BMR (kcal)', data:bmr, yAxisID:'y1', tension:.35, borderColor:'#25c2ff', backgroundColor:'rgba(37,194,255,.12)', fill:true, borderWidth:border},
+      {label:'Obesity Degree %', data:obesity, yAxisID:'y2', tension:.35, borderColor:'#7c5cff', backgroundColor:'rgba(124,92,255,.10)', fill:true, borderWidth:border}
+    ]
+  },
+  options:{
+    plugins:{legend:{labels:{color:'#cfd3e9'}}},
+    scales:{
+      x:{grid:{color:gridColor}, ticks:{color:'#cfd3e9'}},
+      y1:{position:'left', grid:{color:gridColor}, ticks:{color:'#cfd3e9'}},
+      y2:{position:'right', grid:{drawOnChartArea:false}, ticks:{color:'#cfd3e9'}}
     }
+  }
+});
 
-    function drawChart(){
-      const w = canvas.width, h = canvas.height; ctx.clearRect(0,0,w,h);
-      // target band
-      const yMin = mapP(BAND_MAX, h), yMax = mapP(BAND_MIN, h);
-      ctx.save(); ctx.globalAlpha = 0.25; ctx.fillStyle = '#00d68f'; ctx.fillRect(0, yMin, w, yMax - yMin); ctx.restore();
-      // VRR line
-      if(history.length>1){
-        ctx.beginPath(); ctx.lineWidth = 2; ctx.strokeStyle = '#9bfdd7';
-        for(let i=0;i<history.length;i++){ const x = (i/(maxPoints-1))*w; const y = mapP(history[i], h); if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);} ctx.stroke();
-      }
-      // current point
-      ctx.beginPath(); ctx.fillStyle = '#eafff6'; const x = (history.length-1)/(maxPoints-1)*w; ctx.arc(x, mapP(P,h), 3, 0, Math.PI*2); ctx.fill();
+const ctxECW = document.getElementById('ecwChart');
+new Chart(ctxECW, {
+  type:'line',
+  data:{
+    labels:dates,
+    datasets:[{label:'ECW/TBW', data:ecwtbw, tension:.35, borderColor:'#5ad39e', backgroundColor:'rgba(90,211,158,.12)', fill:true, borderWidth:border}]
+  },
+  options:{
+    plugins:{legend:{labels:{color:'#cfd3e9'}}, annotation:{}},
+    scales:{
+      x:{grid:{color:gridColor}, ticks:{color:'#cfd3e9'}},
+      y:{min:0.36, max:0.40, grid:{color:gridColor}, ticks:{color:'#cfd3e9'}}
     }
+  }
+});
 
-    function mapP(p,h){ const min=50, max=150; return h - (p-min)/(max-min)*h; }
-
-    let raf; function loop(){
-      for(let i=0;i<stepsPerFrame;i++) physicsStep(); updateUI(); drawChart();
-      if(outOfBoundsFor > 5){ playing=false; setBadge('Game over: VRR stayed critical for >5s','bad'); startBtn.textContent='Resume'; cancelAnimationFrame(raf); return; }
-      if(playing){ raf = requestAnimationFrame(loop); }
-    }
-
-    // Controls
-    function changeRate(delta){ inj = clampInj(inj + delta); updateUI(); }
-    function bindHold(btn, delta){
-      let repeat; const start=()=>{ changeRate(delta); repeat=setInterval(()=>changeRate(delta),150); };
-      const stop=()=>{ clearInterval(repeat); };
-      btn.addEventListener('mousedown', start);
-      btn.addEventListener('touchstart', (e)=>{ e.preventDefault(); start(); }, {passive:false});
-      ['mouseup','mouseleave','touchend','touchcancel'].forEach(ev=>btn.addEventListener(ev, stop));
-    }
-    bindHold(document.getElementById('injUp'), +STEP);
-    bindHold(document.getElementById('injDown'), -STEP);
-
-    document.addEventListener('keydown', (e)=>{
-      if(e.key==='ArrowUp' || e.key.toLowerCase()==='w') changeRate(+STEP);
-      if(e.key==='ArrowDown' || e.key.toLowerCase()==='s') changeRate(-STEP);
-    });
-
-    startBtn.addEventListener('click', ()=>{ playing = !playing; if(playing){ setBadge('Simulation running','good'); startBtn.textContent='Pause'; raf=requestAnimationFrame(loop);} else { setBadge('Paused','warn'); startBtn.textContent='Resume'; cancelAnimationFrame(raf);} });
-    resetBtn.addEventListener('click', ()=>{ inj=7000; prod=PROD_BASE; P=100; score=0; outOfBoundsFor=0; history.length=0; updateUI(); drawChart(); startBtn.textContent='Start'; playing=false; setBadge('Reset',''); });
-
-    // init
-    bandText.textContent = `${BAND_MIN}–${BAND_MAX} %`; updateUI(); drawChart();
-  </script>
+// Radar – segmental % (24 Sep)
+const radar = document.getElementById('radarChart');
+new Chart(radar,{
+  type:'radar',
+  data:{
+    labels:["Left Arm","Right Arm","Trunk","Left Leg","Right Leg"],
+    datasets:[{
+      label:"% of standard (24 Sep)",
+      data:[96.6,98.2,97.4,90.9,90.9],
+      borderColor:'#7c5cff', backgroundColor:'rgba(124,92,255,.18)', borderWidth:2
+    }]
+  },
+  options:{
+    scales:{ r:{
+      angleLines:{color:gridColor},
+      grid:{color:gridColor},
+      suggestedMin:85, suggestedMax:100,
+      pointLabels:{color:'#cfd3e9'}
+    }},
+    plugins:{legend:{display:false}}
+  }
+});
+</script>
 </body>
 </html>
