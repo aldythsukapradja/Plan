@@ -1,215 +1,532 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Segmental Lean Analysis — Replica</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>InBody Dashboard — All-in-One (Neon)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg:#0f1220; --panel:#161a2b; --ink:#e8ebff; --muted:#a5acce;
-    --accent:#7c5cff; --line:#2a3154; --good:#5ad39e;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui}
-  .wrap{max-width:980px;margin:28px auto;padding:0 16px}
-  .card{
-    background:linear-gradient(180deg,#171b34,#12162b); border:1px solid #232a49;
-    border-radius:20px; padding:18px; box-shadow:0 12px 28px rgba(0,0,0,.4);
-  }
-  h1{margin:0 0 8px;font-size:20px;font-weight:800}
-  .sub{color:var(--muted);font-size:13px;margin-bottom:14px}
-  .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 14px}
-  select, .chip{
-    background:#12162b;border:1px solid #2a3154;color:var(--ink);padding:10px 12px;
-    border-radius:12px;font-weight:600
-  }
-  .grid{display:grid;gap:16px;grid-template-columns: 1.2fr 1fr}
-  @media (max-width:900px){.grid{grid-template-columns:1fr}}
-  .panel{background:var(--panel);border-radius:16px;padding:14px;border:1px solid #232a49}
-  .panel h3{margin:6px 0 12px;font-size:14px;letter-spacing:.2px;color:#cfd3e9}
-  table{width:100%;border-collapse:collapse}
-  th,td{padding:10px;border-bottom:1px solid #252d4f;font-size:13px}
-  th{color:#b9c0df;text-align:left}
-  .badge{display:inline-block;padding:4px 8px;border-radius:10px;border:1px solid #2a3154;background:#141937;font-size:12px}
-  .ok{color:var(--good)}
-  .sil-label{font-size:12px; fill:#d9ddff}
-  .kg{font-size:16px;font-weight:800; fill:#ffffff}
-  .pct{font-size:12px; fill:#aab1d7}
-  .eval{font-size:11px; fill:#5ad39e}
+:root{
+  --bg:#0f1220; --panel:#161a2b; --panel2:#1b2035; --ink:#e7e8ee; --muted:#9aa0b7;
+  --accent:#7c5cff; --cyan:#25c2ff; --amber:#ffb547; --red:#ff6b6b; --good:#5ad39e;
+  --line:#2a3154; --shadow:0 14px 30px rgba(0,0,0,.35); --r:16px;
+}
+*{box-sizing:border-box} html,body{height:100%}
+body{
+  margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;
+  color:var(--ink);
+  background:
+    radial-gradient(1200px 600px at 80% -50%, rgba(124,92,255,.12), transparent 60%),
+    radial-gradient(900px 500px at -10% 20%, rgba(37,194,255,.12), transparent 60%),
+    var(--bg);
+}
+.app{display:grid;grid-template-columns:84px 1fr 360px;gap:24px;padding:24px}
+@media (max-width:1100px){.app{grid-template-columns:72px 1fr} aside.right{display:none}}
+aside.left{
+  background:linear-gradient(180deg,#141831,#101226);border-radius:24px;padding:16px 10px;
+  box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;gap:16px
+}
+.logo{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;
+  background:linear-gradient(135deg,#2b2f55 0%, #7c5cff 120%);font-weight:800}
+.rail-btn{width:48px;height:48px;border-radius:14px;border:1px solid #262c4b;
+  display:grid;place-items:center;color:#cfd3e9;background:#141831;cursor:pointer}
+main{display:grid;gap:24px}
+.header{
+  background:linear-gradient(180deg,#151936,#12152a);border-radius:24px;padding:20px 20px;
+  box-shadow:var(--shadow);display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between
+}
+h1{margin:0;font-size:22px}
+.sub{color:var(--muted);font-size:13px}
+select{
+  background:#12152a;border:1px solid #2a3154;color:var(--ink);border-radius:12px;
+  padding:10px 12px;font-weight:600
+}
+.kpis{display:grid;gap:14px;grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:900px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi{background:var(--panel);border-radius:18px;padding:14px;box-shadow:var(--shadow);position:relative}
+.kpi .label{color:var(--muted);font-size:12px} .kpi .value{font-size:26px;font-weight:800;margin-top:4px}
+.grid-2{display:grid;gap:16px;grid-template-columns:1.2fr 1fr}
+@media (max-width:1100px){.grid-2{grid-template-columns:1fr}}
+.panel{background:var(--panel2);border-radius:20px;padding:16px;box-shadow:var(--shadow)}
+.panel h3{margin:6px 0 12px;font-size:16px}
+canvas{width:100%;height:320px;max-height:42vh}
+details.acc{margin-top:10px;border:1px solid #273056;border-radius:12px;overflow:hidden}
+details.acc > summary{
+  list-style:none;cursor:pointer;padding:12px 14px;background:#11162b;color:#d8ddff;
+  font-weight:700;border-bottom:1px solid #273056
+}
+details.acc[open] > summary{background:#151b36}
+.acc-body{padding:12px 14px;color:#c9ceea;font-size:13px;line-height:1.55;overflow:auto}
+.acc-body table{width:100%;border-collapse:collapse;min-width:640px}
+.acc-body th,.acc-body td{padding:6px 8px;border-bottom:1px solid #262d4a;font-size:12px;text-align:left}
+.badge{display:inline-block;padding:6px 10px;border:1px solid #2b325a;border-radius:999px;background:#141937}
+aside.right{background:linear-gradient(180deg,#151936,#12162d);border-radius:24px;padding:16px;box-shadow:var(--shadow)}
+.goal{background:var(--panel);border-radius:18px;padding:14px;margin-top:10px}
+.gauge{--size:140px;width:var(--size);height:var(--size);border-radius:50%;position:relative;
+  background:conic-gradient(var(--cyan) calc(var(--val)*1%), #343a55 0);display:grid;place-items:center;margin:auto}
+.gauge::after{content:"";position:absolute;width:calc(var(--size) - 40px);height:calc(var(--size) - 40px);
+  border-radius:50%;background:linear-gradient(180deg,#171b34,#121527);box-shadow:inset 0 0 0 1px #2a3154}
+.gauge > span{position:relative;font-weight:800;font-size:20px}
+table.master{width:100%;border-collapse:collapse}
+table.master th, table.master td{padding:8px;border-bottom:1px solid #263056;font-size:12px;vertical-align:top}
+.sil{width:100%;height:auto;max-height:520px}
+.sil .lbl{font-size:12px;fill:#d9ddff} .sil .v1{font-size:16px;font-weight:800;fill:#fff} .sil .v2{font-size:12px;fill:#aab1d7}
+.tabrow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.tab{padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:#12162b;color:#e7e8ee;font-weight:700;cursor:pointer}
+.tab.active{background:#1d2343}
+hr.sep{border:none;border-top:1px solid #273056;margin:12px 0}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="card">
-    <h1>Segmental Lean Analysis (kg · % of standard)</h1>
-    <div class="sub">Replicates the InBody layout with your scan values</div>
+<div class="app">
+  <!-- Left Rail -->
+  <aside class="left">
+    <div class="logo">RMO</div>
+    <div class="rail-btn" title="Overview">🏠</div>
+    <div class="rail-btn" title="Segmental">🧍</div>
+    <div class="rail-btn" title="Table">📋</div>
+    <div style="flex:1"></div>
+    <div class="rail-btn" title="Settings">⚙️</div>
+  </aside>
 
-    <div class="toolbar">
-      <label for="dateSel" class="chip">Select date</label>
-      <select id="dateSel"></select>
-      <span class="chip">Evaluation band: <b>90–110% = Normal</b></span>
+  <!-- Main -->
+  <main>
+    <!-- Header -->
+    <div class="header">
+      <div>
+        <h1>InBody Tracker</h1>
+        <div class="sub">Last scan: <b id="last-date">—</b></div>
+      </div>
+      <div>
+        <label class="sub">Select scan: </label>
+        <select id="scan-select"></select>
+      </div>
     </div>
 
-    <div class="grid">
-      <!-- Left: Silhouette replica -->
-      <div class="panel">
-        <h3>Silhouette View</h3>
-        <svg id="sil" viewBox="0 0 520 600" width="100%" height="auto" aria-labelledby="title">
-          <title>Segmental Lean Analysis</title>
-          <!-- backdrop -->
-          <rect x="0" y="0" width="520" height="600" rx="14" fill="#12162b" stroke="#232a49"/>
-          <!-- simplified silhouette -->
-          <g transform="translate(250,300)">
-            <!-- body core -->
-            <path d="M-55 -165
-                     C -75 -200, 75 -200, 55 -165
-                     L 68 -120  60 -40
-                     C 62 40, 55 85, 40 140
-                     C 20 190, -20 190, -40 140
-                     C -55 85, -62 40, -60 -40
-                     L -68 -120 Z"
-                  fill="#1a1f3a" stroke="#2b345e" stroke-width="2"/>
-            <!-- head -->
-            <circle cx="0" cy="-205" r="28" fill="#1a1f3a" stroke="#2b345e" stroke-width="2"/>
+    <!-- KPI Row -->
+    <section class="kpis">
+      <div class="kpi"><div class="label">Weight</div><div id="kpi-weight" class="value">—</div></div>
+      <div class="kpi"><div class="label">PBF</div><div id="kpi-pbf" class="value">—</div></div>
+      <div class="kpi"><div class="label">Visceral Fat</div><div id="kpi-visc" class="value">—</div></div>
+      <div class="kpi"><div class="label">InBody Score</div><div id="kpi-score" class="value">—</div></div>
+    </section>
 
-            <!-- Arms (capsules) -->
-            <rect x="-150" y="-60" rx="18" ry="18" width="90" height="36"
-                  fill="#151b36" stroke="#2b345e"/>
-            <rect x="60" y="-60" rx="18" ry="18" width="90" height="36"
-                  fill="#151b36" stroke="#2b345e"/>
-
-            <!-- Legs (capsules) -->
-            <rect x="-110" y="150" rx="18" ry="18" width="110" height="38"
-                  fill="#151b36" stroke="#2b345e"/>
-            <rect x="0" y="150" rx="18" ry="18" width="110" height="38"
-                  fill="#151b36" stroke="#2b345e"/>
-
-            <!-- Trunk (capsule) -->
-            <rect x="-85" y="10" rx="18" ry="18" width="170" height="44"
-                  fill="#151b36" stroke="#2b345e"/>
-
-            <!-- Labels -->
-            <!-- Left Arm -->
-            <text class="sil-label" x="-105" y="-100" text-anchor="middle">Left Arm</text>
-            <text id="la-kg" class="kg" x="-105" y="-80" text-anchor="middle">3.01 kg</text>
-            <text id="la-pct" class="pct" x="-105" y="-60" text-anchor="middle">96.6%</text>
-            <text id="la-eval" class="eval" x="-105" y="-40" text-anchor="middle">Normal</text>
-
-            <!-- Right Arm -->
-            <text class="sil-label" x="105" y="-100" text-anchor="middle">Right Arm</text>
-            <text id="ra-kg" class="kg" x="105" y="-80" text-anchor="middle">3.08 kg</text>
-            <text id="ra-pct" class="pct" x="105" y="-60" text-anchor="middle">98.2%</text>
-            <text id="ra-eval" class="eval" x="105" y="-40" text-anchor="middle">Normal</text>
-
-            <!-- Trunk -->
-            <text class="sil-label" x="0" y="-10" text-anchor="middle">Trunk</text>
-            <text id="tr-kg" class="kg" x="0" y="10" text-anchor="middle">24.4 kg</text>
-            <text id="tr-pct" class="pct" x="0" y="30" text-anchor="middle">97.4%</text>
-            <text id="tr-eval" class="eval" x="0" y="50" text-anchor="middle">Normal</text>
-
-            <!-- Left Leg -->
-            <text class="sil-label" x="-55" y="130" text-anchor="middle">Left Leg</text>
-            <text id="ll-kg" class="kg" x="-55" y="150" text-anchor="middle">7.87 kg</text>
-            <text id="ll-pct" class="pct" x="-55" y="170" text-anchor="middle">90.9%</text>
-            <text id="ll-eval" class="eval" x="-55" y="190" text-anchor="middle">Normal</text>
-
-            <!-- Right Leg -->
-            <text class="sil-label" x="55" y="130" text-anchor="middle">Right Leg</text>
-            <text id="rl-kg" class="kg" x="55" y="150" text-anchor="middle">7.94 kg</text>
-            <text id="rl-pct" class="pct" x="55" y="170" text-anchor="middle">90.9%</text>
-            <text id="rl-eval" class="eval" x="55" y="190" text-anchor="middle">Normal</text>
-          </g>
-        </svg>
+    <!-- Overall I-O-R (under KPIs) -->
+    <details class="acc" id="ior-overall">
+      <summary>Overall Insight • Observation • Recommendation</summary>
+      <div class="acc-body">
+        <table><thead><tr><th>Insight</th><th>Observation</th><th>Recommendation</th></tr></thead>
+          <tbody id="overall-row"></tbody></table>
       </div>
+    </details>
 
-      <!-- Right: numbers table -->
-      <div class="panel">
-        <h3>Values</h3>
-        <table>
-          <thead>
-            <tr><th>Segment</th><th>kg</th><th>% of std</th><th>Eval</th></tr>
-          </thead>
-          <tbody id="tbl"></tbody>
-        </table>
-        <div style="margin-top:12px;color:#aab1d7;font-size:12px">
-          Note: InBody considers ~90–110% of standard as “Normal”.
+    <!-- Combined Charts Panel -->
+    <section class="panel">
+      <h3>Composition + BMI/PBF</h3>
+      <div class="tabrow">
+        <span class="badge">Line: Weight • SMM • Fat</span>
+        <span class="badge">Scatter: BMI vs PBF</span>
+      </div>
+      <canvas id="chart-comp"></canvas>
+      <hr class="sep" />
+      <canvas id="chart-bmi-pbf"></canvas>
+
+      <details class="acc" id="ior-comp-bmi">
+        <summary>Chart Insights • Observation • Recommendation</summary>
+        <div class="acc-body">
+          <table>
+            <thead><tr><th>Section</th><th>Insight</th><th>Observation</th><th>Recommendation</th></tr></thead>
+            <tbody id="ior-compbmi-rows"></tbody>
+          </table>
         </div>
+      </details>
+    </section>
+
+    <!-- Metabolic & Fluids -->
+    <section class="grid-2">
+      <div class="panel">
+        <h3>BMR & Obesity Degree</h3>
+        <canvas id="chart-bmr-ob"></canvas>
       </div>
+      <div class="panel">
+        <h3>ECW/TBW</h3>
+        <canvas id="chart-ecw"></canvas>
+      </div>
+    </section>
+    <details class="acc" id="ior-bmr-ecw">
+      <summary>Metabolic & Fluids — I • O • R</summary>
+      <div class="acc-body">
+        <table>
+          <thead><tr><th>Section</th><th>Insight</th><th>Observation</th><th>Recommendation</th></tr></thead>
+          <tbody id="ior-bmrecw-rows"></tbody>
+        </table>
+      </div>
+    </details>
+
+    <!-- Segmental Panel -->
+    <section class="panel">
+      <h3>Segmental Analysis (Lean)</h3>
+      <div class="tabrow"><button class="tab active" id="seg-lean">Lean</button><button class="tab" id="seg-fat">Fat (placeholder)</button></div>
+      <svg id="silhouette" class="sil" viewBox="0 0 520 600" aria-labelledby="title">
+        <title>Human Silhouette</title>
+        <rect x="0" y="0" width="520" height="600" rx="14" fill="#12162b" stroke="#232a49"/>
+        <g transform="translate(260,300)">
+          <!-- body -->
+          <path d="M-55 -165 C -75 -200, 75 -200, 55 -165 L 68 -120 60 -40 C 62 40, 55 85, 40 140 C 20 190, -20 190, -40 140 C -55 85, -62 40, -60 -40 L -68 -120 Z"
+                fill="#1a1f3a" stroke="#2b345e" stroke-width="2"/>
+          <circle cx="0" cy="-205" r="28" fill="#1a1f3a" stroke="#2b345e" stroke-width="2"/>
+          <!-- arms -->
+          <path d="M-68 -120 C -120 -110, -140 -60, -130 -40 C -120 -20, -100 -10, -80 -20" fill="none" stroke="#2b345e" stroke-width="10" stroke-linecap="round"/>
+          <path d="M68 -120 C 120 -110, 140 -60, 130 -40 C 120 -20, 100 -10, 80 -20" fill="none" stroke="#2b345e" stroke-width="10" stroke-linecap="round"/>
+          <!-- limb label boxes -->
+          <rect x="-180" y="-80" width="110" height="70" rx="12" fill="#151b36" stroke="#2b345e"/>
+          <rect x="70" y="-80" width="110" height="70" rx="12" fill="#151b36" stroke="#2b345e"/>
+          <rect x="-90" y="0" width="180" height="70" rx="12" fill="#151b36" stroke="#2b345e"/>
+          <rect x="-150" y="150" width="120" height="70" rx="12" fill="#151b36" stroke="#2b345e"/>
+          <rect x="30" y="150" width="120" height="70" rx="12" fill="#151b36" stroke="#2b345e"/>
+          <!-- labels -->
+          <text class="lbl" x="-125" y="-92">Left Arm</text>
+          <text id="la-kg" class="v1" x="-125" y="-68">—</text>
+          <text id="la-pct" class="v2" x="-125" y="-48">—</text>
+
+          <text class="lbl" x="125" y="-92" text-anchor="middle">Right Arm</text>
+          <text id="ra-kg" class="v1" x="125" y="-68" text-anchor="middle">—</text>
+          <text id="ra-pct" class="v2" x="125" y="-48" text-anchor="middle">—</text>
+
+          <text class="lbl" x="0" y="-8" text-anchor="middle">Trunk</text>
+          <text id="tr-kg" class="v1" x="0" y="16" text-anchor="middle">—</text>
+          <text id="tr-pct" class="v2" x="0" y="36" text-anchor="middle">—</text>
+
+          <text class="lbl" x="-90" y="142" text-anchor="middle">Left Leg</text>
+          <text id="ll-kg" class="v1" x="-90" y="166" text-anchor="middle">—</text>
+          <text id="ll-pct" class="v2" x="-90" y="186" text-anchor="middle">—</text>
+
+          <text class="lbl" x="90" y="142" text-anchor="middle">Right Leg</text>
+          <text id="rl-kg" class="v1" x="90" y="166" text-anchor="middle">—</text>
+          <text id="rl-pct" class="v2" x="90" y="186" text-anchor="middle">—</text>
+        </g>
+      </svg>
+
+      <details class="acc" id="ior-segmental">
+        <summary>Segmental — I • O • R</summary>
+        <div class="acc-body">
+          <table>
+            <thead><tr><th>Insight</th><th>Observation</th><th>Recommendation</th></tr></thead>
+            <tbody id="ior-seg-row"></tbody>
+          </table>
+        </div>
+      </details>
+    </section>
+
+    <!-- Master Table (accordion) -->
+    <section class="panel">
+      <h3>Data Repository (All Scans)</h3>
+      <details class="acc" id="master-accordion">
+        <summary>Show / Hide Master Table (incl. 5+1 I-O-R per scan)</summary>
+        <div class="acc-body">
+          <table class="master" id="master-table">
+            <thead>
+              <tr>
+                <th>Date</th><th>Weight</th><th>PBF%</th><th>BMI</th><th>Score</th><th>Visc</th><th>SMM</th><th>Fat</th>
+                <th>Comp I-O-R</th><th>BMI/PBF I-O-R</th><th>BMR/Obesity I-O-R</th><th>ECW/TBW I-O-R</th><th>Segmental I-O-R</th><th>Overall I-O-R</th>
+              </tr>
+            </thead>
+            <tbody id="master-body"></tbody>
+          </table>
+        </div>
+      </details>
+    </section>
+  </main>
+
+  <!-- Right Sidebar -->
+  <aside class="right">
+    <div class="goal">
+      <h4 style="margin:0 0 6px">InBody Score</h4>
+      <div class="gauge" id="scoreGauge" style="--val:0"><span id="scoreText">—</span></div>
     </div>
-  </div>
+    <div class="goal">
+      <h4 style="margin:0 0 6px">Visceral Fat</h4>
+      <div class="gauge" id="visGauge" style="--val:0"><span id="visText">—</span></div>
+    </div>
+    <div class="goal">
+      <h4 style="margin:0 0 6px">Tips</h4>
+      <div id="tips"></div>
+    </div>
+  </aside>
 </div>
 
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
-/* --- Your data (from scans) --- */
-const data = {
-  "13 Jun 2025 (scan)": {
-    leftArm:  {kg:3.05, pct:95.7},
-    rightArm: {kg:3.12, pct:97.9},
-    trunk:    {kg:24.8, pct:97.6},
-    leftLeg:  {kg:8.09, pct:91.3},
-    rightLeg: {kg:8.16, pct:92.0}
+/* ===========================
+   DATA (all inline)
+   =========================== */
+const scans = [
+  {
+    date: "2025-03-01", label: "Mar 2025 (est.)",
+    metrics: {weight:90.0,pbf:42.0,bmi:31.9,score:62,visceral:15,smm:32.0,fat:38.0,bmr:1750,tbw:42.5,protein:11.2,minerals:3.8,ffm:52.0,obesity:145.0,ecwtbw:0.390},
+    segments:{la:{kg:3.00,pct:98.0},ra:{kg:3.10,pct:98.5},tr:{kg:21.0,pct:99.0},ll:{kg:9.40,pct:97.5},rl:{kg:9.50,pct:98.0}},
+    ior:{
+      composition:{insight:"Fat dominant profile",observation:"Very high fat mass; muscle comparatively lower",recommendation:"Start caloric deficit; protein ≥1.6 g/kg"},
+      bmi_pbf:{insight:"BMI & PBF both high",observation:"BMI 31.9, PBF 42%",recommendation:"Track waist/hip & photos"},
+      bmr_obesity:{insight:"BMR driven by body mass",observation:"~1750 kcal baseline",recommendation:"Moderate deficit (300–500 kcal)"},
+      ecwtbw:{insight:"Upper hydration band",observation:"ECW/TBW 0.390",recommendation:"Control sodium; steady fluids"},
+      segmental:{insight:"Balanced limbs; trunk high",observation:"Arms/legs ~97–99% std",recommendation:"Balanced training; trunk mobility"},
+      overall:{insight:"Obese baseline",observation:"VF 15; obesity degree 145%",recommendation:"Initiate weight-loss phase"}
+    }
   },
-  "11 Sep 2025 (scan)": {
-    leftArm:  {kg:3.00, pct:94.6},
-    rightArm: {kg:3.03, pct:95.6},
-    trunk:    {kg:24.4, pct:96.6},
-    leftLeg:  {kg:8.15, pct:92.6},
-    rightLeg: {kg:8.19, pct:92.9}
+  {
+    date: "2025-04-15", label: "Mid-Apr 2025 (est.)",
+    metrics: {weight:84.7,pbf:39.6,bmi:30.0,score:63,visceral:14,smm:31.2,fat:33.5,bmr:1700,tbw:41.0,protein:10.9,minerals:3.7,ffm:51.2,obesity:139.0,ecwtbw:0.389},
+    segments:{la:{kg:2.90,pct:97.8},ra:{kg:3.00,pct:98.2},tr:{kg:20.5,pct:98.5},ll:{kg:9.20,pct:97.2},rl:{kg:9.30,pct:97.6}},
+    ior:{
+      composition:{insight:"Early fat reduction",observation:"~5 kg loss; mostly fat",recommendation:"Add resistance training"},
+      bmi_pbf:{insight:"PBF ↓ faster than BMI",observation:"PBF 39.6%, BMI 30.0",recommendation:"Keep weekly loss ≤0.7% BW"},
+      bmr_obesity:{insight:"BMR slightly down",observation:"~1700 kcal",recommendation:"Avoid aggressive cuts"},
+      ecwtbw:{insight:"Hydration stable",observation:"0.389",recommendation:"Fluids 35–40 ml/kg"},
+      segmental:{insight:"Balanced limbs",observation:"Arms ~98%, legs ~97%",recommendation:"Add squats/deadlifts"},
+      overall:{insight:"Good start",observation:"−5.3 kg total",recommendation:"Sustain momentum"}
+    }
   },
-  "24 Sep 2025 (scan)": {
-    leftArm:  {kg:3.01, pct:96.6},
-    rightArm: {kg:3.08, pct:98.2},
-    trunk:    {kg:24.4, pct:97.4},
-    leftLeg:  {kg:7.87, pct:90.9},
-    rightLeg: {kg:7.94, pct:90.9}
+  {
+    date: "2025-06-13", label: "13 Jun 2025 (scan)",
+    metrics: {weight:80.6,pbf:32.6,bmi:28.6,score:65,visceral:12,smm:30.4,fat:26.2,bmr:1544,tbw:39.9,protein:10.7,minerals:3.75,ffm:54.4,obesity:130.0,ecwtbw:0.388},
+    segments:{la:{kg:3.05,pct:95.7},ra:{kg:3.12,pct:97.9},tr:{kg:24.8,pct:97.6},ll:{kg:8.09,pct:91.3},rl:{kg:8.16,pct:92.0}},
+    ior:{
+      composition:{insight:"Strong fat loss",observation:"Fat ↓ 11.8 kg; muscle ↓ 1.6 kg",recommendation:"Continue deficit; carbs pre-workout"},
+      bmi_pbf:{insight:"PBF dropping faster",observation:"BMI 28.6; PBF 32.6%",recommendation:"Use tape + photos"},
+      bmr_obesity:{insight:"BMR steady",observation:"1544 kcal",recommendation:"Deficit 300–500 kcal"},
+      ecwtbw:{insight:"Hydration healthy",observation:"0.388",recommendation:"Maintain electrolytes"},
+      segmental:{insight:"Legs slightly low",observation:"LL 91.3%; RL 92.0%",recommendation:"Unilateral leg work"},
+      overall:{insight:"Overfat but improving",observation:"VF ↓ to 12",recommendation:"Push toward VF < 10"}
+    }
+  },
+  {
+    date: "2025-09-11", label: "11 Sep 2025 (scan)",
+    metrics: {weight:79.0,pbf:31.3,bmi:28.0,score:66,visceral:10,smm:30.4,fat:24.8,bmr:1542,tbw:39.8,protein:10.6,minerals:3.75,ffm:54.2,obesity:127.9,ecwtbw:0.388},
+    segments:{la:{kg:3.00,pct:94.6},ra:{kg:3.03,pct:95.6},tr:{kg:24.4,pct:96.6},ll:{kg:8.15,pct:92.6},rl:{kg:8.19,pct:92.9}},
+    ior:{
+      composition:{insight:"Progress sustained",observation:"Muscle stable; fat ↓",recommendation:"Maintain 2–3×/wk lifting"},
+      bmi_pbf:{insight:"PBF ↓ steady",observation:"BMI 28.0; PBF 31.3%",recommendation:"Loss rate ~0.5% BW/wk"},
+      bmr_obesity:{insight:"BMR unchanged",observation:"1542 kcal",recommendation:"Avoid further drop; monitor lifts"},
+      ecwtbw:{insight:"Hydration consistent",observation:"0.388",recommendation:"~3 L/day"},
+      segmental:{insight:"Arms/trunk solid; legs behind",observation:"Legs ~92–93%",recommendation:"Leg hypertrophy focus"},
+      overall:{insight:"Near overweight zone",observation:"VF 10",recommendation:"Push to VF ≤ 9"}
+    }
+  },
+  {
+    date: "2025-09-24", label: "24 Sep 2025 (scan)",
+    metrics: {weight:76.8,pbf:29.7,bmi:27.2,score:68,visceral:9,smm:30.2,fat:22.8,bmr:1536,tbw:39.6,protein:10.6,minerals:3.75,ffm:54.0,obesity:124.8,ecwtbw:0.387},
+    segments:{la:{kg:3.01,pct:96.6},ra:{kg:3.08,pct:98.2},tr:{kg:24.4,pct:97.4},ll:{kg:7.87,pct:90.9},rl:{kg:7.94,pct:90.9}},
+    ior:{
+      composition:{insight:"Major milestone",observation:"Fat ↓ 15.2 kg; muscle preserved",recommendation:"Begin recomposition"},
+      bmi_pbf:{insight:"BMI vs PBF gap",observation:"BMI 27.2; PBF 29.7%",recommendation:"Next goal PBF ≤ 25%"},
+      bmr_obesity:{insight:"BMR stable",observation:"1536 kcal",recommendation:"Keep strength to hold SMM"},
+      ecwtbw:{insight:"Hydration optimal",observation:"0.387",recommendation:"Maintain fluids & electrolytes"},
+      segmental:{insight:"Legs lagging",observation:"LL/RL 90.9% of std",recommendation:"Lower-body progressive overload"},
+      overall:{insight:"Obese → overweight, muscle preserved",observation:"−13.2 kg; ~85% fat loss; VF 9",recommendation:"Target 72 kg, PBF ≤ 25%, VF ≤ 7"}
+    }
   }
-};
+];
 
-const dateSel = document.getElementById('dateSel');
-Object.keys(data).forEach(d=>{
-  const o=document.createElement('option'); o.textContent=d; o.value=d; dateSel.appendChild(o);
-});
-dateSel.value = "24 Sep 2025 (scan)";
+/* ===========================
+   Helpers
+   =========================== */
+const fmt = (n,unit="") => (n===null||n===undefined||Number.isNaN(n)) ? "—" : (unit ? `${n}${unit}` : n);
+let active = scans.length - 1;
 
-/* helper: evaluation text */
-function evalText(pct){
-  if (pct >= 110) return "Over";
-  if (pct >= 90)  return "Normal";
-  return "Under";
+function fillSelect(){
+  const sel = document.getElementById('scan-select');
+  scans.forEach((s,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=s.label; sel.appendChild(o); });
+  sel.value = String(active);
+  sel.addEventListener('change', e => { active = +e.target.value; renderAll(); });
 }
-/* fill table + svg */
-function render(dkey){
-  const d = data[dkey];
-  const cells = [
-    ["Left Arm","la", d.leftArm],
-    ["Right Arm","ra", d.rightArm],
-    ["Trunk","tr", d.trunk],
-    ["Left Leg","ll", d.leftLeg],
-    ["Right Leg","rl", d.rightLeg],
+
+function setKPIs(s){
+  document.getElementById('last-date').textContent = s.label;
+  document.getElementById('kpi-weight').textContent = `${s.metrics.weight.toFixed(1)} kg`;
+  document.getElementById('kpi-pbf').textContent = `${s.metrics.pbf.toFixed(1)}%`;
+  document.getElementById('kpi-visc').textContent = `${s.metrics.visceral}`;
+  document.getElementById('kpi-score').textContent = `${s.metrics.score}`;
+  // Gauges (sidebar)
+  document.getElementById('scoreGauge').style.setProperty('--val', s.metrics.score);
+  document.getElementById('scoreText').textContent = s.metrics.score;
+  document.getElementById('visGauge').style.setProperty('--val', s.metrics.visceral*5);
+  document.getElementById('visText').textContent = s.metrics.visceral;
+  document.getElementById('tips').innerHTML = `
+    <div class="badge">Hydration ${s.metrics.ecwtbw.toFixed(3)}</div>
+    <div style="height:8px"></div>
+    <div class="badge">SMM ${s.metrics.smm.toFixed(1)} kg</div>
+  `;
+}
+
+function setOverallIOR(s){
+  const tr = `<tr><td>${s.ior.overall.insight}</td><td>${s.ior.overall.observation}</td><td>${s.ior.overall.recommendation}</td></tr>`;
+  document.getElementById('overall-row').innerHTML = tr;
+}
+
+/* Build arrays for charts */
+function series(){
+  return {
+    labels: scans.map(s=>s.label),
+    weight: scans.map(s=>s.metrics.weight),
+    smm: scans.map(s=>s.metrics.smm),
+    fat: scans.map(s=>s.metrics.fat),
+    bmi: scans.map(s=>s.metrics.bmi),
+    pbf: scans.map(s=>s.metrics.pbf),
+    bmr: scans.map(s=>s.metrics.bmr),
+    obesity: scans.map(s=>s.metrics.obesity),
+    ecw: scans.map(s=>s.metrics.ecwtbw)
+  };
+}
+
+/* Fill combined panel IOR rows (active scan) */
+function setCompBmiIOR(s){
+  const rows = [
+    ["Composition", s.ior.composition.insight, s.ior.composition.observation, s.ior.composition.recommendation],
+    ["BMI/PBF", s.ior.bmi_pbf.insight, s.ior.bmi_pbf.observation, s.ior.bmi_pbf.recommendation]
   ];
-  // SVG labels
-  cells.forEach(([label, id, obj])=>{
-    document.getElementById(`${id}-kg`).textContent  = `${obj.kg.toFixed(2)} kg`;
-    document.getElementById(`${id}-pct`).textContent = `${obj.pct.toFixed(1)}%`;
-    const ev = evalText(obj.pct);
-    const el = document.getElementById(`${id}-eval`);
-    el.textContent = ev;
-    el.setAttribute("class", "eval" + (ev==="Normal" ? "" : " ok")); // keep green for normal
-  });
-  // Table
-  document.getElementById('tbl').innerHTML = cells.map(([label,id,obj])=>{
-    const ev = evalText(obj.pct);
+  document.getElementById('ior-compbmi-rows').innerHTML =
+    rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join("");
+}
+
+/* Fill metabolic & fluids IOR (active scan) */
+function setBmrecwIOR(s){
+  const rows = [
+    ["BMR/Obesity", s.ior.bmr_obesity.insight, s.ior.bmr_obesity.observation, s.ior.bmr_obesity.recommendation],
+    ["ECW/TBW", s.ior.ecwtbw.insight, s.ior.ecwtbw.observation, s.ior.ecwtbw.recommendation],
+  ];
+  document.getElementById('ior-bmrecw-rows').innerHTML =
+    rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join("");
+}
+
+/* Segmental */
+function setSegmental(s){
+  const {la,ra,tr,ll,rl} = s.segments;
+  const f2 = x => x.toFixed(2);
+  document.getElementById('la-kg').textContent = `${f2(la.kg)} kg`;
+  document.getElementById('la-pct').textContent = `${la.pct.toFixed(1)}%`;
+  document.getElementById('ra-kg').textContent = `${f2(ra.kg)} kg`;
+  document.getElementById('ra-pct').textContent = `${ra.pct.toFixed(1)}%`;
+  document.getElementById('tr-kg').textContent = `${f2(tr.kg)} kg`;
+  document.getElementById('tr-pct').textContent = `${tr.pct.toFixed(1)}%`;
+  document.getElementById('ll-kg').textContent = `${f2(ll.kg)} kg`;
+  document.getElementById('ll-pct').textContent = `${ll.pct.toFixed(1)}%`;
+  document.getElementById('rl-kg').textContent = `${f2(rl.kg)} kg`;
+  document.getElementById('rl-pct').textContent = `${rl.pct.toFixed(1)}%`;
+
+  document.getElementById('ior-seg-row').innerHTML =
+    `<tr><td>${s.ior.segmental.insight}</td><td>${s.ior.segmental.observation}</td><td>${s.ior.segmental.recommendation}</td></tr>`;
+}
+
+/* Master table build (incl 5+1 IOR per scan) */
+function buildMaster(){
+  const body = document.getElementById('master-body');
+  body.innerHTML = scans.map(s=>{
+    function pack(obj){ return `<b>${obj.insight}</b><br><i>${obj.observation}</i><br>${obj.recommendation}` }
     return `<tr>
-      <td>${label}</td>
-      <td>${obj.kg.toFixed(2)}</td>
-      <td>${obj.pct.toFixed(1)}%</td>
-      <td><span class="badge">${ev}</span></td>
+      <td>${s.label}</td>
+      <td>${s.metrics.weight.toFixed(1)}</td>
+      <td>${s.metrics.pbf.toFixed(1)}</td>
+      <td>${s.metrics.bmi.toFixed(1)}</td>
+      <td>${s.metrics.score}</td>
+      <td>${s.metrics.visceral}</td>
+      <td>${s.metrics.smm.toFixed(1)}</td>
+      <td>${s.metrics.fat.toFixed(1)}</td>
+      <td>${pack(s.ior.composition)}</td>
+      <td>${pack(s.ior.bmi_pbf)}</td>
+      <td>${pack(s.ior.bmr_obesity)}</td>
+      <td>${pack(s.ior.ecwtbw)}</td>
+      <td>${pack(s.ior.segmental)}</td>
+      <td>${pack(s.ior.overall)}</td>
     </tr>`;
   }).join("");
 }
-dateSel.addEventListener('change', e=>render(e.target.value));
-render(dateSel.value);
+
+/* ===========================
+   Charts
+   =========================== */
+let compChart, bmiChart, bmrObChart, ecwChart;
+function renderCharts(){
+  const S = series();
+  const gridColor = "#2d355a";
+  const border = 2.4;
+
+  if (!compChart){
+    compChart = new Chart(document.getElementById('chart-comp'), {
+      type:'line',
+      data:{labels:S.labels, datasets:[
+        {label:'Weight', data:S.weight, tension:.35, borderColor:'#7c5cff', backgroundColor:'rgba(124,92,255,.12)', fill:true, borderWidth:border},
+        {label:'SMM',    data:S.smm,    tension:.35, borderColor:'#25c2ff', backgroundColor:'rgba(37,194,255,.12)',  fill:true, borderWidth:border},
+        {label:'Body Fat', data:S.fat,  tension:.35, borderColor:'#ff6b6b', backgroundColor:'rgba(255,107,107,.10)', fill:true, borderWidth:border},
+      ]},
+      options:{plugins:{legend:{labels:{color:'#cfd3e9'}}},
+        scales:{x:{grid:{color:gridColor},ticks:{color:'#cfd3e9'}},
+                y:{grid:{color:gridColor},ticks:{color:'#cfd3e9'}}}
+    });
+  } else {
+    compChart.data.labels=S.labels; compChart.data.datasets[0].data=S.weight;
+    compChart.data.datasets[1].data=S.smm; compChart.data.datasets[2].data=S.fat; compChart.update();
+  }
+
+  if (!bmiChart){
+    bmiChart = new Chart(document.getElementById('chart-bmi-pbf'), {
+      type:'scatter',
+      data:{datasets:[{label:'BMI vs PBF', data:S.labels.map((d,i)=>({x:S.bmi[i],y:S.pbf[i],label:d})),
+                       borderColor:'#ffb547', backgroundColor:'rgba(255,181,71,.28)', pointRadius:6}]},
+      options:{plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${S.labels[c.dataIndex]} — BMI ${c.parsed.x}, PBF ${c.parsed.y}%`}}},
+               scales:{x:{title:{display:true,text:'BMI',color:'#cfd3e9'},grid:{color:gridColor},ticks:{color:'#cfd3e9'}},
+                       y:{title:{display:true,text:'PBF %',color:'#cfd3e9'},grid:{color:gridColor},ticks:{color:'#cfd3e9'}}}}
+    });
+  } else {
+    bmiChart.data.datasets[0].data = S.labels.map((d,i)=>({x:S.bmi[i],y:S.pbf[i],label:d})); bmiChart.update();
+  }
+
+  if (!bmrObChart){
+    bmrObChart = new Chart(document.getElementById('chart-bmr-ob'), {
+      type:'line',
+      data:{labels:S.labels, datasets:[
+        {label:'BMR (kcal)', data:S.bmr, yAxisID:'y1', tension:.35, borderColor:'#25c2ff', backgroundColor:'rgba(37,194,255,.12)', fill:true, borderWidth:border},
+        {label:'Obesity Degree %', data:S.obesity, yAxisID:'y2', tension:.35, borderColor:'#7c5cff', backgroundColor:'rgba(124,92,255,.10)', fill:true, borderWidth:border},
+      ]},
+      options:{plugins:{legend:{labels:{color:'#cfd3e9'}}},
+        scales:{x:{grid:{color:gridColor},ticks:{color:'#cfd3e9'}},
+                y1:{position:'left',grid:{color:gridColor},ticks:{color:'#cfd3e9'}},
+                y2:{position:'right',grid:{drawOnChartArea:false},ticks:{color:'#cfd3e9'}}}
+    });
+  } else {
+    bmrObChart.data.labels=S.labels; bmrObChart.data.datasets[0].data=S.bmr; bmrObChart.data.datasets[1].data=S.obesity; bmrObChart.update();
+  }
+
+  if (!ecwChart){
+    ecwChart = new Chart(document.getElementById('chart-ecw'), {
+      type:'line',
+      data:{labels:S.labels, datasets:[{label:'ECW/TBW', data:S.ecw, tension:.35, borderColor:'#5ad39e', backgroundColor:'rgba(90,211,158,.12)', fill:true, borderWidth:border}]},
+      options:{plugins:{legend:{labels:{color:'#cfd3e9'}}},
+        scales:{x:{grid:{color:gridColor},ticks:{color:'#cfd3e9'}},
+                y:{min:0.36,max:0.40,grid:{color:gridColor},ticks:{color:'#cfd3e9'}}}
+    });
+  } else {
+    ecwChart.data.labels=S.labels; ecwChart.data.datasets[0].data=S.ecw; ecwChart.update();
+  }
+}
+
+/* ===========================
+   Render all
+   =========================== */
+function renderAll(){
+  const s = scans[active];
+  setKPIs(s);
+  setOverallIOR(s);
+  setCompBmiIOR(s);
+  setBmrecwIOR(s);
+  setSegmental(s);
+  renderCharts();
+}
+function init(){
+  fillSelect(); buildMaster(); renderAll();
+}
+document.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
 </html>
