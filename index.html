@@ -343,5 +343,85 @@ function renderCharts(){
   if(scans.length){var s=scans[active]; setKPIs(s); setOverallIOR(s); setCompBmiIOR(s); setBmrecwIOR(s); setSegmental(s); renderCharts();}
 })();
 </script>
+<script>
+/* ===== Fallback dataset (used if JSON fails) ===== */
+var scansFallback = [
+  { date:"2025-03-01", label:"Mar 2025 (est.)",
+    metrics:{weight:90.0,pbf:42.0,bmi:31.9,score:62,visceral:15,smm:32.0,fat:38.0,bmr:1750,tbw:42.5,protein:11.2,minerals:3.8,ffm:52.0,obesity:145.0,ecwtbw:0.390},
+    segments:{la:{kg:3.00,pct:98.0},ra:{kg:3.10,pct:98.5},tr:{kg:21.0,pct:99.0},ll:{kg:9.40,pct:97.5},rl:{kg:9.50,pct:98.0}},
+    ior:{composition:{insight:"Fat dominant profile",observation:"Very high fat mass; muscle comparatively lower",recommendation:"Start caloric deficit; protein >= 1.6 g/kg"},
+         bmi_pbf:{insight:"BMI and PBF both high",observation:"BMI 31.9, PBF 42%",recommendation:"Track waist/hip and photos"},
+         bmr_obesity:{insight:"BMR driven by body mass",observation:"~1750 kcal baseline",recommendation:"Moderate deficit (300-500 kcal)"},
+         ecwtbw:{insight:"Upper hydration band",observation:"ECW/TBW 0.390",recommendation:"Control sodium; steady fluids"},
+         segmental:{insight:"Balanced limbs; trunk high",observation:"Arms/legs ~97-99% std",recommendation:"Balanced training; trunk mobility"},
+         overall:{insight:"Obese baseline",observation:"VF 15; obesity degree 145%",recommendation:"Initiate weight-loss phase"}}
+  },
+  { date:"2025-04-15", label:"Mid-Apr 2025 (est.)",
+    metrics:{weight:84.7,pbf:39.6,bmi:30.0,score:63,visceral:14,smm:31.2,fat:33.5,bmr:1700,tbw:41.0,protein:10.9,minerals:3.7,ffm:51.2,obesity:139.0,ecwtbw:0.389},
+    segments:{la:{kg:2.90,pct:97.8},ra:{kg:3.00,pct:98.2},tr:{kg:20.5,pct:98.5},ll:{kg:9.20,pct:97.2},rl:{kg:9.30,pct:97.6}},
+    ior:{composition:{insight:"Early fat reduction",observation:"~5 kg loss; mostly fat",recommendation:"Add resistance training"},
+         bmi_pbf:{insight:"PBF dropping faster than BMI",observation:"PBF 39.6%, BMI 30.0",recommendation:"Keep weekly loss <= 0.7% BW"},
+         bmr_obesity:{insight:"BMR slightly down",observation:"~1700 kcal",recommendation:"Avoid aggressive cuts"},
+         ecwtbw:{insight:"Hydration stable",observation:"0.389",recommendation:"Fluids 35-40 ml/kg"},
+         segmental:{insight:"Balanced limbs",observation:"Arms ~98%, legs ~97%",recommendation:"Add squats/deadlifts"},
+         overall:{insight:"Good start",observation:"-5.3 kg total",recommendation:"Sustain momentum"}}
+  },
+  { date:"2025-06-13", label:"13 Jun 2025 (scan)",
+    metrics:{weight:80.6,pbf:32.6,bmi:28.6,score:65,visceral:12,smm:30.4,fat:26.2,bmr:1544,tbw:39.9,protein:10.7,minerals:3.75,ffm:54.4,obesity:130.0,ecwtbw:0.388},
+    segments:{la:{kg:3.05,pct:95.7},ra:{kg:3.12,pct:97.9},tr:{kg:24.8,pct:97.6},ll:{kg:8.09,pct:91.3},rl:{kg:8.16,pct:92.0}},
+    ior:{composition:{insight:"Strong fat loss",observation:"Fat down 11.8 kg; muscle down 1.6 kg",recommendation:"Continue deficit; carbs pre-workout"},
+         bmi_pbf:{insight:"PBF dropping faster",observation:"BMI 28.6; PBF 32.6%",recommendation:"Use tape and photos"},
+         bmr_obesity:{insight:"BMR steady",observation:"1544 kcal",recommendation:"Deficit 300-500 kcal"},
+         ecwtbw:{insight:"Hydration healthy",observation:"0.388",recommendation:"Maintain electrolytes"},
+         segmental:{insight:"Legs slightly low",observation:"LL 91.3%; RL 92.0%",recommendation:"Unilateral leg work"},
+         overall:{insight:"Overfat but improving",observation:"VF down to 12",recommendation:"Push toward VF < 10"}}
+  },
+  { date:"2025-09-11", label:"11 Sep 2025 (scan)",
+    metrics:{weight:79.0,pbf:31.3,bmi:28.0,score:66,visceral:10,smm:30.4,fat:24.8,bmr:1542,tbw:39.8,protein:10.6,minerals:3.75,ffm:54.2,obesity:127.9,ecwtbw:0.388},
+    segments:{la:{kg:3.00,pct:94.6},ra:{kg:3.03,pct:95.6},tr:{kg:24.4,pct:96.6},ll:{kg:8.15,pct:92.6},rl:{kg:8.19,pct:92.9}},
+    ior:{composition:{insight:"Progress sustained",observation:"Muscle stable; fat down",recommendation:"Maintain 2-3x/week lifting"},
+         bmi_pbf:{insight:"PBF down steady",observation:"BMI 28.0; PBF 31.3%",recommendation:"Loss rate ~0.5% BW/week"},
+         bmr_obesity:{insight:"BMR unchanged",observation:"1542 kcal",recommendation:"Avoid further drop; monitor lifts"},
+         ecwtbw:{insight:"Hydration consistent",observation:"0.388",recommendation:"~3 L/day"},
+         segmental:{insight:"Arms/trunk solid; legs behind",observation:"Legs ~92-93%",recommendation:"Leg hypertrophy focus"},
+         overall:{insight:"Near overweight zone",observation:"VF 10",recommendation:"Push to VF <= 9"}}
+  },
+  { date:"2025-09-24", label:"24 Sep 2025 (scan)",
+    metrics:{weight:76.8,pbf:29.7,bmi:27.2,score:68,visceral:9,smm:30.2,fat:22.8,bmr:1536,tbw:39.6,protein:10.6,minerals:3.75,ffm:54.0,obesity:124.8,ecwtbw:0.387},
+    segments:{la:{kg:3.01,pct:96.6},ra:{kg:3.08,pct:98.2},tr:{kg:24.4,pct:97.4},ll:{kg:7.87,pct:90.9},rl:{kg:7.94,pct:90.9}},
+    ior:{composition:{insight:"Major milestone",observation:"Fat down 15.2 kg; muscle preserved",recommendation:"Begin recomposition"},
+         bmi_pbf:{insight:"BMI vs PBF gap",observation:"BMI 27.2; PBF 29.7%",recommendation:"Next goal PBF <= 25%"},
+         bmr_obesity:{insight:"BMR stable",observation:"1536 kcal",recommendation:"Keep strength to hold SMM"},
+         ecwtbw:{insight:"Hydration optimal",observation:"0.387",recommendation:"Maintain fluids and electrolytes"},
+         segmental:{insight:"Legs lagging",observation:"LL/RL 90.9% of std",recommendation:"Lower-body progressive overload"},
+         overall:{insight:"Obese to overweight, muscle preserved",observation:"-13.2 kg; ~85% fat loss; VF 9",recommendation:"Target 72 kg, PBF <= 25%, VF <= 7"}}
+  }
+];
+
+/* ===== Try to read JSON; fall back if empty ===== */
+function $(id){return document.getElementById(id)}
+var scans=[], active=0;
+(function(){
+  var src="fallback";
+  try{
+    var el=document.getElementById('scans-json');
+    if(el){
+      var raw=el.textContent||el.innerText||"";
+      var parsed=JSON.parse(raw);
+      if(parsed && parsed.scans && parsed.scans.length){scans=parsed.scans; src="json";}
+    }
+  }catch(e){console.warn("JSON data error -> using fallback", e)}
+  if(!scans.length){scans=scansFallback;}
+  active=scans.length?scans.length-1:0;
+  var dbg=document.getElementById('dbg'); if(dbg) dbg.textContent=' • Loaded '+scans.length+' scans (source: '+src+')';
+})();
+
+/* ===== the rest of your functions stay the SAME ===== */
+/* ... paste all the same functions from your current file:
+     setKPIs, setOverallIOR, setCompBmiIOR, setBmrecwIOR, setSegmental, buildMaster,
+     charts (renderCharts), series, and init block that calls them.
+   IMPORTANT: keep your existing guarded Chart.js code and init calls.
+*/
+</script>
 </body>
 </html>
