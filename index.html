@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>InBody Tracker</title>
 
 <!-- Google Font -->
@@ -26,8 +26,9 @@
     --radius-sm:12px;
   }
   *{box-sizing:border-box}
-  html,body{height:100%}
+  html{ height:100%; -webkit-text-size-adjust:100%; }
   body{
+    min-height:100%;
     margin:0;
     font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,Helvetica,sans-serif;
     color:var(--text);
@@ -36,45 +37,62 @@
       radial-gradient(1000px 500px at -10% 10%, rgba(34,211,238,0.08), transparent 60%),
       linear-gradient(180deg, #0b0f17, #0b0f17);
     background-color:var(--bg);
+    padding-bottom:max(12px, env(safe-area-inset-bottom));
+    padding-top:env(safe-area-inset-top);
   }
 
-  .container{max-width:1100px; margin:0 auto; padding:16px 14px 80px}
+  .container{max-width:1100px; margin:0 auto; padding:12px 10px 80px}
+
+  /* Header alignment */
   header.header{
-    position:relative;
     display:grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr;
     gap:12px;
-    align-items:end;
+    align-items:center;
     margin-bottom:14px;
+  }
+  @media(min-width:760px){
+    header.header{ grid-template-columns:1fr auto; }
   }
   .brand{
     background:linear-gradient(135deg, rgba(34,211,238,0.16), rgba(167,139,250,0.16));
     border:1px solid var(--border);
     border-radius:16px;
-    padding:14px 16px;
+    padding:12px 14px;
     box-shadow:var(--shadow);
+    display:flex; flex-direction:column; justify-content:center;
+    min-height:96px;
   }
-  .brand h1{ margin:0; font-size:1.25rem; letter-spacing:0.2px; font-weight:700; }
+  .brand h1{ margin:0; font-size:1.15rem; letter-spacing:0.2px; font-weight:800; line-height:1.2; }
   .brand .meta{
-    display:flex; flex-wrap:wrap; gap:10px; margin-top:8px; align-items:center;
-    font-size:0.88rem; color:var(--muted)
+    display:flex; flex-wrap:wrap; gap:8px 12px; margin-top:6px; align-items:center;
+    font-size:0.85rem; color:var(--muted)
   }
   .last-scan{color:var(--text)}
   .debug{font-size:0.75rem; opacity:0.85}
-  .controls{ display:flex; gap:10px; align-items:end; justify-self:end; }
+
+  .controls{
+    display:flex; gap:10px; align-items:center; justify-content:stretch;
+  }
+  @media(max-width:759.98px){
+    .controls{ width:100%; }
+  }
   select#scan-select{
+    flex:1 1 auto;
+    width:100%;
     appearance:none; -webkit-appearance:none; -moz-appearance:none;
     background:linear-gradient(180deg, #0c1322, #0c1424);
     color:var(--text);
     border:1px solid var(--border);
     border-radius:12px;
-    padding:12px 36px 12px 12px;
+    padding:12px 40px 12px 12px;
     font-weight:600;
     outline:none;
     box-shadow:var(--shadow);
   }
   .hamburger{
-    position:relative; width:44px; height:44px; border-radius:12px;
+    flex:0 0 44px;
+    width:44px; height:44px; border-radius:12px;
     border:1px solid var(--border);
     background:linear-gradient(180deg, #0c1420, #0c1426);
     display:grid; place-items:center;
@@ -91,6 +109,7 @@
   .hamburger span{position:absolute; top:21px}
   .hamburger::after{position:absolute; top:28px}
 
+  /* Overlay menu */
   .menu{ position:fixed; inset:0; background:rgba(7,10,17,0.88); backdrop-filter: blur(8px); display:none; z-index:50; padding:20px; }
   .menu.open{display:block;}
   .menu-inner{ max-width:1100px; margin:0 auto; color:var(--text); }
@@ -102,66 +121,69 @@
   }
   .menu .close{ float:right; font-weight:700; color:var(--neon-cyan); cursor:pointer; text-decoration:underline; }
 
-  .grid{display:grid; gap:12px}
+  .grid{display:grid; gap:10px}
   .kpis{grid-template-columns:1fr 1fr; margin:12px 0}
   @media(min-width:740px){ .kpis{grid-template-columns:repeat(6,1fr)} }
-  .card{
+  .card, .silhouette, details.repo{
     background:linear-gradient(180deg, #0c1322, #0c1526);
     border-radius:16px;
-    border:1px solid var(--border);
-    box-shadow:var(--shadow);
-    padding:12px;
+    border:1px solid rgba(255,255,255,0.08);
+    box-shadow:0 6px 18px rgba(0,0,0,.35), 0 0 0 1px rgba(255,255,255,0.04) inset;
+    padding:10px;
     position:relative; overflow:hidden;
     transform:translateY(6px); opacity:0;
     animation:fadeUp .5s ease forwards;
   }
-  .card:hover{ box-shadow:var(--shadow), 0 0 24px rgba(167,139,250,0.15); transform:translateY(-2px); transition:transform .15s ease, box-shadow .2s ease}
+  .card:hover{ box-shadow:0 6px 18px rgba(0,0,0,.35), 0 0 24px rgba(167,139,250,0.15), 0 0 0 1px rgba(255,255,255,0.04) inset; transform:translateY(-2px); transition:transform .15s ease, box-shadow .2s ease}
   .card h3{margin:0 0 6px 0; font-size:0.92rem; color:var(--muted); letter-spacing:0.2px}
   @keyframes fadeUp { to{opacity:1; transform:translateY(0)} }
   @media (prefers-reduced-motion: reduce){ .card{animation:none; opacity:1; transform:none} .hamburger, .card:hover{transition:none} }
 
+  /* KPI */
   .kpi{ display:grid; grid-template-columns:auto 1fr; gap:10px; align-items:center; }
   .gauge{
-    --size:58px; --track:8px; --val:0; --max:100; --hue:190;
+    --size:50px; --track:7px; --val:0; --max:100; --hue:190;
     width:var(--size); height:var(--size); border-radius:50%;
     background:conic-gradient(hsl(var(--hue), 95%, 62%) calc(var(--val)/var(--max)*1turn), rgba(255,255,255,0.07) 0);
     display:grid; place-items:center;
     transition: background .6s ease;
     box-shadow: inset 0 0 12px rgba(0,0,0,.35), 0 0 18px rgba(34,211,238,.15);
   }
-  .gauge::after{
-    content:""; width:calc(var(--size) - var(--track)*2); height:calc(var(--size) - var(--track)*2);
-    border-radius:50%; background:linear-gradient(180deg,#0a0f1a,#0b1220);
-    box-shadow: inset 0 0 0 1px var(--border);
-  }
-  .kpi .val{ position:absolute; width:var(--size); text-align:center; font-weight:800; font-size:.95rem; letter-spacing:.2px; }
-  .kpi .label{font-size:.82rem; color:var(--muted)}
-  .kpi .main{font-size:1.05rem; font-weight:800}
+  .gauge::after{ content:""; width:calc(var(--size) - var(--track)*2); height:calc(var(--size) - var(--track)*2); border-radius:50%; background:linear-gradient(180deg,#0a0f1a,#0b1220); box-shadow: inset 0 0 0 1px var(--border); }
+  .kpi .val{ position:absolute; width:var(--size); text-align:center; font-weight:800; font-size:.9rem; letter-spacing:.2px; }
+  .kpi .label{font-size:.78rem; color:var(--muted)}
+  .kpi .main{font-size:1.0rem; font-weight:800}
   .kpi.duo{grid-template-columns:auto 1fr}
   .duo-gauges{display:flex; gap:8px}
-  .mini .gauge{--size:48px}
-  .kpi .stack{display:grid; gap:6px}
-  .stack .row{display:flex; align-items:baseline; gap:8px}
-  .stack .row .t{font-size:.78rem; color:var(--muted)}
-  .stack .row .v{font-size:1.0rem; font-weight:800}
+  .mini .gauge{--size:44px}
 
-  .section-title{ margin:18px 0 8px; font-weight:800; letter-spacing:.3px; font-size:1.05rem; color:#e9e9ee; }
+  /* Mobile typography tweaks */
+  @media (max-width:420px){
+    .brand h1{ font-size:1.05rem; }
+    .kpi .main{ font-size:.96rem; }
+    .kpi .label{ font-size:.72rem; }
+    .kpi .val{ font-size:.86rem; }
+    .box{ min-width:96px; font-size:.8rem; }
+  }
 
+  .section-title{ margin:16px 0 8px; font-weight:800; letter-spacing:.3px; font-size:1.05rem; color:#e9e9ee; }
   .ior-card h4, .big-ior h4{ margin:0 0 8px 0; font-size:.95rem; color:#dfe4ea }
   .ior-table{ width:100%; border-collapse:collapse; font-size:.9rem }
   .ior-table th, .ior-table td{ padding:10px; border-top:1px solid var(--border); border-bottom:1px solid var(--border); text-align:left; vertical-align:top }
   .ior-table th{color:var(--muted); font-weight:600; width:140px}
-  .big-ior{padding:14px 12px}
+  .big-ior{padding:12px}
   .big-ior p{margin:6px 0; line-height:1.35}
 
-  .charts{display:grid; grid-template-columns:1fr; gap:12px}
+  .charts{display:grid; grid-template-columns:1fr; gap:10px}
   @media(min-width:900px){ .charts{grid-template-columns:1fr 1fr} }
-  .chart-card{padding:12px}
+  .chart-card{padding:10px}
+  .chart-card h4{ font-size:.95rem; margin-bottom:8px; }
+  .chart-card canvas{ width:100% !important; height:48vw !important; max-height:320px; min-height:180px; display:block; }
+  @media(min-width:900px){ .chart-card canvas{ height:280px !important; } }
   .chart-card .note{font-size:.8rem; color:var(--muted); margin-top:6px}
 
-  .segments{ display:grid; grid-template-columns:1fr; gap:12px; margin-top:6px; }
+  .segments{ display:grid; grid-template-columns:1fr; gap:10px; margin-top:6px; }
   @media(min-width:900px){ .segments{grid-template-columns:1fr 1fr} }
-  .silhouette{ background:linear-gradient(180deg, #0c1322, #0c1526); border:1px solid var(--border); border-radius:16px; box-shadow:var(--shadow); padding:12px; }
   .silhouette h4{margin:0 0 8px 0; color:#e6e9f2}
   .sil-body{position:relative; min-height:260px; display:grid; place-items:center}
   .human{ width:150px; height:230px; opacity:.9; filter:drop-shadow(0 0 16px rgba(167,139,250,.12)); }
@@ -174,7 +196,7 @@
   .ll{left:-10px; bottom:26px}
   .rl{right:-10px; bottom:26px}
 
-  details.repo{ border:1px solid var(--border); border-radius:16px; background:linear-gradient(180deg,#0c1322,#0c1526); box-shadow:var(--shadow); padding:12px; }
+  details.repo{ padding:12px; }
   details.repo summary{ cursor:pointer; list-style:none; font-weight:800; color:#e9ecf6; }
   details.repo summary::-webkit-details-marker{display:none}
   .table-wrap{overflow:auto; margin-top:10px; border-top:1px solid var(--border)}
@@ -266,11 +288,11 @@
   <section class="charts">
     <div class="card chart-card" style="--i:7">
       <h4>Weight, SMM, Fat (time series)</h4>
-      <canvas id="chart-comp" height="140"></canvas>
+      <canvas id="chart-comp"></canvas>
     </div>
     <div class="card chart-card" style="--i:8">
       <h4>BMI vs PBF (scatter)</h4>
-      <canvas id="chart-bmi" height="140"></canvas>
+      <canvas id="chart-bmi"></canvas>
     </div>
   </section>
   <section class="card ior-card" style="--i:9">
@@ -287,11 +309,11 @@
   <section class="charts">
     <div class="card chart-card" style="--i:10">
       <h4>BMR (kcal) + Obesity Degree %</h4>
-      <canvas id="chart-bmr" height="140"></canvas>
+      <canvas id="chart-bmr"></canvas>
     </div>
     <div class="card chart-card" style="--i:11">
       <h4>ECW/TBW (range 0.36 - 0.40)</h4>
-      <canvas id="chart-ecw" height="140"></canvas>
+      <canvas id="chart-ecw"></canvas>
       <div class="note">Y range is ~0.36 - 0.40</div>
     </div>
   </section>
@@ -361,7 +383,7 @@
   </section>
 
   <!-- Data Repository -->
-  <details class="repo" style="margin-top:14px">
+  <details class="repo" style="margin-top:12px">
     <summary>Data Repository (master table)</summary>
     <div class="table-wrap">
       <table class="master" id="repo-table">
@@ -472,8 +494,8 @@
 }
 </script>
 
+<!-- Robust Chart.js loader with multi-CDN fallback -->
 <script>
-  // Robust Chart.js loader with multi-CDN fallback
   function ensureChartJs(init){
     if (window.Chart) { init(); return; }
     const urls = [
@@ -497,24 +519,20 @@
 (function(){
   'use strict';
 
-  // -------- Data: try embedded JSON, else fallback --------
+  // Data source: parse JSON or fallback to same content
   const fallback = JSON.parse(document.getElementById('scans-json').textContent);
-
   let dataSource = 'json';
   let scans = [];
   try{
     const el = document.getElementById('scans-json');
     const parsed = JSON.parse(el?.textContent || '{}');
-    if(parsed && Array.isArray(parsed.scans) && parsed.scans.length){ scans = parsed.scans; }
-    else{ scans = fallback.scans; dataSource = 'fallback'; }
-  }catch(e){
-    scans = fallback.scans; dataSource = 'fallback';
-  }
+    scans = (parsed && Array.isArray(parsed.scans) && parsed.scans.length) ? parsed.scans : (dataSource='fallback', fallback.scans);
+  }catch(_){ dataSource='fallback'; scans = fallback.scans; }
 
-  const $ = sel => document.querySelector(sel);
   const byId = id => document.getElementById(id);
+  const select = byId('scan-select');
 
-  function fmt(val, digits=1){ return (val==null || Number.isNaN(val)) ? '-' : Number(val).toFixed(digits); }
+  const fmt = (val,d=1)=> (val==null||Number.isNaN(val)) ? '-' : Number(val).toFixed(d);
   function setGauge(el, value, max, text){
     if(!el) return;
     const v = (value==null||Number.isNaN(value)) ? 0 : Number(value);
@@ -525,11 +543,10 @@
     if(valEl){ valEl.textContent = text!=null ? text : fmt(v, (m<=100?1:0)); }
   }
 
-  const select = byId('scan-select');
   function safeMountSelect(items){
     const optionsHTML = items.map((s, i)=>`<option value="${i}">${s.label} - ${s.date}</option>`).join('');
-    select.innerHTML = optionsHTML;
-    select.selectedIndex = items.length - 1;
+    select.innerHTML = optionsHTML;           /* single assignment (iOS safe) */
+    select.selectedIndex = items.length - 1;  /* default to latest */
     updateDebug();
     renderAll(items.length - 1);
   }
@@ -556,11 +573,11 @@
     byId('v-bmr').textContent = String(Math.round(s.metrics.bmr));
 
     setGauge(byId('g-pbf'), s.metrics.pbf, 60, fmt(s.metrics.pbf,1));
-    byId('m-pbf').textContent = fmt(s.metrics.pbf,1) + ' %';
+    byId('m-pbf').textContent = `${fmt(s.metrics.pbf,1)} %`;
     byId('v-pbf').textContent = fmt(s.metrics.pbf,1);
 
     setGauge(byId('g-ob'), s.metrics.obesity, 200, fmt(s.metrics.obesity,1));
-    byId('m-ob').textContent = fmt(s.metrics.obesity,1) + ' %';
+    byId('m-ob').textContent = `${fmt(s.metrics.obesity,1)} %`;
     byId('v-ob').textContent = fmt(s.metrics.obesity,1);
 
     setGauge(byId('g-score'), s.metrics.score, 100, String(Math.round(s.metrics.score)));
@@ -591,11 +608,7 @@
     byId('ior-fat-reco').textContent = s.ior.segmental_fat.recommendation || '-';
   }
 
-  function segFmt(obj){
-    const kg = (obj?.kg==null) ? '-' : fmt(obj.kg,2) + ' kg';
-    const pct = (obj?.pct==null) ? '-' : fmt(obj.pct,1) + ' %';
-    return kg + ' | ' + pct;
-  }
+  const segFmt = o => `${(o?.kg==null)?'-':fmt(o.kg,2)+' kg'} | ${(o?.pct==null)?'-':fmt(o.pct,1)+' %'}`;
   function renderSegments(s){
     byId('lean-la').textContent = segFmt(s.segments_lean.la);
     byId('lean-ra').textContent = segFmt(s.segments_lean.ra);
@@ -633,8 +646,26 @@
     tbody.innerHTML = rows;
   }
 
+  // Charts (guard if Chart.js missing)
   let chComp, chBMI, chBMR, chECW;
-  function destroyChart(c){ if(c && typeof c.destroy==='function'){ try{ c.destroy(); }catch(_){} } }
+  const destroyChart = c => { if(c && typeof c.destroy==='function'){ try{ c.destroy(); }catch(_){} } };
+
+  function commonOptions(){
+    return {
+      responsive:true,
+      maintainAspectRatio:false,
+      interaction:{ intersect:false, mode:'nearest' },
+      layout:{ padding:{ left:4, right:8, top:4, bottom:2 } },
+      plugins:{
+        legend:{ labels:{ color:'#d1d5db', boxWidth:12, font:{ size:11 } } },
+        tooltip:{ bodyFont:{ size:11 }, titleFont:{ size:11 } }
+      },
+      scales:{
+        x:{ ticks:{ color:'#9ca3af', font:{ size:10 } }, grid:{ color:'rgba(255,255,255,0.06)' } },
+        y:{ ticks:{ color:'#9ca3af', font:{ size:10 } }, grid:{ color:'rgba(255,255,255,0.06)' } }
+      }
+    };
+  }
 
   function renderCharts(items){
     const ChartJS = window.Chart;
@@ -665,25 +696,14 @@
           {label:'SMM', data:smm, tension:.3, borderColor:'#34d399', pointRadius:2},
           {label:'Fat', data:fat, tension:.3, borderColor:'#f59e0b', pointRadius:2}
         ]},
-      options:{ responsive:true, maintainAspectRatio:false,
-        scales:{ x:{ ticks:{ color:'#9ca3af' }, grid:{ color:'rgba(255,255,255,0.06)'} },
-                 y:{ ticks:{ color:'#9ca3af' }, grid:{ color:'rgba(255,255,255,0.06)'} } },
-        plugins:{ legend:{ labels:{ color:'#d1d5db' } } }
-      }
+      options: commonOptions()
     });
 
     destroyChart(chBMI);
     chBMI = new ChartJS(byId('chart-bmi'), {
       type:'scatter',
       data:{ datasets:[{ label:'BMI vs PBF', data:bmi.map((v,i)=>({x:v,y:pbf[i], label:labels[i]})), borderColor:'#a78bfa', backgroundColor:'#a78bfa', pointRadius:4 }] },
-      options:{ responsive:true, maintainAspectRatio:false,
-        scales:{
-          x:{ title:{ display:true, text:'BMI', color:'#9ca3af' }, ticks:{ color:'#9ca3af' }, grid:{ color:'rgba(255,255,255,0.06)'} },
-          y:{ title:{ display:true, text:'PBF %', color:'#9ca3af' }, ticks:{ color:'#9ca3af' }, grid:{ color:'rgba(255,255,255,0.06)'} }
-        },
-        plugins:{ legend:{ labels:{ color:'#d1d5db' } },
-          tooltip:{ callbacks:{ label: ctx => `${ctx.raw?.label||''}: BMI ${fmt(ctx.raw.x,1)}, PBF ${fmt(ctx.raw.y,1)}%` } } }
-      }
+      options:(()=>{ const o=commonOptions(); o.scales.x.title={display:true,text:'BMI',color:'#9ca3af'}; o.scales.y.title={display:true,text:'PBF %',color:'#9ca3af'}; return o; })()
     });
 
     destroyChart(chBMR);
@@ -694,27 +714,17 @@
           {label:'BMR (kcal)', data:bmr, yAxisID:'y', tension:.3, borderColor:'#22d3ee', pointRadius:2},
           {label:'Obesity %', data:obesity, yAxisID:'y1', tension:.3, borderColor:'#f87171', pointRadius:2}
         ]},
-      options:{ responsive:true, maintainAspectRatio:false,
-        scales:{
-          x:{ ticks:{ color:'#9ca3af' }, grid:{ color:'rgba(255,255,255,0.06)'} },
-          y:{ position:'left', ticks:{ color:'#9ca3af' }, grid:{ color:'rgba(255,255,255,0.06)'} },
-          y1:{ position:'right', ticks:{ color:'#9ca3af' }, grid:{ drawOnChartArea:false } }
-        },
-        plugins:{ legend:{ labels:{ color:'#d1d5db' } } }
-      }
+      options:(()=>{ const o=commonOptions();
+        o.scales.y.position='left';
+        o.scales.y1={ position:'right', ticks:{ color:'#9ca3af' }, grid:{ drawOnChartArea:false } };
+        return o; })()
     });
 
     destroyChart(chECW);
     chECW = new ChartJS(byId('chart-ecw'), {
       type:'line',
       data:{ labels, datasets:[{label:'ECW/TBW', data:ecw, tension:.3, borderColor:'#34d399', pointRadius:2}] },
-      options:{ responsive:true, maintainAspectRatio:false,
-        scales:{
-          x:{ ticks:{ color:'#9ca3af' }, grid:{ color:'rgba(255,255,255,0.06)'} },
-          y:{ min:0.36, max:0.40, ticks:{ color:'#9ca3af', stepSize:0.01 }, grid:{ color:'rgba(255,255,255,0.06)'} }
-        },
-        plugins:{ legend:{ labels:{ color:'#d1d5db' } } }
-      }
+      options:(()=>{ const o=commonOptions(); o.scales.y.min=0.36; o.scales.y.max=0.40; o.scales.y.ticks.stepSize=0.01; return o; })()
     });
   }
 
@@ -728,6 +738,7 @@
 
   select.addEventListener('change', ()=> renderAll(Number(select.value)));
 
+  // Menu
   const menuBtn = byId('btn-menu');
   const menu = document.createElement('div');
   menu.className = 'menu';
