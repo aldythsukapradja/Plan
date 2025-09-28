@@ -4,217 +4,140 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>InBody Tracker</title>
-
-<!-- Google Font -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg:#0b0f17;
-    --panel:#101827;
-    --panel-2:#0f1624;
-    --text:#e5e7eb;
-    --muted:#9ca3af;
-    --border:rgba(255,255,255,0.06);
-    --neon-cyan:#22d3ee;
-    --neon-purple:#a78bfa;
-    --neon-amber:#f59e0b;
-    --neon-green:#34d399;
-    --neon-red:#f87171;
-    --shadow:0 10px 30px rgba(0,0,0,0.35), 0 0 0 1px var(--border) inset;
-    --radius:16px;
-    --radius-sm:12px;
-  }
-  *{box-sizing:border-box}
-  html{ height:100%; -webkit-text-size-adjust:100%; }
-  body{
-    min-height:100%;
-    margin:0;
-    font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,Helvetica,sans-serif;
-    color:var(--text);
-    background:
-      radial-gradient(1200px 600px at 70% -10%, rgba(167,139,250,0.12), transparent 60%),
-      radial-gradient(1000px 500px at -10% 10%, rgba(34,211,238,0.08), transparent 60%),
-      linear-gradient(180deg, #0b0f17, #0b0f17);
-    background-color:var(--bg);
-    padding-bottom:max(12px, env(safe-area-inset-bottom));
-    padding-top:env(safe-area-inset-top);
-  }
+:root{
+  --bg:#0b0f17; --panel:#0c1322; --panel-2:#0c1526; --text:#e5e7eb; --muted:#9ca3af;
+  --border:rgba(255,255,255,0.08);
+  --neon-cyan:#22d3ee; --neon-purple:#a78bfa; --neon-amber:#f59e0b; --neon-green:#34d399; --neon-red:#f87171;
+  --radius:16px; --radius-sm:12px; --shadow:0 10px 30px rgba(0,0,0,.35), 0 0 0 1px var(--border) inset;
+}
+*{box-sizing:border-box}
+html{height:100%;-webkit-text-size-adjust:100%}
+body{
+  min-height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,Helvetica,sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(1100px 500px at 75% -10%, rgba(167,139,250,.12), transparent 60%),
+    radial-gradient(900px 450px at -10% 5%, rgba(34,211,238,.08), transparent 55%),
+    linear-gradient(#0b0f17,#0b0f17);
+  padding-top:env(safe-area-inset-top); padding-bottom:max(12px,env(safe-area-inset-bottom));
+}
+.container{max-width:1120px;margin:0 auto;padding:12px 10px 72px}
+header.header{display:grid;grid-template-columns:1fr;gap:12px;align-items:center;margin-bottom:12px}
+@media(min-width:760px){ header.header{grid-template-columns:1fr auto}}
+.brand{
+  background:linear-gradient(135deg, rgba(34,211,238,.16), rgba(167,139,250,.16));
+  border:1px solid var(--border); border-radius:16px; padding:12px 14px; box-shadow:var(--shadow);
+  display:flex;flex-direction:column;gap:6px;min-height:96px
+}
+.brand h1{margin:0;font-weight:800;letter-spacing:.2px;font-size:1.16rem}
+.meta{display:flex;flex-wrap:wrap;gap:8px 12px;color:var(--muted);font-size:.86rem}
+.controls{display:flex;gap:10px;align-items:center}
+@media(max-width:759.98px){ .controls{width:100%} }
+select#scan-select{
+  flex:1 1 auto;width:100%;appearance:none;background:linear-gradient(180deg,#0c1424,#0c1528);
+  color:var(--text);border:1px solid var(--border);border-radius:12px;padding:12px 40px 12px 12px;font-weight:600;outline:0;box-shadow:var(--shadow)
+}
+.hamburger{position:relative;width:44px;height:44px;border-radius:12px;border:1px solid var(--border);
+  background:linear-gradient(180deg,#0c1420,#0c1426);display:grid;place-items:center;box-shadow:var(--shadow),0 0 18px rgba(34,211,238,.25);cursor:pointer}
+.hamburger:hover{transform:translateY(-2px);transition:transform .15s ease, box-shadow .15s ease}
+.hamburger::before,.hamburger::after,.hamburger span{content:"";display:block;position:absolute;width:20px;height:2px;background:var(--neon-cyan);border-radius:2px;box-shadow:0 0 10px rgba(34,211,238,.7)}
+.hamburger::before{top:14px} .hamburger span{top:21px} .hamburger::after{top:28px}
+.menu{position:fixed;inset:0;background:rgba(7,10,17,.88);backdrop-filter:blur(8px);display:none;z-index:60;padding:20px}
+.menu.open{display:block}
+.menu .inner{max-width:1120px;margin:0 auto}
+.menu .close{float:right;color:var(--neon-cyan);text-decoration:underline;cursor:pointer}
+.menu .pill{display:inline-block;margin:0 8px 8px 0;padding:10px 14px;border:1px solid var(--border);border-radius:999px;background:linear-gradient(180deg,#0e1526,#0e1629)}
 
-  .container{max-width:1100px; margin:0 auto; padding:12px 10px 80px}
+.grid{display:grid;gap:10px}
+.card{
+  background:linear-gradient(180deg,var(--panel),var(--panel-2));
+  border:1px solid var(--border);border-radius:16px;padding:10px;box-shadow:var(--shadow);
+  position:relative;overflow:hidden;transform:translateY(6px);opacity:0;animation:fadeUp .5s ease forwards
+}
+.card:hover{transform:translateY(-2px);box-shadow:var(--shadow),0 0 24px rgba(167,139,250,.15),0 0 0 1px rgba(255,255,255,.04) inset;transition:.16s}
+@keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){.card{animation:none;opacity:1;transform:none}.card:hover{transition:none}}
 
-  /* Header alignment */
-  header.header{
-    display:grid;
-    grid-template-columns: 1fr;
-    gap:12px;
-    align-items:center;
-    margin-bottom:14px;
-  }
-  @media(min-width:760px){
-    header.header{ grid-template-columns:1fr auto; }
-  }
-  .brand{
-    background:linear-gradient(135deg, rgba(34,211,238,0.16), rgba(167,139,250,0.16));
-    border:1px solid var(--border);
-    border-radius:16px;
-    padding:12px 14px;
-    box-shadow:var(--shadow);
-    display:flex; flex-direction:column; justify-content:center;
-    min-height:96px;
-  }
-  .brand h1{ margin:0; font-size:1.15rem; letter-spacing:0.2px; font-weight:800; line-height:1.2; }
-  .brand .meta{
-    display:flex; flex-wrap:wrap; gap:8px 12px; margin-top:6px; align-items:center;
-    font-size:0.85rem; color:var(--muted)
-  }
-  .last-scan{color:var(--text)}
-  .debug{font-size:0.75rem; opacity:0.85}
+.small{font-size:.86rem;color:var(--muted)}
+.section-title{margin:16px 0 8px;font-weight:800;font-size:1.05rem;letter-spacing:.3px}
 
-  .controls{
-    display:flex; gap:10px; align-items:center; justify-content:stretch;
-  }
-  @media(max-width:759.98px){
-    .controls{ width:100%; }
-  }
-  select#scan-select{
-    flex:1 1 auto;
-    width:100%;
-    appearance:none; -webkit-appearance:none; -moz-appearance:none;
-    background:linear-gradient(180deg, #0c1322, #0c1424);
-    color:var(--text);
-    border:1px solid var(--border);
-    border-radius:12px;
-    padding:12px 40px 12px 12px;
-    font-weight:600;
-    outline:none;
-    box-shadow:var(--shadow);
-  }
-  .hamburger{
-    flex:0 0 44px;
-    width:44px; height:44px; border-radius:12px;
-    border:1px solid var(--border);
-    background:linear-gradient(180deg, #0c1420, #0c1426);
-    display:grid; place-items:center;
-    box-shadow:var(--shadow), 0 0 18px rgba(34,211,238,0.25);
-    cursor:pointer;
-    transition:transform .15s ease, box-shadow .15s ease;
-  }
-  .hamburger:hover{ transform:translateY(-2px); box-shadow:var(--shadow), 0 0 28px rgba(34,211,238,0.35);}
-  .hamburger span, .hamburger::before, .hamburger::after{
-    content:""; display:block; width:20px; height:2px; background:var(--neon-cyan);
-    border-radius:2px; box-shadow:0 0 10px rgba(34,211,238,0.8);
-  }
-  .hamburger::before{position:absolute; top:14px}
-  .hamburger span{position:absolute; top:21px}
-  .hamburger::after{position:absolute; top:28px}
+.kpis{grid-template-columns:1fr 1fr}
+@media(min-width:740px){.kpis{grid-template-columns:repeat(4,1fr)}} 
+@media(min-width:1024px){.kpis{grid-template-columns:repeat(8,1fr)}}
+.kpi{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center}
+.kpi h4{margin:0 0 4px 0;font-size:.9rem;color:var(--muted);font-weight:600}
+.val-big{font-weight:800;font-size:1.02rem}
+.unit{font-size:.78rem;color:var(--muted)}
+.delta{margin-top:6px;display:inline-flex;align-items:center;gap:6px;font-size:.78rem;padding:4px 8px;border-radius:999px;border:1px solid var(--border);background:#0d1525}
+.delta.good{color:#c8f7dc;box-shadow:0 0 0 1px rgba(52,211,153,.25) inset, 0 0 12px rgba(52,211,153,.12)}
+.delta.bad{color:#ffd7d7;box-shadow:0 0 0 1px rgba(248,113,113,.25) inset, 0 0 12px rgba(248,113,113,.12)}
+.delta.neutral{color:#d1d5db;box-shadow:0 0 0 1px rgba(255,255,255,.12) inset}
+.gauge{--size:52px;--track:7px;--val:0;--max:100;--hue:190;width:var(--size);height:var(--size);border-radius:50%;
+  background:conic-gradient(hsl(var(--hue),95%,62%) calc(var(--val)/var(--max)*1turn), rgba(255,255,255,.08) 0);display:grid;place-items:center;transition:background .6s ease;box-shadow:inset 0 0 12px rgba(0,0,0,.35),0 0 18px rgba(34,211,238,.15)}
+.gauge::after{content:"";width:calc(var(--size) - var(--track)*2);height:calc(var(--size) - var(--track)*2);border-radius:50%;background:linear-gradient(180deg,#0a0f1a,#0b1220);box-shadow: inset 0 0 0 1px var(--border)}
+.gval{position:absolute;width:var(--size);text-align:center;font-weight:800;font-size:.9rem;letter-spacing:.2px}
+.badge{min-width:48px;min-height:48px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--border);background:linear-gradient(180deg,#0c1424,#0c1528);box-shadow:var(--shadow)}
+.kpi-cluster{position:relative}
+.kpi-cluster::after{content:"";position:absolute;right:-6px;top:8%;bottom:8%;width:1px;background:linear-gradient(transparent, rgba(255,255,255,.06), transparent);display:none}
+@media(min-width:1024px){ .kpi-cluster::after{display:block} }
 
-  /* Overlay menu */
-  .menu{ position:fixed; inset:0; background:rgba(7,10,17,0.88); backdrop-filter: blur(8px); display:none; z-index:50; padding:20px; }
-  .menu.open{display:block;}
-  .menu-inner{ max-width:1100px; margin:0 auto; color:var(--text); }
-  .menu h3{margin:0 0 12px 0}
-  .menu p{color:var(--muted); margin:0 0 16px 0}
-  .menu .pill{
-    display:inline-block; padding:10px 14px; border:1px solid var(--border); border-radius:999px;
-    margin-right:8px; margin-bottom:8px; font-size:0.9rem; background:linear-gradient(180deg,#0e1526,#0e1629);
-  }
-  .menu .close{ float:right; font-weight:700; color:var(--neon-cyan); cursor:pointer; text-decoration:underline; }
+.data-source-grid{display:grid;gap:8px}
+@media(min-width:680px){.data-source-grid{grid-template-columns:1fr 1fr}}
+.ds-table{width:100%;border-collapse:collapse;font-size:.9rem}
+.ds-table th,.ds-table td{padding:8px 10px;border-bottom:1px solid var(--border);text-align:left}
+.ds-table th{color:var(--muted);font-weight:600;width:160px}
 
-  .grid{display:grid; gap:10px}
-  .kpis{grid-template-columns:1fr 1fr; margin:12px 0}
-  @media(min-width:740px){ .kpis{grid-template-columns:repeat(6,1fr)} }
-  .card, .silhouette, details.repo{
-    background:linear-gradient(180deg, #0c1322, #0c1526);
-    border-radius:16px;
-    border:1px solid rgba(255,255,255,0.08);
-    box-shadow:0 6px 18px rgba(0,0,0,.35), 0 0 0 1px rgba(255,255,255,0.04) inset;
-    padding:10px;
-    position:relative; overflow:hidden;
-    transform:translateY(6px); opacity:0;
-    animation:fadeUp .5s ease forwards;
-  }
-  .card:hover{ box-shadow:0 6px 18px rgba(0,0,0,.35), 0 0 24px rgba(167,139,250,0.15), 0 0 0 1px rgba(255,255,255,0.04) inset; transform:translateY(-2px); transition:transform .15s ease, box-shadow .2s ease}
-  .card h3{margin:0 0 6px 0; font-size:0.92rem; color:var(--muted); letter-spacing:0.2px}
-  @keyframes fadeUp { to{opacity:1; transform:translateY(0)} }
-  @media (prefers-reduced-motion: reduce){ .card{animation:none; opacity:1; transform:none} .hamburger, .card:hover{transition:none} }
+.charts{display:grid;grid-template-columns:1fr;gap:10px}
+@media(min-width:900px){.charts{grid-template-columns:1fr 1fr}}
+.chart-card canvas{width:100% !important;height:48vw !important;max-height:320px;min-height:180px;display:block}
+@media(min-width:900px){.chart-card canvas{height:280px !important}}
+.chart-card h4{margin:0 0 8px 0;font-size:.95rem}
 
-  /* KPI */
-  .kpi{ display:grid; grid-template-columns:auto 1fr; gap:10px; align-items:center; }
-  .gauge{
-    --size:50px; --track:7px; --val:0; --max:100; --hue:190;
-    width:var(--size); height:var(--size); border-radius:50%;
-    background:conic-gradient(hsl(var(--hue), 95%, 62%) calc(var(--val)/var(--max)*1turn), rgba(255,255,255,0.07) 0);
-    display:grid; place-items:center;
-    transition: background .6s ease;
-    box-shadow: inset 0 0 12px rgba(0,0,0,.35), 0 0 18px rgba(34,211,238,.15);
-  }
-  .gauge::after{ content:""; width:calc(var(--size) - var(--track)*2); height:calc(var(--size) - var(--track)*2); border-radius:50%; background:linear-gradient(180deg,#0a0f1a,#0b1220); box-shadow: inset 0 0 0 1px var(--border); }
-  .kpi .val{ position:absolute; width:var(--size); text-align:center; font-weight:800; font-size:.9rem; letter-spacing:.2px; }
-  .kpi .label{font-size:.78rem; color:var(--muted)}
-  .kpi .main{font-size:1.0rem; font-weight:800}
-  .kpi.duo{grid-template-columns:auto 1fr}
-  .duo-gauges{display:flex; gap:8px}
-  .mini .gauge{--size:44px}
+.compare{display:grid;gap:10px}
+@media(min-width:560px){.compare{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:900px){.compare{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:1120px){.compare{grid-template-columns:repeat(4,1fr)}}
+.mini{padding:10px}
+.mini h5{margin:0 0 6px 0;font-size:.9rem;color:var(--muted)}
+.mini .delta{margin:0 0 6px 0}
+.mini .fromto{font-size:.82rem;color:var(--muted)}
 
-  /* Mobile typography tweaks */
-  @media (max-width:420px){
-    .brand h1{ font-size:1.05rem; }
-    .kpi .main{ font-size:.96rem; }
-    .kpi .label{ font-size:.72rem; }
-    .kpi .val{ font-size:.86rem; }
-    .box{ min-width:96px; font-size:.8rem; }
-  }
+.segments{display:grid;gap:10px}
+@media(min-width:900px){.segments{grid-template-columns:1fr 1fr}}
+.sil-body{position:relative;min-height:260px;display:grid;place-items:center}
+.human{width:150px;height:230px;opacity:.9;filter:drop-shadow(0 0 16px rgba(167,139,250,.12))}
+.box{position:absolute;min-width:110px;padding:8px 10px;border:1px solid var(--border);border-radius:12px;background:linear-gradient(180deg,#0c1424,#0d1528);box-shadow:var(--shadow);font-size:.86rem}
+.box .name{color:var(--muted);font-size:.78rem} .box .val{font-weight:800}
+.la{left:-10px;top:60px} .ra{right:-10px;top:60px} .tr{left:50%;transform:translateX(-50%);top:10px} .ll{left:-10px;bottom:26px} .rl{right:-10px;bottom:26px}
 
-  .section-title{ margin:16px 0 8px; font-weight:800; letter-spacing:.3px; font-size:1.05rem; color:#e9e9ee; }
-  .ior-card h4, .big-ior h4{ margin:0 0 8px 0; font-size:.95rem; color:#dfe4ea }
-  .ior-table{ width:100%; border-collapse:collapse; font-size:.9rem }
-  .ior-table th, .ior-table td{ padding:10px; border-top:1px solid var(--border); border-bottom:1px solid var(--border); text-align:left; vertical-align:top }
-  .ior-table th{color:var(--muted); font-weight:600; width:140px}
-  .big-ior{padding:12px}
-  .big-ior p{margin:6px 0; line-height:1.35}
+.ior-table{width:100%;border-collapse:collapse;font-size:.9rem}
+.ior-table th,.ior-table td{padding:10px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.ior-table th{color:var(--muted);font-weight:600;width:140px}
+.big-ior h4{margin:0 0 8px 0}
 
-  .charts{display:grid; grid-template-columns:1fr; gap:10px}
-  @media(min-width:900px){ .charts{grid-template-columns:1fr 1fr} }
-  .chart-card{padding:10px}
-  .chart-card h4{ font-size:.95rem; margin-bottom:8px; }
-  .chart-card canvas{ width:100% !important; height:48vw !important; max-height:320px; min-height:180px; display:block; }
-  @media(min-width:900px){ .chart-card canvas{ height:280px !important; } }
-  .chart-card .note{font-size:.8rem; color:var(--muted); margin-top:6px}
-
-  .segments{ display:grid; grid-template-columns:1fr; gap:10px; margin-top:6px; }
-  @media(min-width:900px){ .segments{grid-template-columns:1fr 1fr} }
-  .silhouette h4{margin:0 0 8px 0; color:#e6e9f2}
-  .sil-body{position:relative; min-height:260px; display:grid; place-items:center}
-  .human{ width:150px; height:230px; opacity:.9; filter:drop-shadow(0 0 16px rgba(167,139,250,.12)); }
-  .box{ position:absolute; min-width:110px; padding:8px 10px; border:1px solid var(--border); border-radius:12px; background:linear-gradient(180deg,#0c1424,#0d1528); box-shadow:var(--shadow); font-size:.86rem }
-  .box .name{color:var(--muted); font-size:.78rem}
-  .box .val{font-weight:800}
-  .la{left:-10px; top:60px}
-  .ra{right:-10px; top:60px}
-  .tr{left:50%; transform:translateX(-50%); top:10px}
-  .ll{left:-10px; bottom:26px}
-  .rl{right:-10px; bottom:26px}
-
-  details.repo{ padding:12px; }
-  details.repo summary{ cursor:pointer; list-style:none; font-weight:800; color:#e9ecf6; }
-  details.repo summary::-webkit-details-marker{display:none}
-  .table-wrap{overflow:auto; margin-top:10px; border-top:1px solid var(--border)}
-  table.master{ width:max(900px, 100%); border-collapse:collapse; font-size:.9rem }
-  table.master th, table.master td{ border-bottom:1px solid var(--border); padding:8px 10px; text-align:left; vertical-align:top }
-  table.master th{position:sticky; top:0; background:#0d1424; z-index:1}
-
-  .stagger > .card{animation-delay: calc(var(--i,0) * 80ms + 120ms)}
+details.repo{padding:12px} details.repo summary{cursor:pointer;list-style:none;font-weight:800}
+.table-wrap{overflow:auto;margin-top:10px;border-top:1px solid var(--border)}
+table.master{width:max(100%,960px);border-collapse:collapse;font-size:.9rem}
+table.master th,table.master td{border-bottom:1px solid var(--border);padding:8px 10px;text-align:left;vertical-align:top}
+table.master th{position:sticky;top:0;background:#0d1424;z-index:1}
+@media(max-width:420px){
+  .brand h1{font-size:1.05rem}.val-big{font-size:.98rem}.unit{font-size:.74rem}
+  .gauge{--size:48px;--track:6px}.badge{min-width:44px;min-height:44px}
+}
 </style>
 </head>
 <body>
 <div class="container">
+
+  <!-- Header -->
   <header class="header">
     <div class="brand">
       <h1>InBody Tracker</h1>
       <div class="meta">
-        <div class="last-scan" id="last-scan">Last scan: -</div>
-        <div class="debug" id="debug">- Loaded 0 scans (source: -) | options: 0</div>
+        <div id="last-scan">Last scan: -</div>
+        <div class="small" id="debug">- Loaded 0 scans (source: -) | options: 0</div>
       </div>
     </div>
     <div class="controls">
@@ -223,60 +146,139 @@
     </div>
   </header>
 
-  <!-- KPI Row -->
-  <section class="grid kpis stagger" id="kpi-row">
-    <div class="card" style="--i:0">
-      <h3>Weight</h3>
-      <div class="kpi">
-        <div class="gauge" id="g-weight" style="--hue:190"><div class="val" id="v-weight">-</div></div>
-        <div><div class="label">kg</div><div class="main" id="m-weight">-</div></div>
+  <!-- Data Source -->
+  <section class="card" id="data-source">
+    <h3 style="margin:0 0 8px 0;font-size:.98rem">Data Source</h3>
+    <div class="data-source-grid">
+      <div class="card" style="padding:8px">
+        <table class="ds-table" id="ds-table">
+          <tbody>
+            <tr><th>Source</th><td id="ds-source">-</td></tr>
+            <tr><th>Loaded</th><td id="ds-loaded">-</td></tr>
+            <tr><th>Records</th><td id="ds-records">-</td></tr>
+            <tr><th>Latest Label</th><td id="ds-latest-label">-</td></tr>
+            <tr><th>Latest Date</th><td id="ds-latest-date">-</td></tr>
+            <tr><th>Notes</th><td id="ds-notes">-</td></tr>
+          </tbody>
+        </table>
+        <div class="small" id="ds-debug" style="margin-top:6px">-</div>
       </div>
-    </div>
-    <div class="card" style="--i:1">
-      <h3>Visceral Fat</h3>
-      <div class="kpi">
-        <div class="gauge" id="g-visc" style="--hue:12; --max:20"><div class="val" id="v-visc">-</div></div>
-        <div><div class="label">level</div><div class="main" id="m-visc">-</div></div>
-      </div>
-    </div>
-    <div class="card" style="--i:2">
-      <h3>SMM</h3>
-      <div class="kpi">
-        <div class="gauge" id="g-smm" style="--hue:160; --max:45"><div class="val" id="v-smm">-</div></div>
-        <div><div class="label">kg</div><div class="main" id="m-smm">-</div></div>
-      </div>
-    </div>
-    <div class="card" style="--i:3">
-      <h3>BMR</h3>
-      <div class="kpi">
-        <div class="gauge" id="g-bmr" style="--hue:48; --max:2200"><div class="val" id="v-bmr">-</div></div>
-        <div><div class="label">kcal</div><div class="main" id="m-bmr">-</div></div>
-      </div>
-    </div>
-    <div class="card" style="--i:4">
-      <h3>PBF % + Obesity %</h3>
-      <div class="kpi duo">
-        <div class="duo-gauges mini">
-          <div class="gauge" id="g-pbf" style="--hue:270; --max:60"><div class="val" id="v-pbf">-</div></div>
-          <div class="gauge" id="g-ob" style="--hue:12; --max:200"><div class="val" id="v-ob">-</div></div>
-        </div>
-        <div class="stack">
-          <div class="row"><span class="t">PBF</span><span class="v" id="m-pbf">-</span></div>
-          <div class="row"><span class="t">Obesity</span><span class="v" id="m-ob">-</span></div>
-        </div>
-      </div>
-    </div>
-    <div class="card" style="--i:5">
-      <h3>InBody Score</h3>
-      <div class="kpi">
-        <div class="gauge" id="g-score" style="--hue:160; --max:100"><div class="val" id="v-score">-</div></div>
-        <div><div class="label">/ 100</div><div class="main" id="m-score">-</div></div>
+      <div class="card" style="padding:8px">
+        <details>
+          <summary style="cursor:pointer;font-weight:700">Raw Data (JSON)</summary>
+          <pre id="raw-json" style="max-height:300px;overflow:auto;margin:8px 0 0;border:1px solid var(--border);border-radius:8px;padding:8px;background:#0a0f1a;color:#dfe3ea;font-size:.82rem"></pre>
+        </details>
       </div>
     </div>
   </section>
 
-  <!-- Overall I-O-R (always visible) -->
-  <section class="card big-ior" style="--i:6">
+  <!-- KPI Row (8 cards by similarity) -->
+  <section class="grid kpis" id="kpi-row">
+    <!-- Cluster A: Composition -->
+    <div class="kpi-cluster card">
+      <div class="kpi">
+        <div class="gauge" id="g-weight" style="--hue:190"><div class="gval" id="gv-weight">-</div></div>
+        <div>
+          <h4>Body Weight</h4>
+          <div class="val-big" id="m-weight">-</div>
+          <div class="unit">kg</div>
+          <div class="delta neutral" id="d-weight">No previous scan to compare</div>
+        </div>
+      </div>
+    </div>
+    <div class="kpi-cluster card">
+      <div class="kpi">
+        <div class="gauge" id="g-smm" style="--hue:160; --max:45"><div class="gval" id="gv-smm">-</div></div>
+        <div>
+          <h4>Skeletal Muscle Mass</h4>
+          <div class="val-big" id="m-smm">-</div>
+          <div class="unit">kg</div>
+          <div class="delta neutral" id="d-smm">No previous scan to compare</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cluster B: Adiposity -->
+    <div class="kpi-cluster card">
+      <div class="kpi">
+        <div class="gauge" id="g-pbf" style="--hue:270; --max:60"><div class="gval" id="gv-pbf">-</div></div>
+        <div>
+          <h4>Percent Body Fat</h4>
+          <div class="val-big" id="m-pbf">-</div>
+          <div class="unit">%</div>
+          <div class="delta neutral" id="d-pbf">No previous scan to compare</div>
+        </div>
+      </div>
+    </div>
+    <div class="kpi-cluster card">
+      <div class="kpi">
+        <div class="gauge" id="g-obesity" style="--hue:12; --max:200"><div class="gval" id="gv-obesity">-</div></div>
+        <div>
+          <h4>Obesity Degree</h4>
+          <div class="val-big" id="m-obesity">-</div>
+          <div class="unit">%</div>
+          <div class="delta neutral" id="d-obesity">No previous scan to compare</div>
+        </div>
+      </div>
+    </div>
+    <div class="kpi-cluster card">
+      <div class="kpi">
+        <div class="gauge" id="g-visc" style="--hue:8; --max:20"><div class="gval" id="gv-visc">-</div></div>
+        <div>
+          <h4>Visceral Fat Level</h4>
+          <div class="val-big" id="m-visc">-</div>
+          <div class="unit">level</div>
+          <div class="delta neutral" id="d-visc">No previous scan to compare</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cluster C: Metabolic -->
+    <div class="kpi-cluster card">
+      <div class="kpi">
+        <div class="gauge" id="g-bmr" style="--hue:42; --max:2200"><div class="gval" id="gv-bmr">-</div></div>
+        <div>
+          <h4>Basal Metabolic Rate</h4>
+          <div class="val-big" id="m-bmr">-</div>
+          <div class="unit">kcal</div>
+          <div class="delta neutral" id="d-bmr">No previous scan to compare</div>
+        </div>
+      </div>
+    </div>
+    <div class="kpi-cluster card">
+      <div class="kpi">
+        <div class="badge" id="badge-deficit"></div>
+        <div>
+          <h4>Calorie Deficit Target</h4>
+          <div class="val-big" id="m-deficit">-</div>
+          <div class="unit" id="m-deficit-range">range -</div>
+          <div class="delta neutral" id="d-deficit">No previous scan to compare</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cluster D: Overall -->
+    <div class="kpi-cluster card">
+      <div class="kpi">
+        <div class="gauge" id="g-score" style="--hue:150; --max:100"><div class="gval" id="gv-score">-</div></div>
+        <div>
+          <h4>InBody Score</h4>
+          <div class="val-big" id="m-score">-</div>
+          <div class="unit">/ 100</div>
+          <div class="delta neutral" id="d-score">No previous scan to compare</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Comparison Mini-Cards -->
+  <h3 class="section-title">Changes Compared With Previous Scan</h3>
+  <section class="compare" id="compare-strip">
+    <!-- mini-cards inserted by JS -->
+  </section>
+
+  <!-- Overall I-O-R -->
+  <section class="card big-ior" style="margin-top:10px">
     <h4>🤖 Overall Insight - Observation - Recommendation</h4>
     <p><strong>Insight:</strong> <span id="overall-insight">-</span></p>
     <p><strong>Observation:</strong> <span id="overall-observation">-</span></p>
@@ -286,16 +288,16 @@
   <!-- Panel 1 -->
   <h3 class="section-title">Composition + BMI/PBF</h3>
   <section class="charts">
-    <div class="card chart-card" style="--i:7">
-      <h4>Weight, SMM, Fat (time series)</h4>
+    <div class="card chart-card">
+      <h4>Body Weight, Skeletal Muscle Mass, Fat Mass (time series)</h4>
       <canvas id="chart-comp"></canvas>
     </div>
-    <div class="card chart-card" style="--i:8">
-      <h4>BMI vs PBF (scatter)</h4>
+    <div class="card chart-card">
+      <h4>Body Mass Index vs Percent Body Fat (scatter)</h4>
       <canvas id="chart-bmi"></canvas>
     </div>
   </section>
-  <section class="card ior-card" style="--i:9">
+  <section class="card">
     <h4>🤖 I-O-R</h4>
     <table class="ior-table">
       <tr><th>Insight</th><td id="ior-composition-insight">-</td></tr>
@@ -307,17 +309,16 @@
   <!-- Panel 2 -->
   <h3 class="section-title">Metabolic & Fluids</h3>
   <section class="charts">
-    <div class="card chart-card" style="--i:10">
-      <h4>BMR (kcal) + Obesity Degree %</h4>
+    <div class="card chart-card">
+      <h4>Basal Metabolic Rate (kcal) + Obesity Degree (%)</h4>
       <canvas id="chart-bmr"></canvas>
     </div>
-    <div class="card chart-card" style="--i:11">
+    <div class="card chart-card">
       <h4>ECW/TBW (range 0.36 - 0.40)</h4>
       <canvas id="chart-ecw"></canvas>
-      <div class="note">Y range is ~0.36 - 0.40</div>
     </div>
   </section>
-  <section class="card ior-card" style="--i:12">
+  <section class="card">
     <h4>🤖 I-O-R</h4>
     <table class="ior-table">
       <tr><th>Insight</th><td id="ior-bmr-insight">-</td></tr>
@@ -329,23 +330,24 @@
   <!-- Panel 3 -->
   <h3 class="section-title">Segmental Analysis</h3>
   <section class="segments">
-    <div class="silhouette card" style="--i:13">
+    <div class="card">
       <h4>Segmental Lean (Muscle)</h4>
       <div class="sil-body">
         <svg class="human" viewBox="0 0 120 180" aria-hidden="true">
           <defs><linearGradient id="grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1b2538"/><stop offset="100%" stop-color="#0f1726"/></linearGradient></defs>
-        <g fill="url(#grad)" stroke="rgba(255,255,255,0.06)" stroke-width="1">
-          <ellipse cx="60" cy="20" rx="16" ry="16"/><rect x="44" y="36" width="32" height="46" rx="10"/>
-          <rect x="22" y="42" width="18" height="42" rx="9"/><rect x="80" y="42" width="18" height="42" rx="9"/>
-          <rect x="40" y="84" width="16" height="70" rx="8"/><rect x="64" y="84" width="16" height="70" rx="8"/>
-        </g></svg>
+          <g fill="url(#grad)" stroke="rgba(255,255,255,0.06)" stroke-width="1">
+            <ellipse cx="60" cy="20" rx="16" ry="16"/><rect x="44" y="36" width="32" height="46" rx="10"/>
+            <rect x="22" y="42" width="18" height="42" rx="9"/><rect x="80" y="42" width="18" height="42" rx="9"/>
+            <rect x="40" y="84" width="16" height="70" rx="8"/><rect x="64" y="84" width="16" height="70" rx="8"/>
+          </g>
+        </svg>
         <div class="box la"><div class="name">LA</div><div class="val" id="lean-la">-</div></div>
         <div class="box ra"><div class="name">RA</div><div class="val" id="lean-ra">-</div></div>
         <div class="box tr"><div class="name">Trunk</div><div class="val" id="lean-tr">-</div></div>
         <div class="box ll"><div class="name">LL</div><div class="val" id="lean-ll">-</div></div>
         <div class="box rl"><div class="name">RL</div><div class="val" id="lean-rl">-</div></div>
       </div>
-      <section class="card ior-card" style="margin-top:10px">
+      <section class="card" style="margin-top:10px">
         <h4>🤖 I-O-R</h4>
         <table class="ior-table">
           <tr><th>Insight</th><td id="ior-lean-insight">-</td></tr>
@@ -355,23 +357,24 @@
       </section>
     </div>
 
-    <div class="silhouette card" style="--i:14">
+    <div class="card">
       <h4>Segmental Fat (Fat)</h4>
       <div class="sil-body">
         <svg class="human" viewBox="0 0 120 180" aria-hidden="true">
           <defs><linearGradient id="grad2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1b2538"/><stop offset="100%" stop-color="#0f1726"/></linearGradient></defs>
-        <g fill="url(#grad2)" stroke="rgba(255,255,255,0.06)" stroke-width="1">
-          <ellipse cx="60" cy="20" rx="16" ry="16"/><rect x="44" y="36" width="32" height="46" rx="10"/>
-          <rect x="22" y="42" width="18" height="42" rx="9"/><rect x="80" y="42" width="18" height="42" rx="9"/>
-          <rect x="40" y="84" width="16" height="70" rx="8"/><rect x="64" y="84" width="16" height="70" rx="8"/>
-        </g></svg>
+          <g fill="url(#grad2)" stroke="rgba(255,255,255,0.06)" stroke-width="1">
+            <ellipse cx="60" cy="20" rx="16" ry="16"/><rect x="44" y="36" width="32" height="46" rx="10"/>
+            <rect x="22" y="42" width="18" height="42" rx="9"/><rect x="80" y="42" width="18" height="42" rx="9"/>
+            <rect x="40" y="84" width="16" height="70" rx="8"/><rect x="64" y="84" width="16" height="70" rx="8"/>
+          </g>
+        </svg>
         <div class="box la"><div class="name">LA</div><div class="val" id="fat-la">-</div></div>
         <div class="box ra"><div class="name">RA</div><div class="val" id="fat-ra">-</div></div>
         <div class="box tr"><div class="name">Trunk</div><div class="val" id="fat-tr">-</div></div>
         <div class="box ll"><div class="name">LL</div><div class="val" id="fat-ll">-</div></div>
         <div class="box rl"><div class="name">RL</div><div class="val" id="fat-rl">-</div></div>
       </div>
-      <section class="card ior-card" style="margin-top:10px">
+      <section class="card" style="margin-top:10px">
         <h4>🤖 I-O-R</h4>
         <table class="ior-table">
           <tr><th>Insight</th><td id="ior-fat-insight">-</td></tr>
@@ -382,7 +385,7 @@
     </div>
   </section>
 
-  <!-- Data Repository -->
+  <!-- Repository -->
   <details class="repo" style="margin-top:12px">
     <summary>Data Repository (master table)</summary>
     <div class="table-wrap">
@@ -390,20 +393,18 @@
         <thead>
           <tr>
             <th>Date</th><th>Label</th>
-            <th>Weight</th><th>PBF %</th><th>BMI</th><th>Score</th><th>Visceral</th><th>SMM</th><th>Fat</th><th>BMR</th><th>TBW</th><th>Protein</th><th>Minerals</th><th>FFM</th><th>Obesity %</th><th>ECW/TBW</th>
-            <th>I-O-R composition</th>
-            <th>I-O-R bmi_pbf</th>
-            <th>I-O-R bmr_obesity</th>
-            <th>I-O-R ecwtbw</th>
-            <th>I-O-R segmental_lean</th>
-            <th>I-O-R segmental_fat</th>
-            <th>I-O-R overall</th>
+            <th>Weight</th><th>Percent Body Fat</th><th>Body Mass Index</th><th>InBody Score</th>
+            <th>Visceral Fat Level</th><th>Skeletal Muscle Mass</th><th>Fat Mass</th><th>Basal Metabolic Rate</th>
+            <th>Total Body Water</th><th>Protein</th><th>Minerals</th><th>Fat-Free Mass</th><th>Obesity Degree</th><th>ECW/TBW</th>
+            <th>I-O-R composition</th><th>I-O-R bmi_pbf</th><th>I-O-R bmr_obesity</th><th>I-O-R ecwtbw</th>
+            <th>I-O-R segmental_lean</th><th>I-O-R segmental_fat</th><th>I-O-R overall</th>
           </tr>
         </thead>
         <tbody id="repo-body"></tbody>
       </table>
     </div>
   </details>
+
 </div>
 
 <!-- Embedded JSON (primary source) -->
@@ -494,103 +495,149 @@
 }
 </script>
 
-<!-- Robust Chart.js loader with multi-CDN fallback -->
+<!-- Chart.js loader with multi-CDN fallback -->
 <script>
-  function ensureChartJs(init){
-    if (window.Chart) { init(); return; }
-    const urls = [
-      "https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js",
-      "https://unpkg.com/chart.js@4.4.4/dist/chart.umd.js",
-      "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"
-    ];
-    (function next(){
-      const url = urls.shift();
-      if (!url) { init(); return; }
-      const s = document.createElement("script");
-      s.src = url;
-      s.onload = () => init();
-      s.onerror = () => next();
-      document.head.appendChild(s);
-    })();
-  }
+function ensureChartJs(init){
+  if(window.Chart){ init(); return; }
+  const urls=[
+    "https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js",
+    "https://unpkg.com/chart.js@4.4.4/dist/chart.umd.js",
+    "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"
+  ];
+  (function next(){
+    const url=urls.shift(); if(!url){ init(); return; }
+    const s=document.createElement('script'); s.src=url; s.onload=()=>init(); s.onerror=()=>next(); document.head.appendChild(s);
+  })();
+}
 </script>
 
 <script>
 (function(){
   'use strict';
+  const byId=id=>document.getElementById(id);
+  const sel=byId('scan-select');
 
-  // Data source: parse JSON or fallback to same content
-  const fallback = JSON.parse(document.getElementById('scans-json').textContent);
-  let dataSource = 'json';
+  // Parse JSON or fallback
+  const jsonText = byId('scans-json')?.textContent || '{}';
   let scans = [];
+  let dataSource = 'json';
   try{
-    const el = document.getElementById('scans-json');
-    const parsed = JSON.parse(el?.textContent || '{}');
-    scans = (parsed && Array.isArray(parsed.scans) && parsed.scans.length) ? parsed.scans : (dataSource='fallback', fallback.scans);
-  }catch(_){ dataSource='fallback'; scans = fallback.scans; }
-
-  const byId = id => document.getElementById(id);
-  const select = byId('scan-select');
-
-  const fmt = (val,d=1)=> (val==null||Number.isNaN(val)) ? '-' : Number(val).toFixed(d);
-  function setGauge(el, value, max, text){
-    if(!el) return;
-    const v = (value==null||Number.isNaN(value)) ? 0 : Number(value);
-    const m = (max==null||max<=0) ? 100 : Number(max);
-    el.style.setProperty('--val', v);
-    el.style.setProperty('--max', m);
-    const valEl = el.querySelector('.val');
-    if(valEl){ valEl.textContent = text!=null ? text : fmt(v, (m<=100?1:0)); }
+    const parsed = JSON.parse(jsonText);
+    scans = Array.isArray(parsed.scans) ? parsed.scans : [];
+    if(!scans.length) throw new Error('empty');
+  }catch(_){
+    dataSource = 'fallback';
+    scans = (function(){ return JSON.parse(jsonText).scans; })();
   }
 
-  function safeMountSelect(items){
-    const optionsHTML = items.map((s, i)=>`<option value="${i}">${s.label} - ${s.date}</option>`).join('');
-    select.innerHTML = optionsHTML;           /* single assignment (iOS safe) */
-    select.selectedIndex = items.length - 1;  /* default to latest */
+  // helpers
+  const fmt=(v,d=1)=> (v==null||Number.isNaN(v))?'-':Number(v).toFixed(d);
+  const setGauge=(el,val,max,text)=>{ if(!el) return; el.style.setProperty('--val',Number(val||0)); el.style.setProperty('--max',Number(max||100)); const gv=el.querySelector('.gval'); if(gv) gv.textContent=text??fmt(val, (max<=100?1:0)); };
+  const segFmt = o => `${(o?.kg==null)?'-':fmt(o.kg,2)+' kg'} | ${(o?.pct==null)?'-':fmt(o.pct,1)+' %'}`;
+
+  function mountSelect(items){
+    const html = items.map((s,i)=>`<option value="${i}">${s.label} - ${s.date}</option>`).join('');
+    sel.innerHTML = html; // one assignment (iOS-safe)
+    sel.selectedIndex = items.length - 1;
     updateDebug();
-    renderAll(items.length - 1);
+    renderAll(sel.selectedIndex);
   }
 
-  function updateDebug(){
-    byId('debug').textContent = `- Loaded ${scans.length} scans (source: ${dataSource}) | options: ${select.options.length}`;
+  function previousIndex(i){ return i>0 ? i-1 : -1; }
+
+  function parseRangeFromText(t){
+    const m = (t||'').match(/(\d+)\s*-\s*(\d+)/);
+    if(m){ let a=+m[1], b=+m[2]; if(a>b){ const x=a;a=b;b=x; } return [a,b]; }
+    return null;
+  }
+  function clamp(v,min,max){ return Math.min(max, Math.max(min,v)); }
+  function round10(v){ return Math.round(v/10)*10; }
+  function computeDeficit(scan){
+    const rec = scan?.ior?.bmr_obesity?.recommendation || '';
+    let range = parseRangeFromText(rec);
+    if(!range){
+      const bmr = Number(scan?.metrics?.bmr||0);
+      const tdee = bmr * 1.35;
+      let lo = round10(tdee*0.15), hi = round10(tdee*0.20);
+      lo = clamp(lo,250,750); hi = clamp(hi,250,750); if(hi<lo){ const t=lo;lo=hi;hi=t; }
+      range = [lo,hi];
+    }
+    const mid = round10((range[0]+range[1])/2);
+    return {range, mid};
   }
 
-  function renderKPIs(s){
-    setGauge(byId('g-weight'), s.metrics.weight, 120, fmt(s.metrics.weight,1));
-    byId('m-weight').textContent = fmt(s.metrics.weight,1);
-    byId('v-weight').textContent = fmt(s.metrics.weight,1);
+  // Delta rules
+  const goodWhenDown = new Set(["Body Weight","Percent Body Fat","Visceral Fat Level","Obesity Degree","Fat Mass"]);
+  const goodWhenUp   = new Set(["Skeletal Muscle Mass","Basal Metabolic Rate","InBody Score"]);
+  function delta(curr, prev, name, unit){
+    if(prev==null) return {text:"No previous scan to compare", cls:"neutral", zero:true};
+    const diff = Number(curr) - Number(prev);
+    const abs = Math.abs(diff);
+    const arrow = diff>0 ? "▲" : diff<0 ? "▼" : "•";
+    const sign = diff>0 ? "+" : diff<0 ? "-" : "";
+    const decimals = (unit==="/ 100"||unit==="level") ? 0 : 1;
+    const text = `${arrow} ${sign}${abs.toFixed(decimals)} ${unit} since previous`;
+    let cls="neutral";
+    if(diff===0) cls="neutral";
+    else if( (diff<0 && goodWhenDown.has(name)) || (diff>0 && goodWhenUp.has(name)) ) cls="good";
+    else cls="bad";
+    return {text, cls};
+  }
 
-    setGauge(byId('g-visc'), s.metrics.visceral, 20, String(s.metrics.visceral));
-    byId('m-visc').textContent = String(s.metrics.visceral);
-    byId('v-visc').textContent = String(s.metrics.visceral);
+  function renderDataSource(){
+    const latest = scans[scans.length-1] || {};
+    byId('ds-source').textContent = (dataSource==='json')? 'Embedded JSON (scans-json)' : 'Fallback Array';
+    byId('ds-loaded').textContent = scans.length? 'Yes':'No';
+    byId('ds-records').textContent = String(scans.length);
+    byId('ds-latest-label').textContent = latest.label || '-';
+    byId('ds-latest-date').textContent = latest.date || '-';
+    byId('ds-notes').textContent = window.Chart ? 'Chart.js loaded' : 'Chart.js not loaded';
+    const dbg = `- Loaded ${scans.length} scans (source: ${dataSource}) | options: ${sel.options.length}`;
+    byId('ds-debug').textContent = dbg;
+    byId('debug').textContent = dbg;
+    try{ byId('raw-json').textContent = JSON.stringify({scans}, null, 2); }catch(_){}
+  }
 
-    setGauge(byId('g-smm'), s.metrics.smm, 45, fmt(s.metrics.smm,1));
-    byId('m-smm').textContent = fmt(s.metrics.smm,1);
-    byId('v-smm').textContent = fmt(s.metrics.smm,1);
+  function renderRepo(items){
+    const tbody = byId('repo-body'); let rows='';
+    for(const s of items){
+      const m=s.metrics, i=s.ior;
+      rows += `<tr>
+        <td>${s.date}</td><td>${s.label}</td>
+        <td>${fmt(m.weight,1)}</td><td>${fmt(m.pbf,1)}</td><td>${fmt(m.bmi,1)}</td><td>${fmt(m.score,0)}</td>
+        <td>${m.visceral}</td><td>${fmt(m.smm,1)}</td><td>${fmt(m.fat,1)}</td><td>${Math.round(m.bmr)}</td>
+        <td>${fmt(m.tbw,1)}</td><td>${fmt(m.protein,1)}</td><td>${fmt(m.minerals,2)}</td><td>${fmt(m.ffm,1)}</td>
+        <td>${fmt(m.obesity,1)}</td><td>${fmt(m.ecwtbw,3)}</td>
+        <td>${i.composition.insight} - ${i.composition.observation} - ${i.composition.recommendation}</td>
+        <td>${i.bmi_pbf.insight} - ${i.bmi_pbf.observation} - ${i.bmi_pbf.recommendation}</td>
+        <td>${i.bmr_obesity.insight} - ${i.bmr_obesity.observation} - ${i.bmr_obesity.recommendation}</td>
+        <td>${i.ecwtbw.insight} - ${i.ecwtbw.observation} - ${i.ecwtbw.recommendation}</td>
+        <td>${i.segmental_lean.insight} - ${i.segmental_lean.observation} - ${i.segmental_lean.recommendation}</td>
+        <td>${i.segmental_fat.insight} - ${i.segmental_fat.observation} - ${i.segmental_fat.recommendation}</td>
+        <td>${i.overall.insight} - ${i.overall.observation} - ${i.overall.recommendation}</td>
+      </tr>`;
+    }
+    tbody.innerHTML = rows;
+  }
 
-    setGauge(byId('g-bmr'), s.metrics.bmr, 2200, String(Math.round(s.metrics.bmr)));
-    byId('m-bmr').textContent = String(Math.round(s.metrics.bmr));
-    byId('v-bmr').textContent = String(Math.round(s.metrics.bmr));
+  function renderSegments(s){
+    byId('lean-la').textContent = segFmt(s.segments_lean.la);
+    byId('lean-ra').textContent = segFmt(s.segments_lean.ra);
+    byId('lean-tr').textContent = segFmt(s.segments_lean.tr);
+    byId('lean-ll').textContent = segFmt(s.segments_lean.ll);
+    byId('lean-rl').textContent = segFmt(s.segments_lean.rl);
+    byId('fat-la').textContent = segFmt(s.segments_fat.la);
+    byId('fat-ra').textContent = segFmt(s.segments_fat.ra);
+    byId('fat-tr').textContent = segFmt(s.segments_fat.tr);
+    byId('fat-ll').textContent = segFmt(s.segments_fat.ll);
+    byId('fat-rl').textContent = segFmt(s.segments_fat.rl);
+  }
 
-    setGauge(byId('g-pbf'), s.metrics.pbf, 60, fmt(s.metrics.pbf,1));
-    byId('m-pbf').textContent = `${fmt(s.metrics.pbf,1)} %`;
-    byId('v-pbf').textContent = fmt(s.metrics.pbf,1);
-
-    setGauge(byId('g-ob'), s.metrics.obesity, 200, fmt(s.metrics.obesity,1));
-    byId('m-ob').textContent = `${fmt(s.metrics.obesity,1)} %`;
-    byId('v-ob').textContent = fmt(s.metrics.obesity,1);
-
-    setGauge(byId('g-score'), s.metrics.score, 100, String(Math.round(s.metrics.score)));
-    byId('m-score').textContent = String(Math.round(s.metrics.score));
-    byId('v-score').textContent = String(Math.round(s.metrics.score));
-
-    byId('last-scan').textContent = `Last scan: ${s.label} - ${s.date}`;
+  function renderIOR(s){
     byId('overall-insight').textContent = s.ior.overall.insight || '-';
     byId('overall-observation').textContent = s.ior.overall.observation || '-';
     byId('overall-reco').textContent = s.ior.overall.recommendation || '-';
-  }
 
-  function renderIORs(s){
     byId('ior-composition-insight').textContent = s.ior.composition.insight || '-';
     byId('ior-composition-observation').textContent = s.ior.composition.observation || '-';
     byId('ior-composition-reco').textContent = s.ior.composition.recommendation || '-';
@@ -602,165 +649,151 @@
     byId('ior-lean-insight').textContent = s.ior.segmental_lean.insight || '-';
     byId('ior-lean-observation').textContent = s.ior.segmental_lean.observation || '-';
     byId('ior-lean-reco').textContent = s.ior.segmental_lean.recommendation || '-';
-
     byId('ior-fat-insight').textContent = s.ior.segmental_fat.insight || '-';
     byId('ior-fat-observation').textContent = s.ior.segmental_fat.observation || '-';
     byId('ior-fat-reco').textContent = s.ior.segmental_fat.recommendation || '-';
   }
 
-  const segFmt = o => `${(o?.kg==null)?'-':fmt(o.kg,2)+' kg'} | ${(o?.pct==null)?'-':fmt(o.pct,1)+' %'}`;
-  function renderSegments(s){
-    byId('lean-la').textContent = segFmt(s.segments_lean.la);
-    byId('lean-ra').textContent = segFmt(s.segments_lean.ra);
-    byId('lean-tr').textContent = segFmt(s.segments_lean.tr);
-    byId('lean-ll').textContent = segFmt(s.segments_lean.ll);
-    byId('lean-rl').textContent = segFmt(s.segments_lean.rl);
-
-    byId('fat-la').textContent = segFmt(s.segments_fat.la);
-    byId('fat-ra').textContent = segFmt(s.segments_fat.ra);
-    byId('fat-tr').textContent = segFmt(s.segments_fat.tr);
-    byId('fat-ll').textContent = segFmt(s.segments_fat.ll);
-    byId('fat-rl').textContent = segFmt(s.segments_fat.rl);
-  }
-
-  function renderRepo(items){
-    const tbody = byId('repo-body');
-    let rows = '';
-    for(const s of items){
-      const m = s.metrics;
-      rows += `<tr>
-        <td>${s.date}</td><td>${s.label}</td>
-        <td>${fmt(m.weight,1)}</td><td>${fmt(m.pbf,1)}</td><td>${fmt(m.bmi,1)}</td><td>${fmt(m.score,0)}</td>
-        <td>${m.visceral}</td><td>${fmt(m.smm,1)}</td><td>${fmt(m.fat,1)}</td><td>${Math.round(m.bmr)}</td>
-        <td>${fmt(m.tbw,1)}</td><td>${fmt(m.protein,1)}</td><td>${fmt(m.minerals,2)}</td><td>${fmt(m.ffm,1)}</td>
-        <td>${fmt(m.obesity,1)}</td><td>${fmt(m.ecwtbw,3)}</td>
-        <td>${s.ior.composition.insight} - ${s.ior.composition.observation} - ${s.ior.composition.recommendation}</td>
-        <td>${s.ior.bmi_pbf.insight} - ${s.ior.bmi_pbf.observation} - ${s.ior.bmi_pbf.recommendation}</td>
-        <td>${s.ior.bmr_obesity.insight} - ${s.ior.bmr_obesity.observation} - ${s.ior.bmr_obesity.recommendation}</td>
-        <td>${s.ior.ecwtbw.insight} - ${s.ior.ecwtbw.observation} - ${s.ior.ecwtbw.recommendation}</td>
-        <td>${s.ior.segmental_lean.insight} - ${s.ior.segmental_lean.observation} - ${s.ior.segmental_lean.recommendation}</td>
-        <td>${s.ior.segmental_fat.insight} - ${s.ior.segmental_fat.observation} - ${s.ior.segmental_fat.recommendation}</td>
-        <td>${s.ior.overall.insight} - ${s.ior.overall.observation} - ${s.ior.overall.recommendation}</td>
-      </tr>`;
-    }
-    tbody.innerHTML = rows;
-  }
-
-  // Charts (guard if Chart.js missing)
+  // Charts
   let chComp, chBMI, chBMR, chECW;
-  const destroyChart = c => { if(c && typeof c.destroy==='function'){ try{ c.destroy(); }catch(_){} } };
-
+  const destroy = c => { try{ c && c.destroy && c.destroy(); }catch(_){ } };
   function commonOptions(){
-    return {
-      responsive:true,
-      maintainAspectRatio:false,
-      interaction:{ intersect:false, mode:'nearest' },
-      layout:{ padding:{ left:4, right:8, top:4, bottom:2 } },
-      plugins:{
-        legend:{ labels:{ color:'#d1d5db', boxWidth:12, font:{ size:11 } } },
-        tooltip:{ bodyFont:{ size:11 }, titleFont:{ size:11 } }
-      },
-      scales:{
-        x:{ ticks:{ color:'#9ca3af', font:{ size:10 } }, grid:{ color:'rgba(255,255,255,0.06)' } },
-        y:{ ticks:{ color:'#9ca3af', font:{ size:10 } }, grid:{ color:'rgba(255,255,255,0.06)' } }
-      }
+    return {responsive:true,maintainAspectRatio:false,interaction:{intersect:false,mode:'nearest'},
+      layout:{padding:{left:4,right:8,top:4,bottom:2}},
+      plugins:{legend:{labels:{color:'#d1d5db',boxWidth:12,font:{size:11}}},tooltip:{bodyFont:{size:11},titleFont:{size:11}}},
+      scales:{x:{ticks:{color:'#9ca3af',font:{size:10}},grid:{color:'rgba(255,255,255,.06)'}},
+              y:{ticks:{color:'#9ca3af',font:{size:10}},grid:{color:'rgba(255,255,255,.06)'}}}
     };
   }
-
   function renderCharts(items){
-    const ChartJS = window.Chart;
-    if(!ChartJS){
+    if(!window.Chart){
       ['chart-comp','chart-bmi','chart-bmr','chart-ecw'].forEach(id=>{
-        const cv = byId(id);
-        if(cv){ const p = cv.parentElement; const note = document.createElement('div'); note.style.color='var(--muted)'; note.style.fontSize='.85rem'; note.style.marginTop='8px'; note.textContent='Chart.js not loaded. Data is still available in cards and table.'; p.appendChild(note); }
+        const cv=byId(id); if(cv){ const note=document.createElement('div'); note.style.color='var(--muted)'; note.style.fontSize='.85rem'; note.style.marginTop='8px'; note.textContent='Chart.js not loaded. Data is still available in cards and table.'; cv.parentElement.appendChild(note); }
       });
       return;
     }
+    const labels=items.map(s=>s.label), w=items.map(s=>s.metrics.weight), smm=items.map(s=>s.metrics.smm),
+          fat=items.map(s=>s.metrics.fat), bmi=items.map(s=>s.metrics.bmi), pbf=items.map(s=>s.metrics.pbf),
+          bmr=items.map(s=>s.metrics.bmr), ob=items.map(s=>s.metrics.obesity), ecw=items.map(s=>s.metrics.ecwtbw);
 
-    const labels = items.map(s => s.label);
-    const weight = items.map(s => s.metrics.weight);
-    const smm = items.map(s => s.metrics.smm);
-    const fat = items.map(s => s.metrics.fat);
-    const bmi = items.map(s => s.metrics.bmi);
-    const pbf = items.map(s => s.metrics.pbf);
-    const bmr = items.map(s => s.metrics.bmr);
-    const obesity = items.map(s => s.metrics.obesity);
-    const ecw = items.map(s => s.metrics.ecwtbw);
+    destroy(chComp);
+    chComp = new Chart(byId('chart-comp'),{type:'line',data:{labels,datasets:[
+      {label:'Body Weight',data:w,tension:.3, borderColor:'#22d3ee', pointRadius:2},
+      {label:'Skeletal Muscle Mass',data:smm,tension:.3,borderColor:'#34d399', pointRadius:2},
+      {label:'Fat Mass',data:fat,tension:.3,borderColor:'#f59e0b', pointRadius:2}]},options:commonOptions()});
 
-    destroyChart(chComp);
-    chComp = new ChartJS(byId('chart-comp'), {
-      type:'line',
-      data:{ labels,
-        datasets:[
-          {label:'Weight', data:weight, tension:.3, borderColor:'#22d3ee', pointRadius:2},
-          {label:'SMM', data:smm, tension:.3, borderColor:'#34d399', pointRadius:2},
-          {label:'Fat', data:fat, tension:.3, borderColor:'#f59e0b', pointRadius:2}
-        ]},
-      options: commonOptions()
-    });
+    destroy(chBMI);
+    chBMI = new Chart(byId('chart-bmi'),{type:'scatter',data:{datasets:[
+      {label:'BMI vs Percent Body Fat', data:bmi.map((x,i)=>({x, y:pbf[i]})), borderColor:'#a78bfa', backgroundColor:'#a78bfa', pointRadius:4}]},
+      options:(()=>{const o=commonOptions();o.scales.x.title={display:true,text:'Body Mass Index',color:'#9ca3af'};o.scales.y.title={display:true,text:'Percent Body Fat',color:'#9ca3af'};return o;})()});
 
-    destroyChart(chBMI);
-    chBMI = new ChartJS(byId('chart-bmi'), {
-      type:'scatter',
-      data:{ datasets:[{ label:'BMI vs PBF', data:bmi.map((v,i)=>({x:v,y:pbf[i], label:labels[i]})), borderColor:'#a78bfa', backgroundColor:'#a78bfa', pointRadius:4 }] },
-      options:(()=>{ const o=commonOptions(); o.scales.x.title={display:true,text:'BMI',color:'#9ca3af'}; o.scales.y.title={display:true,text:'PBF %',color:'#9ca3af'}; return o; })()
-    });
+    destroy(chBMR);
+    chBMR = new Chart(byId('chart-bmr'),{type:'line',data:{labels,datasets:[
+      {label:'Basal Metabolic Rate',data:bmr,yAxisID:'y',tension:.3,borderColor:'#22d3ee',pointRadius:2},
+      {label:'Obesity Degree %',data:ob,yAxisID:'y1',tension:.3,borderColor:'#f87171',pointRadius:2}]},
+      options:(()=>{const o=commonOptions();o.scales.y.position='left';o.scales.y1={position:'right',ticks:{color:'#9ca3af'},grid:{drawOnChartArea:false}};return o;})()});
 
-    destroyChart(chBMR);
-    chBMR = new ChartJS(byId('chart-bmr'), {
-      type:'line',
-      data:{ labels,
-        datasets:[
-          {label:'BMR (kcal)', data:bmr, yAxisID:'y', tension:.3, borderColor:'#22d3ee', pointRadius:2},
-          {label:'Obesity %', data:obesity, yAxisID:'y1', tension:.3, borderColor:'#f87171', pointRadius:2}
-        ]},
-      options:(()=>{ const o=commonOptions();
-        o.scales.y.position='left';
-        o.scales.y1={ position:'right', ticks:{ color:'#9ca3af' }, grid:{ drawOnChartArea:false } };
-        return o; })()
-    });
+    destroy(chECW);
+    chECW = new Chart(byId('chart-ecw'),{type:'line',data:{labels,datasets:[
+      {label:'ECW/TBW',data:ecw,tension:.3,borderColor:'#34d399',pointRadius:2}]},
+      options:(()=>{const o=commonOptions();o.scales.y.min=0.36;o.scales.y.max=0.40;o.scales.y.ticks.stepSize=0.01;return o;})()});
+  }
 
-    destroyChart(chECW);
-    chECW = new ChartJS(byId('chart-ecw'), {
-      type:'line',
-      data:{ labels, datasets:[{label:'ECW/TBW', data:ecw, tension:.3, borderColor:'#34d399', pointRadius:2}] },
-      options:(()=>{ const o=commonOptions(); o.scales.y.min=0.36; o.scales.y.max=0.40; o.scales.y.ticks.stepSize=0.01; return o; })()
-    });
+  function applyKPI(index){
+    const s = scans[index], prevI = previousIndex(index), p = prevI>=0 ? scans[prevI] : null;
+    byId('last-scan').textContent = `Last scan: ${s.label} - ${s.date}`;
+
+    // gauges and values
+    setGauge(byId('g-weight'), s.metrics.weight, 120, fmt(s.metrics.weight,1)); byId('m-weight').textContent = fmt(s.metrics.weight,1);
+    setGauge(byId('g-smm'), s.metrics.smm, 45, fmt(s.metrics.smm,1)); byId('m-smm').textContent = fmt(s.metrics.smm,1);
+    setGauge(byId('g-pbf'), s.metrics.pbf, 60, fmt(s.metrics.pbf,1)); byId('m-pbf').textContent = fmt(s.metrics.pbf,1);
+    setGauge(byId('g-obesity'), s.metrics.obesity, 200, fmt(s.metrics.obesity,1)); byId('m-obesity').textContent = fmt(s.metrics.obesity,1);
+    setGauge(byId('g-visc'), s.metrics.visceral, 20, String(s.metrics.visceral)); byId('m-visc').textContent = String(s.metrics.visceral);
+    setGauge(byId('g-bmr'), s.metrics.bmr, 2200, String(Math.round(s.metrics.bmr))); byId('m-bmr').textContent = String(Math.round(s.metrics.bmr));
+    setGauge(byId('g-score'), s.metrics.score, 100, String(Math.round(s.metrics.score))); byId('m-score').textContent = String(Math.round(s.metrics.score));
+
+    // deficit target
+    const def = computeDeficit(s);
+    byId('badge-deficit').textContent = `${def.mid}`;
+    byId('m-deficit').textContent = `${def.mid}`;
+    byId('m-deficit-range').textContent = `range ${def.range[0]}-${def.range[1]}`;
+
+    // deltas
+    const d = (name, unit, curr, prev)=>{ const res = delta(curr, prev, name, unit); const el=byId('d-'+name.toLowerCase().replaceAll(' ','').replaceAll('/100','score')); el.className='delta '+res.cls; el.textContent=res.text; };
+    if(p){
+      d('Body Weight','kg',s.metrics.weight,p.metrics.weight);
+      d('Skeletal Muscle Mass','kg',s.metrics.smm,p.metrics.smm);
+      d('Percent Body Fat','%',s.metrics.pbf,p.metrics.pbf);
+      d('Obesity Degree','%',s.metrics.obesity,p.metrics.obesity);
+      d('Visceral Fat Level','level',s.metrics.visceral,p.metrics.visceral);
+      d('Basal Metabolic Rate','kcal',s.metrics.bmr,p.metrics.bmr);
+      // deficit change (neutral)
+      const prevDef = computeDeficit(p);
+      const el=byId('d-deficit'); el.className='delta neutral';
+      const change = def.mid - prevDef.mid; const arrow = change>0?'▲':change<0?'▼':'•'; const sign = change>0?'+':change<0?'-':''; el.textContent = `${arrow} ${sign}${Math.abs(change)} kcal since previous`;
+      d('InBody Score','/ 100',s.metrics.score,p.metrics.score);
+    }else{
+      ['weight','smm','pbf','obesity','visc','bmr','deficit','score'].forEach(k=>{ const el=byId('d-'+k); el.className='delta neutral'; el.textContent='No previous scan to compare'; });
+    }
+  }
+
+  function renderCompare(index){
+    const s=scans[index], prevI=previousIndex(index), p=prevI>=0?scans[prevI]:null;
+    const cont = byId('compare-strip');
+    if(!p){ cont.innerHTML = `<div class="card mini"><h5>Comparison</h5><div class="small">No previous scan to compare</div></div>`; return; }
+    const items=[
+      {name:'Body Weight', unit:'kg', cur:s.metrics.weight, prev:p.metrics.weight},
+      {name:'Percent Body Fat', unit:'%', cur:s.metrics.pbf, prev:p.metrics.pbf},
+      {name:'Fat Mass', unit:'kg', cur:s.metrics.fat, prev:p.metrics.fat},
+      {name:'Skeletal Muscle Mass', unit:'kg', cur:s.metrics.smm, prev:p.metrics.smm},
+      {name:'Body Mass Index', unit:'', cur:s.metrics.bmi, prev:p.metrics.bmi},
+      {name:'Visceral Fat Level', unit:'level', cur:s.metrics.visceral, prev:p.metrics.visceral},
+      {name:'Obesity Degree', unit:'%', cur:s.metrics.obesity, prev:p.metrics.obesity},
+      {name:'Basal Metabolic Rate', unit:'kcal', cur:s.metrics.bmr, prev:p.metrics.bmr},
+      {name:'InBody Score', unit:'/ 100', cur:s.metrics.score, prev:p.metrics.score},
+    ];
+    cont.innerHTML = items.map(it=>{
+      const dd = delta(it.cur,it.prev,it.name,it.unit||'');
+      const decimals = (it.unit==='level'||it.unit==='/ 100')?0:1;
+      const abs = Math.abs((it.cur??0) - (it.prev??0)).toFixed(decimals);
+      const prevT = (it.unit==='kcal'||it.unit==='level'||it.unit==='/ 100')? Math.round(it.prev) : fmt(it.prev,1);
+      const curT  = (it.unit==='kcal'||it.unit==='level'||it.unit==='/ 100')? Math.round(it.cur)  : fmt(it.cur,1);
+      return `<div class="card mini">
+        <h5>${it.name}</h5>
+        <div class="delta ${dd.cls}">${dd.text}</div>
+        <div class="fromto">${prevT} ${it.unit} → ${curT} ${it.unit}</div>
+      </div>`;
+    }).join('');
   }
 
   function renderAll(index){
-    const s = scans[index];
-    renderKPIs(s);
-    renderIORs(s);
+    const s=scans[index];
+    applyKPI(index);
+    renderCompare(index);
+    renderIOR(s);
     renderSegments(s);
     renderCharts(scans);
+    renderDataSource();
   }
 
-  select.addEventListener('change', ()=> renderAll(Number(select.value)));
+  function updateDebug(){
+    byId('debug').textContent = `- Loaded ${scans.length} scans (source: ${dataSource}) | options: ${sel.options.length}`;
+  }
 
   // Menu
-  const menuBtn = byId('btn-menu');
-  const menu = document.createElement('div');
-  menu.className = 'menu';
-  menu.innerHTML = `<div class="menu-inner">
-    <span class="close" id="menu-close">Close</span>
-    <h3>Menu</h3>
-    <p>Quick links and info.</p>
-    <div class="pill">InBody Tracker</div>
-    <div class="pill">Composition</div>
-    <div class="pill">Metabolic</div>
-    <div class="pill">Segments</div>
-    <div class="pill">Repository</div>
-  </div>`;
+  const menuBtn=byId('btn-menu'); const menu=document.createElement('div'); menu.className='menu';
+  menu.innerHTML=`<div class="inner"><span class="close" id="menu-close">Close</span><h3>Menu</h3>
+  <p class="small">Quick links</p><span class="pill">Composition</span><span class="pill">Metabolic</span><span class="pill">Segments</span><span class="pill">Repository</span></div>`;
   document.body.appendChild(menu);
-  menuBtn.addEventListener('click', ()=> menu.classList.add('open'));
-  menu.addEventListener('click', (e)=>{ if(e.target.id==='menu-close' || e.target===menu){ menu.classList.remove('open'); } });
+  menuBtn.addEventListener('click',()=>menu.classList.add('open'));
+  menu.addEventListener('click',(e)=>{ if(e.target.id==='menu-close'||e.target===menu) menu.classList.remove('open'); });
 
-  // Init after attempting to load Chart.js (UI renders regardless)
+  // Init
   ensureChartJs(function(){
     renderRepo(scans);
-    safeMountSelect(scans);
+    mountSelect(scans);
   });
+  sel.addEventListener('change',()=>renderAll(Number(sel.value)));
 
 })();
 </script>
