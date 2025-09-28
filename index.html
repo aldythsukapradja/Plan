@@ -50,6 +50,8 @@ hr.sep{border:none;border-top:1px solid #273056;margin:12px 0}
 table.master{width:100%;border-collapse:collapse}
 table.master th,table.master td{padding:8px;border-bottom:1px solid #263056;font-size:12px;vertical-align:top}
 .layout{display:grid;grid-template-columns:1fr 340px;gap:24px}@media (max-width:1100px){.layout{grid-template-columns:1fr}}
+/* tiny debug line you can hide later */
+#dbg{margin-top:8px;color:#8fb3ff;font-size:12px}
 </style>
 </head>
 <body>
@@ -57,7 +59,7 @@ table.master th,table.master td{padding:8px;border-bottom:1px solid #263056;font
   <div class="header">
     <div>
       <h1>InBody Tracker</h1>
-      <div class="sub">Last scan: <b id="last-date">—</b></div>
+      <div class="sub">Last scan: <b id="last-date">—</b> <span id="dbg"></span></div>
     </div>
     <div class="controls">
       <label class="sub">Select scan: </label>
@@ -157,20 +159,103 @@ table.master th,table.master td{padding:8px;border-bottom:1px solid #263056;font
   </div>
 </div>
 
-<!-- Chart.js: if it fails, charts are skipped but data renders -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<script>
-/* DATA */
-var scans=[{"date":"2025-03-01","label":"Mar 2025 (est.)","metrics":{"weight":90,"pbf":42,"bmi":31.9,"score":62,"visceral":15,"smm":32,"fat":38,"bmr":1750,"tbw":42.5,"protein":11.2,"minerals":3.8,"ffm":52,"obesity":145,"ecwtbw":0.39},"segments":{"la":{"kg":3,"pct":98},"ra":{"kg":3.1,"pct":98.5},"tr":{"kg":21,"pct":99},"ll":{"kg":9.4,"pct":97.5},"rl":{"kg":9.5,"pct":98}},"ior":{"composition":{"insight":"Fat dominant profile","observation":"Very high fat mass; muscle comparatively lower","recommendation":"Start caloric deficit; protein ≥1.6 g/kg"},"bmi_pbf":{"insight":"BMI & PBF both high","observation":"BMI 31.9, PBF 42%","recommendation":"Track waist/hip & photos"},"bmr_obesity":{"insight":"BMR driven by body mass","observation":"~1750 kcal baseline","recommendation":"Moderate deficit (300–500 kcal)"},"ecwtbw":{"insight":"Upper hydration band","observation":"ECW/TBW 0.390","recommendation":"Control sodium; steady fluids"},"segmental":{"insight":"Balanced limbs; trunk high","observation":"Arms/legs ~97–99% std","recommendation":"Balanced training; trunk mobility"},"overall":{"insight":"Obese baseline","observation":"VF 15; obesity degree 145%","recommendation":"Initiate weight-loss phase"}}},
-{"date":"2025-04-15","label":"Mid-Apr 2025 (est.)","metrics":{"weight":84.7,"pbf":39.6,"bmi":30,"score":63,"visceral":14,"smm":31.2,"fat":33.5,"bmr":1700,"tbw":41,"protein":10.9,"minerals":3.7,"ffm":51.2,"obesity":139,"ecwtbw":0.389},"segments":{"la":{"kg":2.9,"pct":97.8},"ra":{"kg":3,"pct":98.2},"tr":{"kg":20.5,"pct":98.5},"ll":{"kg":9.2,"pct":97.2},"rl":{"kg":9.3,"pct":97.6}},"ior":{"composition":{"insight":"Early fat reduction","observation":"~5 kg loss; mostly fat","recommendation":"Add resistance training"},"bmi_pbf":{"insight":"PBF ↓ faster than BMI","observation":"PBF 39.6%, BMI 30.0","recommendation":"Keep weekly loss ≤0.7% BW"},"bmr_obesity":{"insight":"BMR slightly down","observation":"~1700 kcal","recommendation":"Avoid aggressive cuts"},"ecwtbw":{"insight":"Hydration stable","observation":"0.389","recommendation":"Fluids 35–40 ml/kg"},"segmental":{"insight":"Balanced limbs","observation":"Arms ~98%, legs ~97%","recommendation":"Add squats/deadlifts"},"overall":{"insight":"Good start","observation":"−5.3 kg total","recommendation":"Sustain momentum"}}},
-{"date":"2025-06-13","label":"13 Jun 2025 (scan)","metrics":{"weight":80.6,"pbf":32.6,"bmi":28.6,"score":65,"visceral":12,"smm":30.4,"fat":26.2,"bmr":1544,"tbw":39.9,"protein":10.7,"minerals":3.75,"ffm":54.4,"obesity":130,"ecwtbw":0.388},"segments":{"la":{"kg":3.05,"pct":95.7},"ra":{"kg":3.12,"pct":97.9},"tr":{"kg":24.8,"pct":97.6},"ll":{"kg":8.09,"pct":91.3},"rl":{"kg":8.16,"pct":92}},"ior":{"composition":{"insight":"Strong fat loss","observation":"Fat ↓ 11.8 kg; muscle ↓ 1.6 kg","recommendation":"Continue deficit; carbs pre-workout"},"bmi_pbf":{"insight":"PBF dropping faster","observation":"BMI 28.6; PBF 32.6%","recommendation":"Use tape + photos"},"bmr_obesity":{"insight":"BMR steady","observation":"1544 kcal","recommendation":"Deficit 300–500 kcal"},"ecwtbw":{"insight":"Hydration healthy","observation":"0.388","recommendation":"Maintain electrolytes"},"segmental":{"insight":"Legs slightly low","observation":"LL 91.3%; RL 92.0%","recommendation":"Unilateral leg work"},"overall":{"insight":"Overfat but improving","observation":"VF ↓ to 12","recommendation":"Push toward VF < 10"}}},
-{"date":"2025-09-11","label":"11 Sep 2025 (scan)","metrics":{"weight":79,"pbf":31.3,"bmi":28,"score":66,"visceral":10,"smm":30.4,"fat":24.8,"bmr":1542,"tbw":39.8,"protein":10.6,"minerals":3.75,"ffm":54.2,"obesity":127.9,"ecwtbw":0.388},"segments":{"la":{"kg":3,"pct":94.6},"ra":{"kg":3.03,"pct":95.6},"tr":{"kg":24.4,"pct":96.6},"ll":{"kg":8.15,"pct":92.6},"rl":{"kg":8.19,"pct":92.9}},"ior":{"composition":{"insight":"Progress sustained","observation":"Muscle stable; fat ↓","recommendation":"Maintain 2–3×/wk lifting"},"bmi_pbf":{"insight":"PBF ↓ steady","observation":"BMI 28.0; PBF 31.3%","recommendation":"Loss rate ~0.5% BW/wk"},"bmr_obesity":{"insight":"BMR unchanged","observation":"1542 kcal","recommendation":"Avoid further drop; monitor lifts"},"ecwtbw":{"insight":"Hydration consistent","observation":"0.388","recommendation":"~3 L/day"},"segmental":{"insight":"Arms/trunk solid; legs behind","observation":"Legs ~92–93%","recommendation":"Leg hypertrophy focus"},"overall":{"insight":"Near overweight zone","observation":"VF 10","recommendation":"Push to VF ≤ 9"}}},
-{"date":"2025-09-24","label":"24 Sep 2025 (scan)","metrics":{"weight":76.8,"pbf":29.7,"bmi":27.2,"score":68,"visceral":9,"smm":30.2,"fat":22.8,"bmr":1536,"tbw":39.6,"protein":10.6,"minerals":3.75,"ffm":54,"obesity":124.8,"ecwtbw":0.387},"segments":{"la":{"kg":3.01,"pct":96.6},"ra":{"kg":3.08,"pct":98.2},"tr":{"kg":24.4,"pct":97.4},"ll":{"kg":7.87,"pct":90.9},"rl":{"kg":7.94,"pct":90.9}},"ior":{"composition":{"insight":"Major milestone","observation":"Fat ↓ 15.2 kg; muscle preserved","recommendation":"Begin recomposition"},"bmi_pbf":{"insight":"BMI vs PBF gap","observation":"BMI 27.2; PBF 29.7%","recommendation":"Next goal PBF ≤ 25%"},"bmr_obesity":{"insight":"BMR stable","observation":"1536 kcal","recommendation":"Keep strength to hold SMM"},"ecwtbw":{"insight":"Hydration optimal","observation":"0.387","recommendation":"Maintain fluids & electrolytes"},"segmental":{"insight":"Legs lagging","observation":"LL/RL 90.9% of std","recommendation":"Lower-body progressive overload"},"overall":{"insight":"Obese → overweight, muscle preserved","observation":"−13.2 kg; ~85% fat loss; VF 9","recommendation":"Target 72 kg, PBF ≤ 25%, VF ≤ 7"}}}];
+<!-- DATA as JSON (safe for GitHub Pages / mobile Safari) -->
+<script type="application/json" id="scans-json">{
+  "scans": [
+    {
+      "date": "2025-03-01",
+      "label": "Mar 2025 (est.)",
+      "metrics": {"weight": 90.0, "pbf": 42.0, "bmi": 31.9, "score": 62, "visceral": 15, "smm": 32.0, "fat": 38.0, "bmr": 1750, "tbw": 42.5, "protein": 11.2, "minerals": 3.8, "ffm": 52.0, "obesity": 145.0, "ecwtbw": 0.390},
+      "segments": {"la":{"kg":3.00,"pct":98.0},"ra":{"kg":3.10,"pct":98.5},"tr":{"kg":21.0,"pct":99.0},"ll":{"kg":9.40,"pct":97.5},"rl":{"kg":9.50,"pct":98.0}},
+      "ior": {
+        "composition":{"insight":"Fat dominant profile","observation":"Very high fat mass; muscle comparatively lower","recommendation":"Start caloric deficit; protein >= 1.6 g/kg"},
+        "bmi_pbf":{"insight":"BMI and PBF both high","observation":"BMI 31.9, PBF 42%","recommendation":"Track waist/hip and photos"},
+        "bmr_obesity":{"insight":"BMR driven by body mass","observation":"About 1750 kcal baseline","recommendation":"Moderate deficit 300-500 kcal"},
+        "ecwtbw":{"insight":"Upper hydration band","observation":"ECW/TBW 0.390","recommendation":"Control sodium; steady fluids"},
+        "segmental":{"insight":"Balanced limbs; trunk high","observation":"Arms/legs ~97-99% of standard","recommendation":"Balanced training; trunk mobility"},
+        "overall":{"insight":"Obese baseline","observation":"Visceral fat 15; obesity degree 145%","recommendation":"Initiate weight-loss phase"}
+      }
+    },
+    {
+      "date": "2025-04-15",
+      "label": "Mid-Apr 2025 (est.)",
+      "metrics": {"weight": 84.7, "pbf": 39.6, "bmi": 30.0, "score": 63, "visceral": 14, "smm": 31.2, "fat": 33.5, "bmr": 1700, "tbw": 41.0, "protein": 10.9, "minerals": 3.7, "ffm": 51.2, "obesity": 139.0, "ecwtbw": 0.389},
+      "segments": {"la":{"kg":2.90,"pct":97.8},"ra":{"kg":3.00,"pct":98.2},"tr":{"kg":20.5,"pct":98.5},"ll":{"kg":9.20,"pct":97.2},"rl":{"kg":9.30,"pct":97.6}},
+      "ior": {
+        "composition":{"insight":"Early fat reduction","observation":"About 5 kg loss; mostly fat","recommendation":"Add resistance training"},
+        "bmi_pbf":{"insight":"PBF dropping faster than BMI","observation":"PBF 39.6%, BMI 30.0","recommendation":"Keep weekly loss <= 0.7% body weight"},
+        "bmr_obesity":{"insight":"BMR slightly down","observation":"About 1700 kcal","recommendation":"Avoid aggressive cuts"},
+        "ecwtbw":{"insight":"Hydration stable","observation":"0.389","recommendation":"Fluids 35-40 ml/kg"},
+        "segmental":{"insight":"Balanced limbs","observation":"Arms ~98%, legs ~97%","recommendation":"Add squats/deadlifts"},
+        "overall":{"insight":"Good start","observation":"Minus 5.3 kg total","recommendation":"Sustain momentum"}
+      }
+    },
+    {
+      "date": "2025-06-13",
+      "label": "13 Jun 2025 (scan)",
+      "metrics": {"weight": 80.6, "pbf": 32.6, "bmi": 28.6, "score": 65, "visceral": 12, "smm": 30.4, "fat": 26.2, "bmr": 1544, "tbw": 39.9, "protein": 10.7, "minerals": 3.75, "ffm": 54.4, "obesity": 130.0, "ecwtbw": 0.388},
+      "segments": {"la":{"kg":3.05,"pct":95.7},"ra":{"kg":3.12,"pct":97.9},"tr":{"kg":24.8,"pct":97.6},"ll":{"kg":8.09,"pct":91.3},"rl":{"kg":8.16,"pct":92.0}},
+      "ior": {
+        "composition":{"insight":"Strong fat loss","observation":"Fat down 11.8 kg; muscle down 1.6 kg","recommendation":"Continue deficit; carbs pre-workout"},
+        "bmi_pbf":{"insight":"PBF dropping faster","observation":"BMI 28.6; PBF 32.6%","recommendation":"Use tape and photos"},
+        "bmr_obesity":{"insight":"BMR steady","observation":"1544 kcal","recommendation":"Deficit 300-500 kcal"},
+        "ecwtbw":{"insight":"Hydration healthy","observation":"0.388","recommendation":"Maintain electrolytes"},
+        "segmental":{"insight":"Legs slightly low","observation":"LL 91.3%; RL 92.0%","recommendation":"Unilateral leg work"},
+        "overall":{"insight":"Overfat but improving","observation":"Visceral fat down to 12","recommendation":"Push toward VF < 10"}
+      }
+    },
+    {
+      "date": "2025-09-11",
+      "label": "11 Sep 2025 (scan)",
+      "metrics": {"weight": 79.0, "pbf": 31.3, "bmi": 28.0, "score": 66, "visceral": 10, "smm": 30.4, "fat": 24.8, "bmr": 1542, "tbw": 39.8, "protein": 10.6, "minerals": 3.75, "ffm": 54.2, "obesity": 127.9, "ecwtbw": 0.388},
+      "segments": {"la":{"kg":3.00,"pct":94.6},"ra":{"kg":3.03,"pct":95.6},"tr":{"kg":24.4,"pct":96.6},"ll":{"kg":8.15,"pct":92.6},"rl":{"kg":8.19,"pct":92.9}},
+      "ior": {
+        "composition":{"insight":"Progress sustained","observation":"Muscle stable; fat down","recommendation":"Maintain 2-3x/week lifting"},
+        "bmi_pbf":{"insight":"PBF down steady","observation":"BMI 28.0; PBF 31.3%","recommendation":"Loss rate about 0.5% body weight per week"},
+        "bmr_obesity":{"insight":"BMR unchanged","observation":"1542 kcal","recommendation":"Avoid further drop; monitor lifts"},
+        "ecwtbw":{"insight":"Hydration consistent","observation":"0.388","recommendation":"~3 L/day"},
+        "segmental":{"insight":"Arms/trunk solid; legs behind","observation":"Legs about 92-93%","recommendation":"Leg hypertrophy focus"},
+        "overall":{"insight":"Near overweight zone","observation":"Visceral fat 10","recommendation":"Push to VF <= 9"}
+      }
+    },
+    {
+      "date": "2025-09-24",
+      "label": "24 Sep 2025 (scan)",
+      "metrics": {"weight": 76.8, "pbf": 29.7, "bmi": 27.2, "score": 68, "visceral": 9, "smm": 30.2, "fat": 22.8, "bmr": 1536, "tbw": 39.6, "protein": 10.6, "minerals": 3.75, "ffm": 54.0, "obesity": 124.8, "ecwtbw": 0.387},
+      "segments": {"la":{"kg":3.01,"pct":96.6},"ra":{"kg":3.08,"pct":98.2},"tr":{"kg":24.4,"pct":97.4},"ll":{"kg":7.87,"pct":90.9},"rl":{"kg":7.94,"pct":90.9}},
+      "ior": {
+        "composition":{"insight":"Major milestone","observation":"Fat down 15.2 kg; muscle preserved","recommendation":"Begin recomposition"},
+        "bmi_pbf":{"insight":"BMI vs PBF gap","observation":"BMI 27.2; PBF 29.7%","recommendation":"Next goal PBF <= 25%"},
+        "bmr_obesity":{"insight":"BMR stable","observation":"1536 kcal","recommendation":"Keep strength to hold SMM"},
+        "ecwtbw":{"insight":"Hydration optimal","observation":"0.387","recommendation":"Maintain fluids and electrolytes"},
+        "segmental":{"insight":"Legs lagging","observation":"LL/RL 90.9% of standard","recommendation":"Lower-body progressive overload"},
+        "overall":{"insight":"Obese to overweight, muscle preserved","observation":"Minus 13.2 kg; about 85% fat loss; VF 9","recommendation":"Target 72 kg, PBF <= 25%, VF <= 7"}
+      }
+    }
+  ]
+}</script>
 
-var active=scans.length-1; /* default latest */
+<!-- Chart.js (OK to fail) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+<script>
+/* ===== Parse JSON safely ===== */
 function $(id){return document.getElementById(id)}
 var gridColor="#2d355a";
+var scans=[], active=0;
 
+try{
+  var raw=document.getElementById('scans-json').textContent;
+  var parsed=JSON.parse(raw);
+  scans=parsed.scans||[];
+  active=scans.length?scans.length-1:0; // default latest
+  $('dbg').textContent=' • Loaded '+scans.length+' scans';
+}catch(e){
+  console.error('JSON parse error', e);
+  $('dbg').textContent=' • Data error';
+}
+
+/* ===== UI functions (same as before) ===== */
 function fillSelect(){
   var sel=$("scan-select"); sel.innerHTML="";
   for(var i=0;i<scans.length;i++){var s=scans[i],o=document.createElement("option");o.value=i;o.textContent=s.label;sel.appendChild(o)}
@@ -230,7 +315,7 @@ function series(){
 }
 function renderCharts(){
   if(typeof window.Chart==="undefined"){console.warn("Chart.js not available. Skipping charts.");return;}
-  var S=series(), border=2.4;
+  var S=series(), border=2.4, gridColor="#2d355a";
   if(!compChart){compChart=new Chart($("chart-comp"),{type:"line",data:{labels:S.labels,datasets:[
     {label:"Weight",data:S.weight,tension:.35,borderColor:"#7c5cff",backgroundColor:"rgba(124,92,255,.12)",fill:true,borderWidth:border},
     {label:"SMM",data:S.smm,tension:.35,borderColor:"#25c2ff",backgroundColor:"rgba(37,194,255,.12)",fill:true,borderWidth:border},
@@ -249,12 +334,14 @@ function renderCharts(){
   if(!ecwChart){ecwChart=new Chart($("chart-ecw"),{type:"line",data:{labels:S.labels,datasets:[{label:"ECW/TBW",data:S.ecw,tension:.35,borderColor:"#5ad39e",backgroundColor:"rgba(90,211,158,.12)",fill:true,borderWidth:border}]},options:{plugins:{legend:{labels:{color:"#cfd3e9"}}},scales:{x:{grid:{color:gridColor},ticks:{color:"#cfd3e9"}},y:{min:0.36,max:0.40,grid:{color:gridColor},ticks:{color:"#cfd3e9"}}}})}
   else{ecwChart.data.labels=S.labels;ecwChart.data.datasets[0].data=S.ecw;ecwChart.update()}
 }
-/* Init (runs after HTML since script is at end) */
-try{
-  // hamburger
-  (function(){var b=$("burger"),m=$("menu-list");b.onclick=function(e){e.stopPropagation();m.style.display=(m.style.display==="block"?"none":"block")};document.addEventListener("click",function(e){if(!m.contains(e.target)&&e.target!==b){m.style.display="none"}})})();
-  fillSelect(); buildMaster(); (function(){var s=scans[active]; setKPIs(s); setOverallIOR(s); setCompBmiIOR(s); setBmrecwIOR(s); setSegmental(s); renderCharts();})();
-}catch(err){console.error(err)}
+
+/* Init */
+(function(){
+  // Hamburger
+  var b=$("burger"),m=$("menu-list"); b.onclick=function(e){e.stopPropagation();m.style.display=(m.style.display==="block"?"none":"block")}; document.addEventListener("click",function(e){if(!m.contains(e.target)&&e.target!==b){m.style.display="none"}});
+  fillSelect(); buildMaster();
+  if(scans.length){var s=scans[active]; setKPIs(s); setOverallIOR(s); setCompBmiIOR(s); setBmrecwIOR(s); setSegmental(s); renderCharts();}
+})();
 </script>
 </body>
 </html>
