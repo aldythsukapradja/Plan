@@ -1,887 +1,822 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-<title>InBody Tracker</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>InBody Tracker — Bulletproof Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<!-- Chart.js v4 -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js" defer></script>
+
 <style>
-:root{
-  --bg:#0b0f17; --panel:#0c1322; --panel-2:#0c1526; --text:#e5e7eb; --muted:#9ca3af;
-  --border:rgba(255,255,255,0.08);
-  --cyan:#22d3ee; --purple:#a78bfa; --amber:#f59e0b; --green:#34d399; --red:#f87171;
-  --radius:16px; --shadow:0 10px 30px rgba(0,0,0,.35), 0 0 0 1px var(--border) inset;
-}
-*{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
-body{
-  margin:0;color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,Helvetica,sans-serif;
-  background:
-   radial-gradient(1000px 520px at 80% -10%, rgba(167,139,250,.12), transparent 60%),
-   radial-gradient(900px 450px at -10% 5%, rgba(34,211,238,.08), transparent 55%),
-   linear-gradient(#0b0f17,#0b0f17);
-  padding-bottom:max(12px, env(safe-area-inset-bottom));
-}
-.container{max-width:1120px;margin:0 auto;padding:12px 10px 80px}
-header.header{
-  position:sticky;top:0;z-index:50;
-  backdrop-filter:blur(10px);
-  background:linear-gradient(180deg, rgba(12,19,34,.85), rgba(12,21,38,.65));
-  border-bottom:1px solid var(--border);
-  padding:10px 10px env(safe-area-inset-top);
-}
-.header-grid{display:grid;grid-template-columns:1fr;gap:10px;align-items:center}
-@media(min-width:760px){.header-grid{grid-template-columns:1fr auto}}
-.brand{
-  display:flex;flex-direction:column;gap:6px;
-}
-.brand h1{margin:0;font-weight:800;letter-spacing:.2px;font-size:1.16rem}
-.meta{display:flex;flex-wrap:wrap;gap:8px 12px;color:var(--muted);font-size:.86rem}
+  :root{
+    --bg:#0b0f14;
+    --panel:#101621;
+    --panel-2:#0e1420;
+    --text:#e6f1ff;
+    --muted:#9fb3c8;
+    --border:rgba(255,255,255,0.08);
+    --glow:0 0 0.75rem rgba(0,255,255,0.25);
+    --cyan:#00e5ff;         /* weight / accent */
+    --green:#21f3a3;        /* SMM / SMI */
+    --purple:#a16bff;       /* PBF */
+    --amber:#ffcf66;        /* BMR */
+    --red:#ff6b6b;          /* visceral / obesity */
+    --card-radius:16px;
+    --shadow:0 6px 24px rgba(0,0,0,0.35), inset 0 0 0 1px var(--border);
+    --sticky-h:68px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    background:
+      radial-gradient(1200px 600px at 10% -10%, rgba(0,255,255,0.06), transparent 60%),
+      radial-gradient(1200px 600px at 110% 10%, rgba(161,107,255,0.06), transparent 60%),
+      linear-gradient(180deg, #0a0f15, #0b1118 20%, #0b0f14 60%);
+    color:var(--text); line-height:1.4;
+  }
+  a{color:var(--cyan); text-decoration:none}
+  .wrap{max-width:1100px; margin:0 auto; padding:calc(var(--sticky-h) + 16px) 16px 96px}
 
-.controls{display:grid;gap:8px;align-items:center;grid-template-columns:1fr auto}
-@media(min-width:840px){.controls{grid-template-columns:auto auto;justify-content:end}}
-select#scan-select{
-  width:100%;appearance:none;background:linear-gradient(180deg,#0c1424,#0c1528);
-  color:var(--text);border:1px solid var(--border);border-radius:12px;padding:12px 40px 12px 12px;font-weight:600;outline:0;box-shadow:var(--shadow);height:44px
-}
-.hamburger{
-  position:relative;width:44px;height:44px;border-radius:12px;border:1px solid var(--border);
-  background:linear-gradient(180deg,#0c1420,#0c1426);display:flex;align-items:center;justify-content:center;
-  box-shadow:var(--shadow),0 0 18px rgba(34,211,238,.25);cursor:pointer
-}
-.hamburger:hover{transform:translateY(-2px);transition:transform .15s ease, box-shadow .15s ease}
-.hamburger .bars{position:relative;width:22px;height:16px;display:block}
-.hamburger .bars span{position:absolute;left:0;right:0;height:2px;background:var(--cyan);border-radius:2px;box-shadow:0 0 10px rgba(34,211,238,.7)}
-.hamburger .bars span:nth-child(1){top:0}
-.hamburger .bars span:nth-child(2){top:7px}
-.hamburger .bars span:nth-child(3){bottom:0}
+  /* Sticky header */
+  header{
+    position:fixed; inset:0 0 auto 0; height:var(--sticky-h);
+    display:flex; align-items:center; justify-content:space-between;
+    padding:12px 16px; backdrop-filter:blur(10px);
+    background:rgba(10,16,24,0.6); border-bottom:1px solid var(--border); z-index:50;
+  }
+  .brand{
+    display:flex; align-items:center; gap:12px;
+  }
+  .brand h1{margin:0; font-size:18px; letter-spacing:.4px}
+  .last-scan{font-size:12px; color:var(--muted)}
+  .debug{font-size:11px; color:#7bdcff}
+  .controls{display:flex; align-items:center; gap:8px}
+  select, button, .pill{
+    background:var(--panel-2); color:var(--text); border:1px solid var(--border);
+    padding:10px 12px; border-radius:999px; box-shadow:var(--shadow);
+  }
+  button{cursor:pointer}
+  .hamburger{width:42px; height:42px; display:grid; place-items:center}
+  .ham-bars{width:20px; height:14px; position:relative}
+  .ham-bars span{position:absolute; left:0; right:0; height:2px; background:var(--text); border-radius:2px; box-shadow:var(--glow)}
+  .ham-bars span:nth-child(1){top:0}
+  .ham-bars span:nth-child(2){top:6px}
+  .ham-bars span:nth-child(3){bottom:0}
 
-main{margin-top:10px}
-.grid{display:grid;gap:10px}
-.card{
-  background:linear-gradient(180deg,var(--panel),var(--panel-2));
-  border:1px solid var(--border);border-radius:16px;padding:10px;box-shadow:var(--shadow);
-  position:relative;overflow:hidden;transform:translateY(6px);opacity:0;animation:fadeUp .5s ease forwards
-}
-.card:hover{transform:translateY(-2px);box-shadow:var(--shadow),0 0 24px rgba(167,139,250,.15),0 0 0 1px rgba(255,255,255,.04) inset;transition:.16s}
-@keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
-@media(prefers-reduced-motion:reduce){.card{animation:none;opacity:1;transform:none}.card:hover{transition:none}}
+  /* Overlay menu */
+  .overlay{
+    position:fixed; inset:0; background:rgba(6,10,16,0.92); backdrop-filter:blur(12px);
+    display:none; z-index:80; padding:24px 16px;
+  }
+  .overlay.open{display:block}
+  .overlay-inner{max-width:640px; margin:0 auto; text-align:center}
+  .overlay h2{margin:10px 0 22px}
+  .qlist{display:flex; flex-direction:column; gap:12px; align-items:center}
+  .qlist a{
+    display:block; width:min(420px, 90vw); text-align:center; padding:14px 18px; border-radius:999px;
+    border:1px solid var(--border); background:linear-gradient(180deg,#0f1624,#0b1320);
+    box-shadow:var(--shadow), 0 0 18px rgba(0,255,255,0.05);
+  }
+  .qlist a:hover{box-shadow:var(--shadow), 0 0 26px rgba(0,255,255,0.18)}
 
-.small{font-size:.86rem;color:var(--muted)}
-.section-title{margin:16px 0 8px;font-weight:800;font-size:1.05rem;letter-spacing:.3px}
+  /* Sections */
+  section{scroll-margin-top:calc(var(--sticky-h) + 16px)}
+  .section{background:linear-gradient(180deg,#0e1522,#0d1420); border:1px solid var(--border);
+    border-radius:20px; padding:16px; margin:14px 0; box-shadow:var(--shadow)}
+  .section h3{margin:0 0 10px; letter-spacing:.3px}
+  .subtle{color:var(--muted)}
 
-.kpis{grid-template-columns:1fr 1fr}
-@media(min-width:740px){.kpis{grid-template-columns:repeat(4,1fr)}}
-@media(min-width:1024px){.kpis{grid-template-columns:repeat(8,1fr)}}
-.kpi{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center}
-.kpi h4{margin:0 0 4px 0;font-size:.9rem;color:var(--muted);font-weight:600}
-.val-big{font-weight:800;font-size:1.02rem}
-.unit{font-size:.78rem;color:var(--muted)}
-.delta{margin-top:6px;display:inline-flex;align-items:center;gap:6px;font-size:.78rem;padding:4px 8px;border-radius:999px;border:1px solid var(--border);background:#0d1525}
-.delta.good{color:#c8f7dc;box-shadow:0 0 0 1px rgba(52,211,153,.25) inset, 0 0 12px rgba(52,211,153,.12)}
-.delta.bad{color:#ffd7d7;box-shadow:0 0 0 1px rgba(248,113,113,.25) inset, 0 0 12px rgba(248,113,113,.12)}
-.delta.neutral{color:#d1d5db;box-shadow:0 0 0 1px rgba(255,255,255,.12) inset}
-.gauge{--size:52px;--track:7px;--val:0;--max:100;--hue:190;width:var(--size);height:var(--size);border-radius:50%;
-  background:conic-gradient(hsl(var(--hue),95%,62%) calc(var(--val)/var(--max)*1turn), rgba(255,255,255,.08) 0);display:grid;place-items:center;transition:background .6s ease;box-shadow:inset 0 0 12px rgba(0,0,0,.35),0 0 18px rgba(34,211,238,.15)}
-.gauge::after{content:"";width:calc(var(--size) - var(--track)*2);height:calc(var(--size) - var(--track)*2);border-radius:50%;background:linear-gradient(180deg,#0a0f1a,#0b1220);box-shadow: inset 0 0 0 1px var(--border)}
-.gval{position:absolute;width:var(--size);text-align:center;font-weight:800;font-size:.9rem;letter-spacing:.2px}
-.badge{min-width:48px;min-height:48px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--border);background:linear-gradient(180deg,#0c1424,#0c1528);box-shadow:var(--shadow)}
+  /* KPIs grid */
+  .kpis{display:grid; grid-template-columns:1fr; gap:12px}
+  @media(min-width:700px){ .kpis{grid-template-columns:repeat(4,1fr)} }
+  .kpi{
+    background:linear-gradient(180deg,#10192a,#0f1829); border:1px solid var(--border); border-radius:var(--card-radius);
+    padding:14px; box-shadow:var(--shadow); position:relative; overflow:hidden;
+  }
+  .kpi .name{font-size:12px; color:var(--muted); letter-spacing:.3px}
+  .kpi .val{font-size:22px; font-weight:700}
+  .delta{font-size:11px; padding:4px 8px; border-radius:999px; border:1px solid var(--border); margin-left:8px}
+  .delta.good{background:rgba(33,243,163,0.1); color:var(--green)}
+  .delta.bad{background:rgba(255,107,107,0.1); color:var(--red)}
+  .mini{height:32px; margin-top:6px}
+  .bar-track{height:8px; border-radius:6px; background:#0c1320; border:1px solid var(--border); overflow:hidden}
+  .bar-fill{height:100%; width:0%; transition:width .6s ease}
+  .spark{height:18px}
 
-.compare-controls{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px}
-.segmented{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.segmented .label{color:var(--muted);font-size:.86rem;margin-right:4px}
-.segmented input{position:absolute;opacity:0;pointer-events:none}
-.segmented label{position:relative;padding:8px 10px;border-radius:999px;border:1px solid var(--border);
-  background:linear-gradient(180deg,#0c1424,#0c1528);cursor:pointer;font-weight:600;font-size:.86rem}
-.segmented label:has(input:checked){
-  border-color:rgba(167,139,250,.45);
-  box-shadow:0 0 0 1px rgba(167,139,250,.25) inset, 0 0 14px rgba(167,139,250,.18);
-  background:linear-gradient(180deg,#0d1a2b,#0e1e34);
-}
+  /* Cards / panels */
+  .card{background:linear-gradient(180deg,#0f1624,#0c1422); border:1px solid var(--border); border-radius:var(--card-radius); padding:12px; box-shadow:var(--shadow)}
+  .row{display:grid; grid-template-columns:1fr; gap:12px}
+  @media(min-width:900px){ .row{grid-template-columns:1fr 1fr} }
 
-.compare{display:grid;gap:10px}
-@media(min-width:560px){.compare{grid-template-columns:repeat(2,1fr)}}
-@media(min-width:900px){.compare{grid-template-columns:repeat(3,1fr)}}
-@media(min-width:1120px){.compare{grid-template-columns:repeat(4,1fr)}}
-.mini{padding:10px}
-.mini h5{margin:0 0 6px 0;font-size:.9rem;color:var(--muted)}
-.mini .delta{margin:0 0 6px 0}
-.mini .fromto{font-size:.82rem;color:var(--muted)}
+  /* Silhouettes (segmental) */
+  .segs{display:grid; grid-template-columns:1fr; gap:12px}
+  @media(min-width:900px){ .segs{grid-template-columns:1fr 1fr} }
+  .sil{
+    display:grid; grid-template-columns:90px 1fr; gap:12px; align-items:center
+  }
+  .human{
+    width:90px; height:160px; border-radius:50px/90px; background:linear-gradient(180deg,#17243a,#0e1a2d);
+    border:1px solid var(--border); position:relative; box-shadow:var(--shadow)
+  }
+  .human::before{content:""; position:absolute; width:32px; height:32px; border-radius:50%; top:-20px; left:50%; transform:translateX(-50%);
+    background:linear-gradient(180deg,#17243a,#0e1a2d); border:1px solid var(--border)}
+  .seg-bars{display:grid; gap:6px}
+  .seg-row{display:flex; gap:8px; align-items:center; font-size:12px}
+  .seg-name{width:28px; color:var(--muted)}
+  .seg-track{flex:1; height:10px; border-radius:6px; border:1px solid var(--border); background:#0b1322; overflow:hidden}
+  .seg-fill{height:100%; width:0%}
 
-.segments{display:grid;gap:10px}
-@media(min-width:900px){.segments{grid-template-columns:1fr 1fr}}
-.sil-body{position:relative;min-height:260px;display:grid;place-items:center}
-.human{width:150px;height:230px;opacity:.9;filter:drop-shadow(0 0 16px rgba(167,139,250,.12))}
-.box{position:absolute;min-width:110px;padding:8px 10px;border:1px solid var(--border);border-radius:12px;background:linear-gradient(180deg,#0c1424,#0d1528);box-shadow:var(--shadow);font-size:.86rem}
-.box .name{color:var(--muted);font-size:.78rem} .box .val{font-weight:800}
-.la{left:-10px;top:60px} .ra{right:-10px;top:60px} .tr{left:50%;transform:translateX(-50%);top:10px} .ll{left:-10px;bottom:26px} .rl{right:-10px;bottom:26px}
+  /* Comparison */
+  .toggle{display:flex; gap:8px; margin:8px 0 12px}
+  .toggle button.active{outline:2px solid var(--cyan); box-shadow:var(--glow)}
 
-.ior-table{width:100%;border-collapse:collapse;font-size:.9rem}
-.ior-table th,.ior-table td{padding:10px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
-.ior-table th{color:var(--muted);font-weight:600;width:140px}
-.big-ior h4{margin:0 0 8px 0}
+  /* Details accordion */
+  details{border:1px solid var(--border); border-radius:12px; padding:10px 12px; background:linear-gradient(180deg,#0f1624,#0c1524)}
+  details[open]{box-shadow:var(--shadow)}
+  details summary{cursor:pointer; list-style:none}
+  details summary::-webkit-details-marker{display:none}
 
-.chart-wrap{height:260px;position:relative}
-@media(min-width:980px){.chart-wrap{height:300px}}
-.chart-missing{position:absolute;inset:8px;display:grid;place-items:center;border:1px dashed var(--border);border-radius:12px;color:var(--muted);font-size:.86rem}
+  /* Table */
+  table{width:100%; border-collapse:collapse; font-size:12px}
+  th,td{padding:8px; border-bottom:1px solid var(--border); vertical-align:top}
+  th{text-align:left; color:var(--muted)}
 
-details.repo{padding:12px} details.repo summary{cursor:pointer;list-style:none;font-weight:800}
-.table-wrap{overflow:auto;margin-top:10px;border-top:1px solid var(--border)}
-table.master{width:max(100%,960px);border-collapse:collapse;font-size:.9rem}
-table.master th,table.master td{border-bottom:1px solid var(--border);padding:8px 10px;text-align:left;vertical-align:top}
-table.master th{position:sticky;top:0;background:#0d1424;z-index:1}
+  /* Up button */
+  .up{
+    position:fixed; right:16px; bottom:16px; display:none; z-index:70;
+    padding:12px 14px; border-radius:999px; border:1px solid var(--border);
+    background:linear-gradient(180deg,#0d1a28,#0a1624);
+    box-shadow:var(--shadow), 0 0 18px rgba(0,229,255,0.25);
+  }
+  .up.show{display:block}
 
-.forecast{display:grid;gap:10px}
-@media(min-width:760px){.forecast{grid-template-columns:repeat(3,1fr)}}
-.f-item h5{margin:0 0 6px 0;font-size:.92rem;color:var(--muted)}
-.f-vals{display:flex;gap:8px;flex-wrap:wrap}
-.f-chip{padding:6px 10px;border-radius:10px;border:1px solid var(--border);background:linear-gradient(180deg,#0c1424,#0c1528);font-weight:700}
-.f-note{font-size:.82rem;color:var(--muted);margin-top:6px}
-.f-delta.good{color:#c8f7dc}.f-delta.bad{color:#ffd7d7}.f-delta.neutral{color:#d1d5db}
+  /* Helper pills */
+  .pill{display:inline-flex; gap:6px; align-items:center}
+  .pill.cyan{box-shadow:0 0 24px rgba(0,229,255,0.25)}
+  .pill.green{box-shadow:0 0 24px rgba(33,243,163,0.22)}
+  .pill.purple{box-shadow:0 0 24px rgba(161,107,255,0.22)}
+  .pill.amber{box-shadow:0 0 24px rgba(255,207,102,0.22)}
+  .pill.red{box-shadow:0 0 24px rgba(255,107,107,0.22)}
 
-table.milestones{width:100%;border-collapse:collapse;font-size:.9rem;margin-top:4px}
-table.milestones th, table.milestones td{border-bottom:1px solid var(--border);padding:8px 10px;text-align:left}
-
-.meal h4{margin:0 0 8px 0}
-.day{margin-bottom:8px}
-.day h5{margin:6px 0 4px 0}
-.badge-kcal{display:inline-block;margin-left:6px;padding:4px 8px;border-radius:999px;border:1px solid var(--border);background:#0d1525;font-size:.82rem}
-.grocery{columns:2;column-gap:12px}
-@media(max-width:560px){.grocery{columns:1}}
-
-.menu{position:fixed;inset:0;background:rgba(7,10,17,.88);backdrop-filter:blur(8px);display:none;z-index:60;padding:20px}
-.menu .inner{max-width:1120px;margin:0 auto;display:flex;flex-direction:column;min-height:100%}
-.menu .content{margin:auto 0;display:flex;flex-direction:column;gap:12px}
-.menu .pill{display:inline-block;margin:0 8px 8px 0;padding:10px 14px;border:1px solid var(--border);border-radius:999px;background:linear-gradient(180deg,#0e1526,#0e1629);cursor:pointer}
-.menu .pill:focus{outline:2px solid var(--cyan)}
-.menu .close{align-self:flex-end;color:var(--cyan);cursor:pointer;text-decoration:underline}
-
-.up{
-  position:fixed;right:14px;bottom:18px;z-index:40;display:none;
-  border:1px solid rgba(34,211,238,.6);border-radius:999px;padding:10px 12px;background:linear-gradient(180deg,#0b1524,#0b1a2e);
-  color:#d9fbff;font-weight:800;letter-spacing:.4px;cursor:pointer;
-  box-shadow:0 0 0 1px rgba(34,211,238,.25) inset, 0 10px 28px rgba(34,211,238,.24), 0 0 22px rgba(34,211,238,.35);
-}
-.up:hover{transform:translateY(-2px)}
-.anchor{scroll-margin-top:86px} /* for sticky header offset */
+  .muted{color:var(--muted)}
 </style>
 </head>
 <body>
-<header class="header">
-  <div class="header-grid">
+  <header>
     <div class="brand">
-      <h1>InBody Tracker</h1>
-      <div class="meta">
-        <div id="last-scan">Last scan: -</div>
-        <div class="small" id="debug">- Loaded 0 scans (source: -) | options: 0</div>
+      <div class="pill cyan">💡 InBody Tracker</div>
+      <div>
+        <div class="last-scan">Last scan: <span id="lastScanTxt">—</span></div>
+        <div class="debug" id="debugLine">Charts enabled • Forecast OLS+band</div>
       </div>
     </div>
     <div class="controls">
-      <select id="scan-select" aria-label="Select scan"></select>
-      <button class="hamburger" id="btn-menu" aria-label="Open menu">
-        <span class="bars" aria-hidden="true"><span></span><span></span><span></span></span>
+      <select id="scanSelect" aria-label="Select scan"></select>
+      <button class="hamburger" id="openMenu" aria-label="Open quick links">
+        <div class="ham-bars"><span></span><span></span><span></span></div>
       </button>
     </div>
+  </header>
+
+  <!-- Overlay Quick Links -->
+  <div class="overlay" id="overlay">
+    <div class="overlay-inner">
+      <h2>Quick Links</h2>
+      <div class="qlist">
+        <a href="#kpis" data-link>KPIs</a>
+        <a href="#comparison" data-link>Comparison</a>
+        <a href="#insights" data-link>Insights</a>
+        <a href="#composition" data-link>Composition</a>
+        <a href="#metabolic" data-link>Metabolic</a>
+        <a href="#segments" data-link>Segments</a>
+        <a href="#forecast" data-link>Forecast</a>
+        <a href="#mealplan" data-link>Meal Plan</a>
+        <a href="#repo" data-link>Repository</a>
+        <a href="#datasrc" data-link>Data Source</a>
+      </div>
+      <p class="subtle" style="margin-top:14px">Smooth scroll respects sticky header.</p>
+      <p><button id="closeMenu">Close</button></p>
+    </div>
   </div>
-</header>
 
-<main class="container">
-  <!-- KPI Row -->
-  <section class="grid kpis anchor" id="kpi-row">
-    <!-- 8 KPI cards -->
-    <div class="card"><div class="kpi"><div class="gauge" id="g-weight" style="--hue:190"><div class="gval" id="gv-weight">-</div></div><div><h4>Body Weight</h4><div class="val-big" id="m-weight">-</div><div class="unit">kg</div><div class="delta neutral" id="d-weight">No previous scan to compare</div></div></div></div>
-    <div class="card"><div class="kpi"><div class="gauge" id="g-smm" style="--hue:160; --max:45"><div class="gval" id="gv-smm">-</div></div><div><h4>Skeletal Muscle Mass</h4><div class="val-big" id="m-smm">-</div><div class="unit">kg</div><div class="delta neutral" id="d-smm">No previous scan to compare</div></div></div></div>
-    <div class="card"><div class="kpi"><div class="gauge" id="g-pbf" style="--hue:270; --max:60"><div class="gval" id="gv-pbf">-</div></div><div><h4>Percent Body Fat</h4><div class="val-big" id="m-pbf">-</div><div class="unit">%</div><div class="delta neutral" id="d-pbf">No previous scan to compare</div></div></div></div>
-    <div class="card"><div class="kpi"><div class="gauge" id="g-obesity" style="--hue:12; --max:200"><div class="gval" id="gv-obesity">-</div></div><div><h4>Obesity Degree</h4><div class="val-big" id="m-obesity">-</div><div class="unit">%</div><div class="delta neutral" id="d-obesity">No previous scan to compare</div></div></div></div>
-    <div class="card"><div class="kpi"><div class="gauge" id="g-visc" style="--hue:8; --max:20"><div class="gval" id="gv-visc">-</div></div><div><h4>Visceral Fat Level</h4><div class="val-big" id="m-visc">-</div><div class="unit">level</div><div class="delta neutral" id="d-visc">No previous scan to compare</div></div></div></div>
-    <div class="card"><div class="kpi"><div class="gauge" id="g-bmr" style="--hue:42; --max:2200"><div class="gval" id="gv-bmr">-</div></div><div><h4>Basal Metabolic Rate</h4><div class="val-big" id="m-bmr">-</div><div class="unit">kcal</div><div class="delta neutral" id="d-bmr">No previous scan to compare</div></div></div></div>
-    <div class="card"><div class="kpi"><div class="badge" id="badge-deficit"></div><div><h4>Calorie Deficit Target</h4><div class="val-big" id="m-deficit">-</div><div class="unit" id="m-deficit-range">range -</div><div class="delta neutral" id="d-deficit">No previous scan to compare</div></div></div></div>
-    <div class="card"><div class="kpi"><div class="gauge" id="g-score" style="--hue:150; --max:100"><div class="gval" id="gv-score">-</div></div><div><h4>InBody Score</h4><div class="val-big" id="m-score">-</div><div class="unit">/ 100</div><div class="delta neutral" id="d-score">No previous scan to compare</div></div></div></div>
-  </section>
+  <div class="wrap">
+    <!-- KPIs -->
+    <section id="kpis" class="section">
+      <h3>Key Metrics</h3>
+      <div class="kpis" id="kpiGrid"></div>
+    </section>
 
-  <!-- Compare toggle -->
-  <div class="compare-controls">
-    <fieldset id="compare-mode" aria-label="Compare to" class="segmented">
-      <span class="label">Compare to:</span>
-      <label><input type="radio" name="compareMode" value="previous" checked> Previous</label>
-      <label><input type="radio" name="compareMode" value="baseline"> Baseline</label>
-      <span id="compare-baseline-label" class="small"></span>
-    </fieldset>
+    <!-- Comparison -->
+    <section id="comparison" class="section">
+      <h3>Changes Compared With <span id="cmpLabel" class="pill">Previous</span></h3>
+      <div class="toggle">
+        <button id="cmpPrev" class="pill active">Previous</button>
+        <button id="cmpBase" class="pill">Baseline</button>
+      </div>
+      <div id="cmpCards" class="row"></div>
+    </section>
+
+    <!-- Insights -->
+    <section id="insights" class="section">
+      <h3>🤖 Overall & I-O-R</h3>
+      <div class="row" id="insightsRow"></div>
+    </section>
+
+    <!-- Composition -->
+    <section id="composition" class="section">
+      <h3>Body Composition</h3>
+      <div class="row">
+        <div class="card">
+          <div class="muted">Weight / SMM / Fat Mass</div>
+          <canvas id="chartComp" height="220" aria-label="Composition chart"></canvas>
+          <div class="muted" id="compFallback" style="display:none;">Chart unavailable</div>
+        </div>
+        <div class="card">
+          <div class="muted">BMI vs PBF (Scatter)</div>
+          <canvas id="chartScatter" height="220" aria-label="BMI vs PBF"></canvas>
+          <div class="muted" id="scatterFallback" style="display:none;">Chart unavailable</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Metabolic -->
+    <section id="metabolic" class="section">
+      <h3>Metabolic</h3>
+      <div class="row">
+        <div class="card">
+          <div class="muted">BMR (kcal) & Obesity Degree (%)</div>
+          <canvas id="chartBmrOb" height="220" aria-label="BMR & Obesity"></canvas>
+          <div class="muted" id="bmrFallback" style="display:none;">Chart unavailable</div>
+        </div>
+        <div class="card">
+          <div class="muted">ECW/TBW</div>
+          <canvas id="chartECW" height="220" aria-label="ECW/TBW"></canvas>
+          <div class="muted" id="ecwFallback" style="display:none;">Chart unavailable</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Segments -->
+    <section id="segments" class="section">
+      <h3>Segmental Analysis</h3>
+      <div class="segs">
+        <div class="card sil">
+          <div>
+            <div class="pill green">Muscle</div>
+            <div class="human" aria-hidden="true"></div>
+          </div>
+          <div class="seg-bars" id="segLean"></div>
+        </div>
+        <div class="card sil">
+          <div>
+            <div class="pill purple">Fat</div>
+            <div class="human" aria-hidden="true"></div>
+          </div>
+          <div class="seg-bars" id="segFat"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Forecast -->
+    <section id="forecast" class="section">
+      <h3>Forecast (OLS with Confidence Bands)</h3>
+      <div class="row">
+        <div class="card">
+          <div class="pill cyan">Weight</div>
+          <canvas id="fcWeight" height="220"></canvas>
+          <div class="muted" id="fcWeightFallback" style="display:none;">Chart unavailable</div>
+        </div>
+        <div class="card">
+          <div class="pill green">Skeletal Muscle Index (derived)</div>
+          <canvas id="fcSMI" height="220"></canvas>
+          <div class="muted" id="fcSMIFallback" style="display:none;">Chart unavailable</div>
+        </div>
+        <div class="card">
+          <div class="pill purple">Percent Body Fat</div>
+          <canvas id="fcPBF" height="220"></canvas>
+          <div class="muted" id="fcPBFFallback" style="display:none;">Chart unavailable</div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <div class="muted">Milestones</div>
+        <table id="milestonesTbl">
+          <thead><tr><th>Point</th><th>Weight</th><th>SMI</th><th>PBF</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Meal Plan -->
+    <section id="mealplan" class="section">
+      <h3>Meal Plan</h3>
+      <details>
+        <summary>Daily kcal & macros • 7-day rotation • Grocery • Disclaimer</summary>
+        <div class="row" style="margin-top:10px">
+          <div class="card">
+            <h4>Targets</h4>
+            <ul class="muted">
+              <li>Calories: <strong id="kcalTarget">~1700 kcal</strong></li>
+              <li>Protein: <strong>1.6–2.0 g/kg</strong></li>
+              <li>Carb timing: <strong>pre-workout</strong></li>
+              <li>Fat: <strong>balance sat/mono/poly</strong></li>
+            </ul>
+          </div>
+          <div class="card">
+            <h4>7-Day Rotation</h4>
+            <ol class="muted" id="rotationList">
+              <li>Egg white omelet, chicken rice bowl, yogurt & berries</li>
+              <li>Greek salad + tuna, beef & veg, protein shake</li>
+              <li>Overnight oats, salmon, cottage cheese & fruit</li>
+              <li>Tofu stir-fry, chicken wrap, kefir</li>
+              <li>Lentil soup, steak & greens, casein</li>
+              <li>Protein pancakes, turkey bowl, almonds</li>
+              <li>Free choice (hit protein & calories)</li>
+            </ol>
+          </div>
+        </div>
+        <div class="card" style="margin-top:10px">
+          <h4>Grocery List</h4>
+          <p class="muted">Lean proteins (chicken, fish, yogurt), whole grains, leafy greens, berries, nuts, olive oil, electrolyte tabs.</p>
+          <h4>Disclaimer</h4>
+          <p class="muted">Informational only. Adjust per medical guidance and tolerance.</p>
+        </div>
+      </details>
+    </section>
+
+    <!-- Repository -->
+    <section id="repo" class="section">
+      <h3>Repository</h3>
+      <details open>
+        <summary>Master table (metrics + 7 IOR columns)</summary>
+        <div style="overflow:auto; margin-top:10px">
+          <table id="repoTbl"></table>
+        </div>
+      </details>
+    </section>
+
+    <!-- Data Source -->
+    <section id="datasrc" class="section">
+      <h3>Data Source</h3>
+      <p class="muted">Source: Self-reported + InBody scans • Records: <span id="recCount">0</span> • Notes: “Charts enabled”.</p>
+      <details>
+        <summary>Raw JSON (dataset)</summary>
+        <pre id="rawJson" style="white-space:pre-wrap; color:#b7c9e6; font-size:12px;"></pre>
+      </details>
+    </section>
   </div>
-  <h3 class="section-title" id="compare-title">Changes Compared With Previous Scan</h3>
-  <section class="compare" id="compare-strip"></section>
 
-  <!-- Overall I-O-R -->
-  <section class="card big-ior" style="margin-top:10px">
-    <h4>🤖 Overall Insight - Observation - Recommendation</h4>
-    <p><strong>Insight:</strong> <span id="overall-insight">-</span></p>
-    <p><strong>Observation:</strong> <span id="overall-observation">-</span></p>
-    <p><strong>Recommendation:</strong> <span id="overall-reco">-</span></p>
-  </section>
-
-  <!-- Panel 1 -->
-  <h3 class="section-title anchor" id="sec-composition">Composition + BMI/PBF</h3>
-  <section class="card"><div class="chart-wrap"><canvas id="chart-comp"></canvas><div class="chart-missing" hidden id="miss-comp">Chart unavailable</div></div></section>
-  <section class="card" style="margin-top:10px"><div class="chart-wrap"><canvas id="chart-bmi"></canvas><div class="chart-missing" hidden id="miss-bmi">Chart unavailable</div></div></section>
-  <section class="card">
-    <h4>🤖 I-O-R</h4>
-    <table class="ior-table">
-      <tr><th>Insight</th><td id="ior-composition-insight">-</td></tr>
-      <tr><th>Observation</th><td id="ior-composition-observation">-</td></tr>
-      <tr><th>Recommendation</th><td id="ior-composition-reco">-</td></tr>
-    </table>
-  </section>
-
-  <!-- Panel 2 -->
-  <h3 class="section-title anchor" id="sec-metabolic">Metabolic &amp; Fluids</h3>
-  <section class="card"><div class="chart-wrap"><canvas id="chart-bmr-obesity"></canvas><div class="chart-missing" hidden id="miss-bmro">Chart unavailable</div></div></section>
-  <section class="card" style="margin-top:10px"><div class="chart-wrap"><canvas id="chart-ecw"></canvas><div class="chart-missing" hidden id="miss-ecw">Chart unavailable</div></div></section>
-  <section class="card">
-    <h4>🤖 I-O-R</h4>
-    <table class="ior-table">
-      <tr><th>Insight</th><td id="ior-bmr-insight">-</td></tr>
-      <tr><th>Observation</th><td id="ior-bmr-observation">-</td></tr>
-      <tr><th>Recommendation</th><td id="ior-bmr-reco">-</td></tr>
-    </table>
-  </section>
-
-  <!-- Panel 3 -->
-  <h3 class="section-title anchor" id="sec-segments">Segmental Analysis</h3>
-  <section class="segments">
-    <div class="card">
-      <h4>Segmental Lean (Muscle)</h4>
-      <div class="sil-body">
-        <svg class="human" viewBox="0 0 120 180" aria-hidden="true"><defs><linearGradient id="grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1b2538"/><stop offset="100%" stop-color="#0f1726"/></linearGradient></defs><g fill="url(#grad)" stroke="rgba(255,255,255,0.06)" stroke-width="1"><ellipse cx="60" cy="20" rx="16" ry="16"/><rect x="44" y="36" width="32" height="46" rx="10"/><rect x="22" y="42" width="18" height="42" rx="9"/><rect x="80" y="42" width="18" height="42" rx="9"/><rect x="40" y="84" width="16" height="70" rx="8"/><rect x="64" y="84" width="16" height="70" rx="8"/></g></svg>
-        <div class="box la"><div class="name">LA</div><div class="val" id="lean-la">-</div></div>
-        <div class="box ra"><div class="name">RA</div><div class="val" id="lean-ra">-</div></div>
-        <div class="box tr"><div class="name">Trunk</div><div class="val" id="lean-tr">-</div></div>
-        <div class="box ll"><div class="name">LL</div><div class="val" id="lean-ll">-</div></div>
-        <div class="box rl"><div class="name">RL</div><div class="val" id="lean-rl">-</div></div>
-      </div>
-      <section class="card" style="margin-top:10px">
-        <h4>🤖 I-O-R</h4>
-        <table class="ior-table">
-          <tr><th>Insight</th><td id="ior-lean-insight">-</td></tr>
-          <tr><th>Observation</th><td id="ior-lean-observation">-</td></tr>
-          <tr><th>Recommendation</th><td id="ior-lean-reco">-</td></tr>
-        </table>
-      </section>
-    </div>
-
-    <div class="card">
-      <h4>Segmental Fat (Fat)</h4>
-      <div class="sil-body">
-        <svg class="human" viewBox="0 0 120 180" aria-hidden="true"><defs><linearGradient id="grad2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1b2538"/><stop offset="100%" stop-color="#0f1726"/></linearGradient></defs><g fill="url(#grad2)" stroke="rgba(255,255,255,0.06)" stroke-width="1"><ellipse cx="60" cy="20" rx="16" ry="16"/><rect x="44" y="36" width="32" height="46" rx="10"/><rect x="22" y="42" width="18" height="42" rx="9"/><rect x="80" y="42" width="18" height="42" rx="9"/><rect x="40" y="84" width="16" height="70" rx="8"/><rect x="64" y="84" width="16" height="70" rx="8"/></g></svg>
-        <div class="box la"><div class="name">LA</div><div class="val" id="fat-la">-</div></div>
-        <div class="box ra"><div class="name">RA</div><div class="val" id="fat-ra">-</div></div>
-        <div class="box tr"><div class="name">Trunk</div><div class="val" id="fat-tr">-</div></div>
-        <div class="box ll"><div class="name">LL</div><div class="val" id="fat-ll">-</div></div>
-        <div class="box rl"><div class="name">RL</div><div class="val" id="fat-rl">-</div></div>
-      </div>
-      <section class="card" style="margin-top:10px">
-        <h4>🤖 I-O-R</h4>
-        <table class="ior-table">
-          <tr><th>Insight</th><td id="ior-fat-insight">-</td></tr>
-          <tr><th>Observation</th><td id="ior-fat-observation">-</td></tr>
-          <tr><th>Recommendation</th><td id="ior-fat-reco">-</td></tr>
-        </table>
-      </section>
-    </div>
-  </section>
-
-  <!-- Panel 4 — Forecasts -->
-  <h3 class="section-title anchor" id="sec-forecast">Forecast (12 weeks) — Weight, Skeletal Muscle Index, Percent Body Fat</h3>
-  <section class="forecast" id="forecast-cards">
-    <div class="card f-item" id="fc-weight"><h5>Projected Body Weight</h5><div class="f-vals" id="fcw-vals"></div><div class="f-note" id="fcw-note"></div></div>
-    <div class="card f-item" id="fc-smi"><h5>Projected Skeletal Muscle Index</h5><div class="f-vals" id="fcs-vals"></div><div class="f-note" id="fcs-note"></div></div>
-    <div class="card f-item" id="fc-pbf"><h5>Projected Percent Body Fat</h5><div class="f-vals" id="fcp-vals"></div><div class="f-note" id="fcp-note"></div></div>
-  </section>
-  <section class="card" style="margin-top:10px"><div class="chart-wrap"><canvas id="chart-w-forecast"></canvas><div class="chart-missing" hidden id="miss-w-forecast">Chart unavailable</div></div></section>
-  <section class="card" style="margin-top:10px"><div class="chart-wrap"><canvas id="chart-smi-forecast"></canvas><div class="chart-missing" hidden id="miss-smi-forecast">Chart unavailable</div></div></section>
-  <section class="card" style="margin-top:10px"><div class="chart-wrap"><canvas id="chart-pbf-forecast"></canvas><div class="chart-missing" hidden id="miss-pbf-forecast">Chart unavailable</div></div></section>
-  <section class="card" style="margin-top:10px">
-    <h4>Milestones (Today, +2w, +4w, +12w)</h4>
-    <div class="table-wrap"><table class="milestones" id="milestones"><thead><tr><th>Date</th><th>Weight (kg)</th><th>SMI (kg/m^2)</th><th>PBF (%)</th><th>Delta vs Today</th></tr></thead><tbody></tbody></table></div>
-  </section>
-
-  <!-- Meal Plan -->
-  <details class="card meal anchor" id="sec-meal" style="margin-top:10px">
-    <summary style="cursor:pointer;font-weight:800">Meal Plan (deficit aligned)</summary>
-    <div style="margin-top:8px">
-      <p class="small" id="meal-summary">-</p>
-      <div id="meal-days"></div>
-      <h5>Grocery List (condensed)</h5>
-      <div class="grocery small" id="grocery"></div>
-      <p class="small" style="margin-top:6px">Guidance only, not medical advice.</p>
-    </div>
-  </details>
-
-  <!-- Repository -->
-  <details class="repo anchor" id="sec-repo" style="margin-top:12px">
-    <summary>Data Repository (master table)</summary>
-    <div class="table-wrap">
-      <table class="master" id="repo-table">
-        <thead>
-          <tr>
-            <th>Date</th><th>Label</th>
-            <th>Weight</th><th>Percent Body Fat</th><th>Body Mass Index</th><th>InBody Score</th>
-            <th>Visceral Fat Level</th><th>Skeletal Muscle Mass</th><th>Fat Mass</th><th>Basal Metabolic Rate</th>
-            <th>Total Body Water</th><th>Protein</th><th>Minerals</th><th>Fat-Free Mass</th><th>Obesity Degree</th><th>ECW/TBW</th>
-            <th>I-O-R composition</th><th>I-O-R bmi_pbf</th><th>I-O-R bmr_obesity</th><th>I-O-R ecwtbw</th>
-            <th>I-O-R segmental_lean</th><th>I-O-R segmental_fat</th><th>I-O-R overall</th>
-          </tr>
-        </thead>
-        <tbody id="repo-body"></tbody>
-      </table>
-    </div>
-  </details>
-
-  <!-- Data Source -->
-  <section class="card anchor" id="sec-ds" style="margin-top:12px">
-    <h3 style="margin:0 0 8px 0;font-size:.98rem">Data Source</h3>
-    <div class="grid" style="grid-template-columns:1fr;gap:8px">
-      <div class="card" style="padding:8px">
-        <table class="ds-table" style="width:100%;border-collapse:collapse;font-size:.9rem">
-          <tbody>
-            <tr><th style="text-align:left;color:var(--muted);width:160px;padding:8px 10px;border-bottom:1px solid var(--border)">Source</th><td id="ds-source" style="padding:8px 10px;border-bottom:1px solid var(--border)">-</td></tr>
-            <tr><th style="text-align:left;color:var(--muted);padding:8px 10px;border-bottom:1px solid var(--border)">Loaded</th><td id="ds-loaded" style="padding:8px 10px;border-bottom:1px solid var(--border)">-</td></tr>
-            <tr><th style="text-align:left;color:var(--muted);padding:8px 10px;border-bottom:1px solid var(--border)">Records</th><td id="ds-records" style="padding:8px 10px;border-bottom:1px solid var(--border)">-</td></tr>
-            <tr><th style="text-align:left;color:var(--muted);padding:8px 10px;border-bottom:1px solid var(--border)">Latest Label</th><td id="ds-latest-label" style="padding:8px 10px;border-bottom:1px solid var(--border)">-</td></tr>
-            <tr><th style="text-align:left;color:var(--muted);padding:8px 10px;border-bottom:1px solid var(--border)">Latest Date</th><td id="ds-latest-date" style="padding:8px 10px;border-bottom:1px solid var(--border)">-</td></tr>
-            <tr><th style="text-align:left;color:var(--muted);padding:8px 10px;border-bottom:1px solid var(--border)">Notes</th><td id="ds-notes" style="padding:8px 10px;border-bottom:1px solid var(--border)">-</td></tr>
-          </tbody>
-        </table>
-        <div class="small" id="ds-debug" style="margin-top:6px">-</div>
-      </div>
-      <div class="card" style="padding:8px">
-        <details>
-          <summary style="cursor:pointer;font-weight:700">Raw Data (JSON)</summary>
-          <pre id="raw-json" style="max-height:300px;overflow:auto;margin:8px 0 0;border:1px solid var(--border);border-radius:8px;padding:8px;background:#0a0f1a;color:#dfe3ea;font-size:.82rem"></pre>
-        </details>
-      </div>
-    </div>
-  </section>
-</main>
-
-<button class="up" id="btn-up" aria-label="Scroll to top">↑</button>
-
-<!-- Embedded JSON -->
-<script type="application/json" id="scans-json">{"scans":[{"date":"2025-03-01","label":"Mar 2025 (est.)","metrics":{"weight":90.0,"pbf":42.0,"bmi":31.9,"score":62,"visceral":15,"smm":32.0,"fat":38.0,"bmr":1750,"tbw":42.5,"protein":11.2,"minerals":3.8,"ffm":52.0,"obesity":145.0,"ecwtbw":0.390},"segments_lean":{"la":{"kg":3.00,"pct":98.0},"ra":{"kg":3.10,"pct":98.5},"tr":{"kg":21.0,"pct":99.0},"ll":{"kg":9.40,"pct":97.5},"rl":{"kg":9.50,"pct":98.0}},"segments_fat":{"la":{"kg":3.04,"pct":8.0},"ra":{"kg":3.04,"pct":8.0},"tr":{"kg":19.0,"pct":50.0},"ll":{"kg":6.46,"pct":17.0},"rl":{"kg":6.46,"pct":17.0}},"ior":{"composition":{"insight":"Fat dominant","observation":"High fat, lower muscle relative","recommendation":"Deficit >= 300; protein >= 1.6 g/kg"},"bmi_pbf":{"insight":"BMI and PBF high","observation":"BMI 31.9, PBF 42%","recommendation":"Add waist/hip tracking"},"bmr_obesity":{"insight":"BMR high due to mass","observation":"1750 kcal baseline","recommendation":"Moderate deficit 300-500"},"ecwtbw":{"insight":"Hydration high side","observation":"ECW/TBW 0.390","recommendation":"Control sodium"},"segmental_lean":{"insight":"Balanced limbs, trunk heavy","observation":"~97-99% of standard","recommendation":"Balanced training"},"segmental_fat":{"insight":"Central fat heavy (est)","observation":"Trunk 50% share","recommendation":"Prioritize trunk fat loss"},"overall":{"insight":"Obese baseline","observation":"VF 15, obesity 145%","recommendation":"Initiate fat-loss"}}},{"date":"2025-04-15","label":"Mid-Apr 2025 (est.)","metrics":{"weight":84.7,"pbf":39.6,"bmi":30.0,"score":63,"visceral":14,"smm":31.2,"fat":33.5,"bmr":1700,"tbw":41.0,"protein":10.9,"minerals":3.7,"ffm":51.2,"obesity":139.0,"ecwtbw":0.389},"segments_lean":{"la":{"kg":2.90,"pct":97.8},"ra":{"kg":3.00,"pct":98.2},"tr":{"kg":20.5,"pct":98.5},"ll":{"kg":9.20,"pct":97.2},"rl":{"kg":9.30,"pct":97.6}},"segments_fat":{"la":{"kg":2.68,"pct":8.0},"ra":{"kg":2.68,"pct":8.0},"tr":{"kg":16.75,"pct":50.0},"ll":{"kg":5.70,"pct":17.0},"rl":{"kg":5.70,"pct":17.0}},"ior":{"composition":{"insight":"Early fat drop","observation":"~5 kg fat loss","recommendation":"Add resistance training"},"bmi_pbf":{"insight":"PBF down faster than BMI","observation":"PBF 39.6, BMI 30.0","recommendation":"Loss <= 0.7% BW/week"},"bmr_obesity":{"insight":"BMR slightly down","observation":"1700 kcal","recommendation":"Avoid aggressive cuts"},"ecwtbw":{"insight":"Hydration stable","observation":"0.389","recommendation":"35-40 ml/kg"},"segmental_lean":{"insight":"Balanced limbs","observation":"Arms 98%, legs 97%","recommendation":"Add squats/deadlifts"},"segmental_fat":{"insight":"Fat down modest","observation":"VF down 1","recommendation":"2-3 cardio/week"},"overall":{"insight":"Good start","observation":"-5.3 kg total","recommendation":"Sustain momentum"}}},{"date":"2025-06-13","label":"13 Jun 2025 (scan)","metrics":{"weight":80.6,"pbf":32.6,"bmi":28.6,"score":65,"visceral":12,"smm":30.4,"fat":26.2,"bmr":1544,"tbw":39.9,"protein":10.7,"minerals":3.75,"ffm":54.4,"obesity":130.0,"ecwtbw":0.388},"segments_lean":{"la":{"kg":3.05,"pct":95.7},"ra":{"kg":3.12,"pct":97.9},"tr":{"kg":24.8,"pct":97.6},"ll":{"kg":8.09,"pct":91.3},"rl":{"kg":8.16,"pct":92.0}},"segments_fat":{"la":{"kg":1.90,"pct":333.8},"ra":{"kg":1.90,"pct":323.6},"tr":{"kg":14.10,"pct":358.4},"ll":{"kg":3.50,"pct":223.9},"rl":{"kg":3.60,"pct":225.8}},"ior":{"composition":{"insight":"Strong fat loss","observation":"Fat -11.8, SMM -1.6","recommendation":"Keep deficit; carbs pre-workout"},"bmi_pbf":{"insight":"PBF dropping faster","observation":"BMI 28.6, PBF 32.6%","recommendation":"Use tape and photos"},"bmr_obesity":{"insight":"BMR stable","observation":"1544 kcal","recommendation":"Deficit 300-500 kcal"},"ecwtbw":{"insight":"Hydration healthy","observation":"0.388","recommendation":"Maintain electrolytes"},"segmental_lean":{"insight":"Legs weak","observation":"LL 91%, RL 92%","recommendation":"Unilateral work"},"segmental_fat":{"insight":"Central fat high","observation":"Trunk 14.1 kg (358%)","recommendation":"Aerobic + core stability"},"overall":{"insight":"Overfat improving","observation":"VF 12","recommendation":"Push to VF < 10"}}},{"date":"2025-09-11","label":"11 Sep 2025 (scan)","metrics":{"weight":79.0,"pbf":31.3,"bmi":28.0,"score":66,"visceral":10,"smm":30.4,"fat":24.8,"bmr":1542,"tbw":39.8,"protein":10.6,"minerals":3.75,"ffm":54.2,"obesity":127.9,"ecwtbw":0.388},"segments_lean":{"la":{"kg":3.00,"pct":94.6},"ra":{"kg":3.03,"pct":95.6},"tr":{"kg":24.4,"pct":96.6},"ll":{"kg":8.15,"pct":92.6},"rl":{"kg":8.19,"pct":92.9}},"segments_fat":{"la":{"kg":1.70,"pct":303.4},"ra":{"kg":1.70,"pct":298.3},"tr":{"kg":13.20,"pct":334.8},"ll":{"kg":3.50,"pct":217.6},"rl":{"kg":3.50,"pct":218.5}},"ior":{"composition":{"insight":"Progress steady","observation":"Muscle stable, fat down","recommendation":"Lift 2-3x/week"},"bmi_pbf":{"insight":"PBF steady drop","observation":"BMI 28.0, PBF 31.3%","recommendation":"~0.5% BW loss/week"},"bmr_obesity":{"insight":"BMR stable","observation":"1542 kcal","recommendation":"Avoid further drop"},"ecwtbw":{"insight":"Hydration steady","observation":"0.388","recommendation":"~3 L/day"},"segmental_lean":{"insight":"Arms/trunk solid, legs lag","observation":"Legs ~92%","recommendation":"Leg hypertrophy focus"},"segmental_fat":{"insight":"Central fat dropping","observation":"VF 10","recommendation":"Add HIIT block"},"overall":{"insight":"Near overweight","observation":"VF 10","recommendation":"Push to VF <= 9"}}},{"date":"2025-09-24","label":"24 Sep 2025 (scan)","metrics":{"weight":76.8,"pbf":29.7,"bmi":27.2,"score":68,"visceral":9,"smm":30.2,"fat":22.8,"bmr":1536,"tbw":39.6,"protein":10.6,"minerals":3.75,"ffm":54.0,"obesity":124.8,"ecwtbw":0.387},"segments_lean":{"la":{"kg":3.01,"pct":96.6},"ra":{"kg":3.08,"pct":98.2},"tr":{"kg":24.4,"pct":97.4},"ll":{"kg":7.87,"pct":90.9},"rl":{"kg":7.94,"pct":90.9}},"segments_fat":{"la":{"kg":1.50,"pct":274.2},"ra":{"kg":1.50,"pct":271.7},"tr":{"kg":12.30,"pct":314.1},"ll":{"kg":3.10,"pct":192.5},"rl":{"kg":3.10,"pct":194.0}},"ior":{"composition":{"insight":"Milestone","observation":"Fat -15.2, muscle stable","recommendation":"Start recomposition"},"bmi_pbf":{"insight":"BMI vs PBF gap","observation":"BMI 27.2, PBF 29.7%","recommendation":"Aim PBF <= 25%"},"bmr_obesity":{"insight":"BMR stable","observation":"1536 kcal","recommendation":"Preserve strength"},"ecwtbw":{"insight":"Hydration optimal","observation":"0.387","recommendation":"Maintain intake"},"segmental_lean":{"insight":"Legs lag","observation":"~91%","recommendation":"Lower-body overload"},"segmental_fat":{"insight":"Abdominal fat down","observation":"VF 9","recommendation":"Transition to recomp + diet breaks"},"overall":{"insight":"Obese to overweight","observation":"-13.2 kg; ~85% fat loss; VF 9","recommendation":"Next: 72 kg, PBF <= 25%, VF <= 7"}}}]}</script>
+  <button class="up" id="toTop">↑ Up</button>
 
 <script>
-(function(){
-  'use strict';
-  const $=id=>document.getElementById(id);
-  const sel=$('scan-select');
-  const compareFieldset=$('compare-mode');
-  const compareTitle=$('compare-title');
-  const compareBaselineLabel=$('compare-baseline-label');
-
-  // Parse JSON or fallback
-  const raw = $('scans-json')?.textContent || '{}';
-  let scans=[], source='json';
-  try{ const j=JSON.parse(raw); scans=Array.isArray(j.scans)?j.scans:[]; if(!scans.length) throw 0; }
-  catch(e){ source='fallback'; scans=(JSON.parse('{"scans":[]}').scans); }
-
-  // Helpers
-  const fmt=(v,d=1)=> (v==null||Number.isNaN(v))?'-':Number(v).toFixed(d);
-  const setGauge=(el,val,max,text)=>{ if(!el) return; el.style.setProperty('--val',Number(val||0)); el.style.setProperty('--max',Number(max||100)); const gv=el.querySelector('.gval'); if(gv) gv.textContent=text??fmt(val,(max<=100?1:0)); };
-  const segFmt=o=>`${(o?.kg==null)?'-':fmt(o.kg,2)+' kg'} | ${(o?.pct==null)?'-':fmt(o.pct,1)+' %'}`;
-  const prevIndex=i=> i>0 ? i-1 : -1;
-  const baselineIndex=0;
-  const clamp=(v,min,max)=>Math.min(max,Math.max(min,v));
-  const r10=v=>Math.round(v/10)*10;
-
-  // Persisted compare mode
-  const getCompareMode=()=> localStorage.getItem('compareMode') || 'previous';
-  const setCompareMode=v=> localStorage.setItem('compareMode', v);
-
-  // Populate select once
-  function mountSelect(list){
-    sel.innerHTML = list.map((s,i)=>`<option value="${i}">${s.label} - ${s.date}</option>`).join('');
-    sel.selectedIndex = list.length-1;
-    updateDebug();
-    renderAll(sel.selectedIndex);
-  }
-
-  function parseRange(text){
-    const m=(text||'').match(/(\d+)\s*-\s*(\d+)/); if(!m) return null;
-    let a=+m[1], b=+m[2]; if(a>b){const t=a;a=b;b=t;} return [a,b];
-  }
-  function deficitFor(scan){
-    const rec=scan?.ior?.bmr_obesity?.recommendation||'';
-    let range=parseRange(rec);
-    if(!range){
-      const bmr=Number(scan?.metrics?.bmr||0), tdee=bmr*1.35;
-      let lo=r10(tdee*0.15), hi=r10(tdee*0.20);
-      lo=clamp(lo,250,750); hi=clamp(hi,250,750); if(hi<lo){const t=lo;lo=hi;hi=t;}
-      range=[lo,hi];
+/* -------------------- Embedded Dataset -------------------- */
+const DATA = {
+  "scans": [
+    {
+      "date": "2025-03-01",
+      "label": "Mar 2025 (est.)",
+      "metrics": {"weight":90.0,"pbf":42.0,"bmi":31.9,"score":62,"visceral":15,"smm":32.0,"fat":38.0,"bmr":1750,"tbw":42.5,"protein":11.2,"minerals":3.8,"ffm":52.0,"obesity":145.0,"ecwtbw":0.390},
+      "segments_lean": {"la":{"kg":3.00,"pct":98.0},"ra":{"kg":3.10,"pct":98.5},"tr":{"kg":21.0,"pct":99.0},"ll":{"kg":9.40,"pct":97.5},"rl":{"kg":9.50,"pct":98.0}},
+      "segments_fat":  {"la":{"kg":3.04,"pct":8.0},"ra":{"kg":3.04,"pct":8.0},"tr":{"kg":19.0,"pct":50.0},"ll":{"kg":6.46,"pct":17.0},"rl":{"kg":6.46,"pct":17.0}},
+      "ior": {"composition":{"insight":"Fat dominant","observation":"High fat, lower muscle relative","recommendation":"Deficit >= 300; protein >= 1.6 g/kg"},"bmi_pbf":{"insight":"BMI and PBF high","observation":"BMI 31.9, PBF 42%","recommendation":"Add waist/hip tracking"},"bmr_obesity":{"insight":"BMR high due to mass","observation":"1750 kcal baseline","recommendation":"Moderate deficit 300-500"},"ecwtbw":{"insight":"Hydration high side","observation":"ECW/TBW 0.390","recommendation":"Control sodium"},"segmental_lean":{"insight":"Balanced limbs, trunk heavy","observation":"~97-99% of standard","recommendation":"Balanced training"},"segmental_fat":{"insight":"Central fat heavy","observation":"Trunk 50% share","recommendation":"Prioritize trunk fat loss"},"overall":{"insight":"Obese baseline","observation":"VF 15, obesity 145%","recommendation":"Initiate fat-loss"}}
+    },
+    {
+      "date": "2025-04-15",
+      "label": "Mid-Apr 2025 (est.)",
+      "metrics": {"weight":84.7,"pbf":39.6,"bmi":30.0,"score":63,"visceral":14,"smm":31.2,"fat":33.5,"bmr":1700,"tbw":41.0,"protein":10.9,"minerals":3.7,"ffm":51.2,"obesity":139.0,"ecwtbw":0.389},
+      "segments_lean": {"la":{"kg":2.90,"pct":97.8},"ra":{"kg":3.00,"pct":98.2},"tr":{"kg":20.5,"pct":98.5},"ll":{"kg":9.20,"pct":97.2},"rl":{"kg":9.30,"pct":97.6}},
+      "segments_fat":  {"la":{"kg":2.68,"pct":8.0},"ra":{"kg":2.68,"pct":8.0},"tr":{"kg":16.75,"pct":50.0},"ll":{"kg":5.70,"pct":17.0},"rl":{"kg":5.70,"pct":17.0}},
+      "ior": {"composition":{"insight":"Early fat drop","observation":"~5 kg fat loss","recommendation":"Add resistance training"},"bmi_pbf":{"insight":"PBF down faster than BMI","observation":"PBF 39.6%, BMI 30.0","recommendation":"Loss <= 0.7% BW/week"},"bmr_obesity":{"insight":"BMR slightly down","observation":"1700 kcal","recommendation":"Avoid aggressive cuts"},"ecwtbw":{"insight":"Hydration stable","observation":"0.389","recommendation":"35-40 ml/kg"},"segmental_lean":{"insight":"Balanced limbs","observation":"Arms 98%, legs 97%","recommendation":"Add squats/deadlifts"},"segmental_fat":{"insight":"Fat down modest","observation":"VF down 1","recommendation":"2-3 cardio/week"},"overall":{"insight":"Good start","observation":"-5.3 kg total","recommendation":"Sustain momentum"}}
+    },
+    {
+      "date": "2025-06-13",
+      "label": "13 Jun 2025 (scan)",
+      "metrics": {"weight":80.6,"pbf":32.6,"bmi":28.6,"score":65,"visceral":12,"smm":30.4,"fat":26.2,"bmr":1544,"tbw":39.9,"protein":10.7,"minerals":3.75,"ffm":54.4,"obesity":130.0,"ecwtbw":0.388},
+      "segments_lean": {"la":{"kg":3.05,"pct":95.7},"ra":{"kg":3.12,"pct":97.9},"tr":{"kg":24.8,"pct":97.6},"ll":{"kg":8.09,"pct":91.3},"rl":{"kg":8.16,"pct":92.0}},
+      "segments_fat":  {"la":{"kg":1.90,"pct":333.8},"ra":{"kg":1.90,"pct":323.6},"tr":{"kg":14.10,"pct":358.4},"ll":{"kg":3.50,"pct":223.9},"rl":{"kg":3.60,"pct":225.8}},
+      "ior": {"composition":{"insight":"Strong fat loss","observation":"Fat -11.8, SMM -1.6","recommendation":"Keep deficit; carbs pre-workout"},"bmi_pbf":{"insight":"PBF dropping faster","observation":"BMI 28.6, PBF 32.6%","recommendation":"Use tape and photos"},"bmr_obesity":{"insight":"BMR stable","observation":"1544 kcal","recommendation":"Deficit 300-500 kcal"},"ecwtbw":{"insight":"Hydration healthy","observation":"0.388","recommendation":"Maintain electrolytes"},"segmental_lean":{"insight":"Legs weak","observation":"LL 91%, RL 92%","recommendation":"Unilateral work"},"segmental_fat":{"insight":"Central fat high","observation":"Trunk 14.1 kg (358%)","recommendation":"Aerobic + core stability"},"overall":{"insight":"Overfat improving","observation":"VF 12","recommendation":"Push to VF < 10"}}
+    },
+    {
+      "date": "2025-09-11",
+      "label": "11 Sep 2025 (scan)",
+      "metrics": {"weight":79.0,"pbf":31.3,"bmi":28.0,"score":66,"visceral":10,"smm":30.4,"fat":24.8,"bmr":1542,"tbw":39.8,"protein":10.6,"minerals":3.75,"ffm":54.2,"obesity":127.9,"ecwtbw":0.388},
+      "segments_lean": {"la":{"kg":3.00,"pct":94.6},"ra":{"kg":3.03,"pct":95.6},"tr":{"kg":24.4,"pct":96.6},"ll":{"kg":8.15,"pct":92.6},"rl":{"kg":8.19,"pct":92.9}},
+      "segments_fat":  {"la":{"kg":1.70,"pct":303.4},"ra":{"kg":1.70,"pct":298.3},"tr":{"kg":13.20,"pct":334.8},"ll":{"kg":3.50,"pct":217.6},"rl":{"kg":3.50,"pct":218.5}},
+      "ior": {"composition":{"insight":"Progress steady","observation":"Muscle stable, fat down","recommendation":"Lift 2-3x/week"},"bmi_pbf":{"insight":"PBF steady drop","observation":"BMI 28.0, PBF 31.3%","recommendation":"~0.5% BW loss/week"},"bmr_obesity":{"insight":"BMR stable","observation":"1542 kcal","recommendation":"Avoid further drop"},"ecwtbw":{"insight":"Hydration steady","observation":"0.388","recommendation":"~3 L/day"},"segmental_lean":{"insight":"Arms/trunk solid, legs lag","observation":"Legs ~92%","recommendation":"Leg hypertrophy focus"},"segmental_fat":{"insight":"Central fat dropping","observation":"VF 10","recommendation":"Add HIIT block"},"overall":{"insight":"Near overweight","observation":"VF 10","recommendation":"Push to VF <= 9"}}
+    },
+    {
+      "date": "2025-09-24",
+      "label": "24 Sep 2025 (scan)",
+      "metrics": {"weight":76.8,"pbf":29.7,"bmi":27.2,"score":68,"visceral":9,"smm":30.2,"fat":22.8,"bmr":1536,"tbw":39.6,"protein":10.6,"minerals":3.75,"ffm":54.0,"obesity":124.8,"ecwtbw":0.387},
+      "segments_lean": {"la":{"kg":3.01,"pct":96.6},"ra":{"kg":3.08,"pct":98.2},"tr":{"kg":24.4,"pct":97.4},"ll":{"kg":7.87,"pct":90.9},"rl":{"kg":7.94,"pct":90.9}},
+      "segments_fat":  {"la":{"kg":1.50,"pct":274.2},"ra":{"kg":1.50,"pct":271.7},"tr":{"kg":12.30,"pct":314.1},"ll":{"kg":3.10,"pct":192.5},"rl":{"kg":3.10,"pct":194.0}},
+      "ior": {"composition":{"insight":"Milestone","observation":"Fat -15.2, muscle stable","recommendation":"Start recomposition"},"bmi_pbf":{"insight":"BMI vs PBF gap","observation":"BMI 27.2, PBF 29.7%","recommendation":"Aim PBF <= 25%"},"bmr_obesity":{"insight":"BMR stable","observation":"1536 kcal","recommendation":"Preserve strength"},"ecwtbw":{"insight":"Hydration optimal","observation":"0.387","recommendation":"Maintain intake"},"segmental_lean":{"insight":"Legs lag","observation":"~91%","recommendation":"Lower-body overload"},"segmental_fat":{"insight":"Abdominal fat down","observation":"VF 9","recommendation":"Transition to recomp + diet breaks"},"overall":{"insight":"Obese to overweight","observation":"-13.2 kg; ~85% fat loss; VF 9","recommendation":"Next: 72 kg, PBF <= 25%, VF <= 7"}}
     }
-    return {range, mid:r10((range[0]+range[1])/2)};
-  }
+  ]
+};
 
-  const goodDown=new Set(["Body Weight","Percent Body Fat","Visceral Fat Level","Obesity Degree","Fat Mass"]);
-  const goodUp  =new Set(["Skeletal Muscle Mass","Basal Metabolic Rate","InBody Score"]);
-  function delta(curr,prev,name,unit,modeLabel){
-    if(prev==null) return {text:`No ${modeLabel} scan to compare`, cls:"neutral"};
-    const d=Number(curr)-Number(prev), abs=Math.abs(d);
-    const arrow=d>0?"▲":d<0?"▼":"•", sign=d>0?"+":d<0?"-":"";
-    const decimals=(unit==="/ 100"||unit==="level")?0:1;
-    const text=`${arrow} ${sign}${abs.toFixed(decimals)} ${unit} since ${modeLabel}`.trim();
-    let cls="neutral";
-    if(d===0) cls="neutral";
-    else if((d<0&&goodDown.has(name))||(d>0&&goodUp.has(name))) cls="good";
-    else cls="bad";
-    return {text,cls};
-  }
+/* -------------------- Utilities -------------------- */
+const fmt = (v, d=1) => (typeof v === 'number' ? v.toFixed(d) : v);
+const el = (sel) => document.querySelector(sel);
+const make = (tag, cls) => { const n = document.createElement(tag); if (cls) n.className = cls; return n; };
+const COLORS = { weight:'var(--cyan)', smm:'var(--green)', pbf:'var(--purple)', bmr:'var(--amber)', obesity:'var(--red)', fat:'var(--purple)' };
 
-  function renderDataSource(){
-    const latest=scans[scans.length-1]||{};
-    $('ds-source').textContent=(source==='json')?'Embedded JSON (scans-json)':'Fallback Array';
-    $('ds-loaded').textContent=scans.length?'Yes':'No';
-    $('ds-records').textContent=String(scans.length);
-    $('ds-latest-label').textContent=latest.label||'-';
-    $('ds-latest-date').textContent=latest.date||'-';
-    $('ds-notes').textContent='Charts enabled (Chart.js)';
-    const dbg=`- Loaded ${scans.length} scans (source: ${source}) | options: ${sel.options.length}`;
-    $('ds-debug').textContent=dbg; $('debug').textContent=dbg;
-    try{ $('raw-json').textContent=JSON.stringify({scans},null,2);}catch(_){}
-  }
+/* Simple OLS regression with band; enforces negative slope if observed slope < 0 */
+function olsForecast(xs, ys, futureCount=12){
+  // xs, ys = numeric arrays; xs in days since first
+  const n = xs.length;
+  const xbar = xs.reduce((a,b)=>a+b,0)/n;
+  const ybar = ys.reduce((a,b)=>a+b,0)/n;
+  let num=0, den=0;
+  for(let i=0;i<n;i++){ num += (xs[i]-xbar)*(ys[i]-ybar); den += (xs[i]-xbar)**2; }
+  let slope = den ? num/den : 0;
+  const intercept = ybar - slope*xbar;
 
-  function renderRepo(items){
-    $('repo-body').innerHTML = items.map(s=>{
-      const m=s.metrics,i=s.ior;
-      return `<tr>
-        <td>${s.date}</td><td>${s.label}</td>
-        <td>${fmt(m.weight,1)}</td><td>${fmt(m.pbf,1)}</td><td>${fmt(m.bmi,1)}</td><td>${fmt(m.score,0)}</td>
-        <td>${m.visceral}</td><td>${fmt(m.smm,1)}</td><td>${fmt(m.fat,1)}</td><td>${Math.round(m.bmr)}</td>
-        <td>${fmt(m.tbw,1)}</td><td>${fmt(m.protein,1)}</td><td>${fmt(m.minerals,2)}</td><td>${fmt(m.ffm,1)}</td>
-        <td>${fmt(m.obesity,1)}</td><td>${fmt(m.ecwtbw,3)}</td>
-        <td>${i.composition.insight} - ${i.composition.observation} - ${i.composition.recommendation}</td>
-        <td>${i.bmi_pbf.insight} - ${i.bmi_pbf.observation} - ${i.bmi_pbf.recommendation}</td>
-        <td>${i.bmr_obesity.insight} - ${i.bmr_obesity.observation} - ${i.bmr_obesity.recommendation}</td>
-        <td>${i.ecwtbw.insight} - ${i.ecwtbw.observation} - ${i.ecwtbw.recommendation}</td>
-        <td>${i.segmental_lean.insight} - ${i.segmental_lean.observation} - ${i.segmental_lean.recommendation}</td>
-        <td>${i.segmental_fat.insight} - ${i.segmental_fat.observation} - ${i.segmental_fat.recommendation}</td>
-        <td>${i.overall.insight} - ${i.overall.observation} - ${i.overall.recommendation}</td>
-      </tr>`;
-    }).join('');
-  }
+  // residual std
+  let resid = [];
+  for(let i=0;i<n;i++){ resid.push(ys[i] - (intercept + slope*xs[i])); }
+  const sigma = Math.sqrt(resid.reduce((a,b)=>a+b*b,0) / Math.max(1, n-2));
 
-  function renderSegments(s){
-    $('lean-la').textContent=segFmt(s.segments_lean.la);
-    $('lean-ra').textContent=segFmt(s.segments_lean.ra);
-    $('lean-tr').textContent=segFmt(s.segments_lean.tr);
-    $('lean-ll').textContent=segFmt(s.segments_lean.ll);
-    $('lean-rl').textContent=segFmt(s.segments_lean.rl);
-    $('fat-la').textContent=segFmt(s.segments_fat.la);
-    $('fat-ra').textContent=segFmt(s.segments_fat.ra);
-    $('fat-tr').textContent=segFmt(s.segments_fat.tr);
-    $('fat-ll').textContent=segFmt(s.segments_fat.ll);
-    $('fat-rl').textContent=segFmt(s.segments_fat.rl);
-  }
-  function renderIOR(s){
-    $('overall-insight').textContent=s.ior.overall.insight||'-';
-    $('overall-observation').textContent=s.ior.overall.observation||'-';
-    $('overall-reco').textContent=s.ior.overall.recommendation||'-';
-    $('ior-composition-insight').textContent=s.ior.composition.insight||'-';
-    $('ior-composition-observation').textContent=s.ior.composition.observation||'-';
-    $('ior-composition-reco').textContent=s.ior.composition.recommendation||'-';
-    $('ior-bmr-insight').textContent=s.ior.bmr_obesity.insight||'-';
-    $('ior-bmr-observation').textContent=s.ior.bmr_obesity.observation||'-';
-    $('ior-bmr-reco').textContent=s.ior.bmr_obesity.recommendation||'-';
-    $('ior-lean-insight').textContent=s.ior.segmental_lean.insight||'-';
-    $('ior-lean-observation').textContent=s.ior.segmental_lean.observation||'-';
-    $('ior-lean-reco').textContent=s.ior.segmental_lean.recommendation||'-';
-    $('ior-fat-insight').textContent=s.ior.segmental_fat.insight||'-';
-    $('ior-fat-observation').textContent=s.ior.segmental_fat.observation||'-';
-    $('ior-fat-reco').textContent=s.ior.segmental_fat.recommendation||'-';
-  }
+  // If slope is negative, enforce strictly decreasing continuation
+  const lastX = xs[xs.length-1];
+  const lastY = ys[ys.length-1];
 
-  // Forecast math (OLS)
-  const toDate=d=>new Date(d+'T00:00:00');
-  const daysBetween=(a,b)=>Math.round((toDate(b)-toDate(a))/86400000);
-  const linReg=(xs,ys)=>{
-    const n=xs.length, sx=xs.reduce((a,b)=>a+b,0), sy=ys.reduce((a,b)=>a+b,0);
-    const sxx=xs.reduce((a,x)=>a+x*x,0), sxy=xs.reduce((a,_,i)=>a+xs[i]*ys[i],0);
-    const b=(n*sxy - sx*sy)/(n*sxx - sx*sx || 1e-6); const a=(sy - b*sx)/n;
-    const resid=ys.map((y,i)=>y-(a+b*xs[i])); const std=Math.sqrt(resid.reduce((s,v)=>s+v*v,0)/Math.max(1,n-2));
-    return {a,b,std};
-  };
-
-  function forecastAll(){
-    if(!scans.length) return {table:[]};
-    const base=scans[0].date, last=scans[scans.length-1].date;
-    const t=scans.map(s=>daysBetween(base,s.date));
-    const weight=scans.map(s=>s.metrics.weight);
-    const pbf=scans.map(s=>s.metrics.pbf);
-
-    const heights=scans.map(s=>Math.sqrt(s.metrics.weight/ s.metrics.bmi));
-    const sorted=[...heights].sort((a,b)=>a-b);
-    const height=sorted[Math.floor(sorted.length/2)]||1.7;
-    const smi=scans.map(s=> s.metrics.smm/(height*height));
-
-    const rw=linReg(t,weight), rp=linReg(t,pbf), rs=linReg(t,smi);
-    const offsets=[0,14,28,84];
-    const out=offsets.map(off=>{
-      const tt=daysBetween(base,last)+off;
-      const date=new Date(toDate(last).getTime()+off*86400000).toISOString().slice(0,10);
-      const w=rw.a+rw.b*tt, p=Math.min(60,Math.max(8, rp.a+rp.b*tt)), s=rs.a+rs.b*tt;
-      return {date, w:+w.toFixed(1), p:+p.toFixed(1), s:+s.toFixed(1), wStd:+rw.std.toFixed(1), pStd:+rp.std.toFixed(1), sStd:+rs.std.toFixed(1)};
-    });
-    return {height, table:out, lastIndex:scans.length-1, models:{rw,rp,rs}, base, last};
-  }
-
-  function renderForecast(){
-    const {table} = forecastAll();
-    if(!table.length) return;
-    const today=table[0], w2=table[1], w4=table[2], w12=table[3];
-
-    const cur=scans[scans.length-1].metrics;
-    const chip=(v,curv,unit,name)=>{
-      const d=v-curv; const a=Math.abs(d).toFixed(unit==='level'?0:1);
-      const good = (name==='Weight'||name==='PBF') ? d<0 : (name==='SMI' ? d>0 : false);
-      const cls = d===0?'neutral':(good?'good':'bad'); const arrow=d>0?'▲':d<0?'▼':'•';
-      return `<span class="f-chip f-delta ${cls}">${arrow} ${d>0?'+':''}${a} ${unit}</span>`;
-    };
-    $('fcw-vals').innerHTML = [`<span class="f-chip">2w: ${w2.w} kg</span>`, chip(w2.w,cur.weight,'kg','Weight'),
-                               `<span class="f-chip">4w: ${w4.w} kg</span>`, chip(w4.w,cur.weight,'kg','Weight'),
-                               `<span class="f-chip">12w: ${w12.w} kg</span>`, chip(w12.w,cur.weight,'kg','Weight'),
-                               `<span class="f-chip small">~ +/- ${today.wStd} kg</span>`].join(' ');
-    $('fcw-note').textContent='Assumes current trend continues.';
-    const h=(function(){const heights=scans.map(s=>Math.sqrt(s.metrics.weight/ s.metrics.bmi)); const sorted=[...heights].sort((a,b)=>a-b); return sorted[Math.floor(sorted.length/2)]||1.7;})();
-    const curSMI=(cur.smm/(h*h));
-    $('fcs-vals').innerHTML = [`<span class="f-chip">2w: ${w2.s} kg/m^2</span>`, chip(w2.s,curSMI,'kg/m^2','SMI'),
-                               `<span class="f-chip">4w: ${w4.s} kg/m^2</span>`, chip(w4.s,curSMI,'kg/m^2','SMI'),
-                               `<span class="f-chip">12w: ${w12.s} kg/m^2</span>`, chip(w12.s,curSMI,'kg/m^2','SMI'),
-                               `<span class="f-chip small">~ +/- ${today.sStd} kg/m^2</span>`].join(' ');
-    $('fcs-note').textContent='SMI uses median height estimated from BMI.';
-    $('fcp-vals').innerHTML = [`<span class="f-chip">2w: ${w2.p} %</span>`, chip(w2.p,cur.pbf,'%', 'PBF'),
-                               `<span class="f-chip">4w: ${w4.p} %</span>`, chip(w4.p,cur.pbf,'%', 'PBF'),
-                               `<span class="f-chip">12w: ${w12.p} %</span>`, chip(w12.p,cur.pbf,'%', 'PBF'),
-                               `<span class="f-chip small">~ +/- ${today.pStd} %</span>`].join(' ');
-    $('fcp-note').textContent='Bounded to 8-60%.';
-
-    // Milestones table
-    const tb=$('milestones').querySelector('tbody');
-    tb.innerHTML = table.map((r,i)=>{
-      const base=table[0];
-      const dW = (r.w - base.w).toFixed(1);
-      const dS = (r.s - base.s).toFixed(1);
-      const dP = (r.p - base.p).toFixed(1);
-      const delta = i===0 ? '0 (today)' :
-        `${dW>0?'+':''}${dW} kg, ${dS>0?'+':''}${dS} SMI, ${dP>0?'+':''}${dP} %`;
-      const label = i===0?'Today': i===1?'+2w': i===2?'+4w':'+12w';
-      return `<tr><td>${label} - ${r.date}</td><td>${r.w.toFixed(1)}</td><td>${r.s.toFixed(1)}</td><td>${r.p.toFixed(1)}</td><td>${delta}</td></tr>`;
-    }).join('');
-  }
-
-  // Meal plan
-  function mealPlan(){
-    const s=scans[scans.length-1];
-    const def=deficitFor(s);
-    const BMR=s.metrics.bmr, TDEE=BMR*1.35;
-    let target=Math.round(TDEE - def.mid);
-    target=Math.max(Math.round(BMR)+100, target);
-    const weight=s.metrics.weight;
-
-    const protein=Math.ceil(weight*1.6);
-    const fat=Math.max(Math.round(weight*0.8), 40);
-    const kcalFromPF=protein*4 + fat*9;
-    const carbs=Math.max(Math.round((target - kcalFromPF)/4), 60);
-
-    $('meal-summary').textContent=`Target ~ ${target} kcal/day | P ${protein} g | C ${carbs} g | F ${fat} g (BMR ${Math.round(BMR)}, TDEE ~ ${Math.round(TDEE)}, deficit ${def.range[0]}-${def.range[1]} kcal).`;
-
-    const days=[
-      {name:'Day 1', meals:['Oats 60 g + whey 30 g + berries','Chicken breast 150 g + rice 150 g + greens','Skyr 200 g + honey 10 g + walnuts 15 g','Salmon 150 g + potatoes 250 g + salad']},
-      {name:'Day 2', meals:['Egg white omelette (4 whites + 1 whole) + toast','Turkey mince 150 g + pasta 120 g + tomato sauce','Greek yogurt 200 g + banana','Beef 150 g + quinoa 120 g + broccoli']},
-      {name:'Day 3', meals:['Smoothie (whey 30 g, banana, oats 40 g)','Tuna 1 can + rice 150 g + veg','Cottage cheese 200 g + crackers','Chicken thighs 180 g + couscous 120 g + salad']},
-      {name:'Day 4', meals:['Overnight oats 60 g + chia 10 g + whey 25 g','Pork loin 150 g + rice 150 g + kimchi','Protein bar ~200 kcal','Shrimp 180 g + noodles 120 g + veg stir-fry']},
-      {name:'Day 5', meals:['Toast x2 + peanut butter 25 g + whey 25 g','Chicken breast 160 g + potatoes 250 g + veg','Skyr 200 g + fruit','White fish 200 g + rice 150 g + salad']},
-      {name:'Day 6', meals:['Eggs 2 + oats 50 g + whey 20 g','Lean beef 150 g + rice 150 g + veg','Yogurt 200 g + granola 30 g','Turkey 160 g + pasta 120 g + marinara']},
-      {name:'Day 7', meals:['Protein pancakes (whey 25 g, oats 50 g) + fruit','Chicken 150 g + sweet potato 250 g + greens','Cottage cheese 200 g + pineapple','Salmon 150 g + rice 130 g + salad']}
-    ];
-    $('meal-days').innerHTML = days.map(d=>`<div class="day"><h5>${d.name} <span class="badge-kcal">${target} kcal | P ${protein} | C ${carbs} | F ${fat}</span></h5><ul class="small">${d.meals.map(m=>`<li>${m}</li>`).join('')}</ul></div>`).join('');
-    const list=['Chicken','Turkey mince','Lean beef','Pork loin','Salmon/white fish','Shrimp','Eggs','Whey/protein powder','Skyr/Greek yogurt','Cottage cheese','Rice','Pasta','Potatoes/Sweet potatoes','Noodles','Quinoa','Oats','Bread/Toast','Veg mix','Tomato sauce','Fruit','Olive oil','Nuts','Granola','Honey','Kimchi/spices'];
-    $('grocery').innerHTML = list.map(i=>`<div>• ${i}</div>`).join('');
-  }
-
-  function applyKPI(idx){
-    const s=scans[idx], pi=prevIndex(idx), p=pi>=0?scans[pi]:null;
-    $('last-scan').textContent=`Last scan: ${s.label} - ${s.date}`;
-
-    setGauge($('g-weight'),s.metrics.weight,120,fmt(s.metrics.weight,1)); $('m-weight').textContent=fmt(s.metrics.weight,1);
-    setGauge($('g-smm'),s.metrics.smm,45,fmt(s.metrics.smm,1)); $('m-smm').textContent=fmt(s.metrics.smm,1);
-    setGauge($('g-pbf'),s.metrics.pbf,60,fmt(s.metrics.pbf,1)); $('m-pbf').textContent=fmt(s.metrics.pbf,1);
-    setGauge($('g-obesity'),s.metrics.obesity,200,fmt(s.metrics.obesity,1)); $('m-obesity').textContent=fmt(s.metrics.obesity,1);
-    setGauge($('g-visc'),s.metrics.visceral,20,String(s.metrics.visceral)); $('m-visc').textContent=String(s.metrics.visceral);
-    setGauge($('g-bmr'),s.metrics.bmr,2200,String(Math.round(s.metrics.bmr))); $('m-bmr').textContent=String(Math.round(s.metrics.bmr));
-    setGauge($('g-score'),s.metrics.score,100,String(Math.round(s.metrics.score))); $('m-score').textContent=String(Math.round(s.metrics.score));
-
-    const def=deficitFor(s);
-    $('badge-deficit').textContent=`${def.mid}`; $('m-deficit').textContent=`${def.mid}`; $('m-deficit-range').textContent=`range ${def.range[0]}-${def.range[1]}`;
-
-    function setDelta(elId, name, unit, cur, prev){
-      const res=delta(cur,prev,name,unit,'previous'); const el=$(elId); el.className='delta '+res.cls; el.textContent=res.text;
+  let fxs = [], fys = [], upper=[], lower=[];
+  for(let i=1;i<=futureCount;i++){
+    const x = lastX + i*7; // weekly steps for projection
+    let y = intercept + slope*x;
+    if (slope < 0) {
+      // ensure monotonic decrease
+      y = Math.min(y, fxs.length ? fys[fys.length-1]-Math.abs(slope)*7 : lastY - Math.abs(slope)*7);
     }
-    if(p){
-      setDelta('d-weight','Body Weight','kg',s.metrics.weight,p.metrics.weight);
-      setDelta('d-smm','Skeletal Muscle Mass','kg',s.metrics.smm,p.metrics.smm);
-      setDelta('d-pbf','Percent Body Fat','%',s.metrics.pbf,p.metrics.pbf);
-      setDelta('d-obesity','Obesity Degree','%',s.metrics.obesity,p.metrics.obesity);
-      setDelta('d-visc','Visceral Fat Level','level',s.metrics.visceral,p.metrics.visceral);
-      setDelta('d-bmr','Basal Metabolic Rate','kcal',s.metrics.bmr,p.metrics.bmr);
-      const prevDef=deficitFor(p); const ch=def.mid-prevDef.mid; const arrow=ch>0?'▲':ch<0?'▼':'•'; const sign=ch>0?'+':ch<0?'-':'';
-      $('d-deficit').className='delta neutral'; $('d-deficit').textContent=`${arrow} ${sign}${Math.abs(ch)} kcal since previous`;
-      const res=delta(s.metrics.score,p.metrics.score,'InBody Score','/ 100','previous'); $('d-score').className='delta '+res.cls; $('d-score').textContent=res.text;
-    }else{
-      ['d-weight','d-smm','d-pbf','d-obesity','d-visc','d-bmr','d-deficit','d-score'].forEach(id=>{ $(id).className='delta neutral'; $(id).textContent='No previous scan to compare'; });
-    }
+    fxs.push(x); fys.push(y);
+    upper.push(y + sigma); lower.push(y - sigma);
   }
+  return {fxs, fys, upper, lower, slope, intercept, sigma};
+}
 
-  function renderCompare(idx){
-    const mode=getCompareMode();
-    const modeLabel = mode==='baseline' ? 'baseline' : 'previous';
-    const s=scans[idx];
-    let ref=null;
-    if(mode==='baseline'){ ref=scans[baselineIndex]; compareTitle.textContent=`Changes Compared With Baseline (${ref?.label||'-'})`; compareBaselineLabel.textContent=`(${ref?.label||'Baseline'})`; }
-    else{ const pi=prevIndex(idx); ref = pi>=0?scans[pi]:null; compareTitle.textContent=`Changes Compared With Previous Scan`; compareBaselineLabel.textContent=''; }
-    const cont=$('compare-strip');
-    if(!ref){ cont.innerHTML=`<div class="card mini"><h5>Comparison</h5><div class="small">No ${modeLabel} scan to compare</div></div>`; return; }
-    if(mode==='baseline' && idx===baselineIndex){ cont.innerHTML=`<div class="card mini"><h5>Comparison</h5><div class="small">No baseline difference (same scan)</div></div>`; return; }
-    const items=[
-      {name:'Body Weight', unit:'kg', cur:s.metrics.weight, prev:ref.metrics.weight},
-      {name:'Percent Body Fat', unit:'%', cur:s.metrics.pbf, prev:ref.metrics.pbf},
-      {name:'Fat Mass', unit:'kg', cur:s.metrics.fat, prev:ref.metrics.fat},
-      {name:'Skeletal Muscle Mass', unit:'kg', cur:s.metrics.smm, prev:ref.metrics.smm},
-      {name:'Body Mass Index', unit:'', cur:s.metrics.bmi, prev:ref.metrics.bmi},
-      {name:'Visceral Fat Level', unit:'level', cur:s.metrics.visceral, prev:ref.metrics.visceral},
-      {name:'Obesity Degree', unit:'%', cur:s.metrics.obesity, prev:ref.metrics.obesity},
-      {name:'Basal Metabolic Rate', unit:'kcal', cur:s.metrics.bmr, prev:ref.metrics.bmr},
-      {name:'InBody Score', unit:'/ 100', cur:s.metrics.score, prev:ref.metrics.score},
-    ];
-    cont.innerHTML = items.map(it=>{
-      const d=delta(it.cur,it.prev,it.name,it.unit,modeLabel);
-      const decimals=(it.unit==='level'||it.unit==='/ 100')?0:1;
-      const prevT=(it.unit==='kcal'||it.unit==='level'||it.unit==='/ 100')?Math.round(it.prev):fmt(it.prev,decimals);
-      const curT =(it.unit==='kcal'||it.unit==='level'||it.unit==='/ 100')?Math.round(it.cur):fmt(it.cur,decimals);
-      const extraStyle = (mode==='baseline') ? 'style="border-color:rgba(34,211,238,.35);box-shadow:0 0 0 1px rgba(34,211,238,.18) inset"' : '';
-      return `<div class="card mini" ${extraStyle}><h5>${it.name}</h5><div class="delta ${d.cls}">${d.text}</div><div class="fromto">${prevT} ${it.unit} → ${curT} ${it.unit}</div></div>`;
-    }).join('');
-  }
+/* Derived SMI (simple proxy): SMM / (height^2). If height unknown, scale to index-like score. */
+const HEIGHT_M = 1.74; // assumption for index derivation
+function deriveSMI(smm){ return smm / (HEIGHT_M*HEIGHT_M); }
 
-  // CHARTS
-  let charts=[];
-  const destroyCharts=()=>{charts.forEach(c=>{try{c.destroy()}catch{}}); charts=[]};
-  const hasChart=()=>!!window.Chart;
+/* Smooth scroll with sticky header offset */
+function scrollToId(id){
+  const target = document.getElementById(id);
+  if(!target) return;
+  const y = target.getBoundingClientRect().top + window.scrollY - (parseInt(getComputedStyle(document.documentElement).getPropertyValue('--sticky-h')) + 8);
+  window.scrollTo({top:y, behavior:'smooth'});
+}
 
-  function makeLine(ctx, data, options){ return new Chart(ctx, {type:'line', data, options}); }
-  function baseOpts(yTitle, min=null, max=null, rightAxis=false){
-    const gridColor='rgba(255,255,255,.06)', tickColor='rgba(255,255,255,.65)';
-    const opts={
-      responsive:true, maintainAspectRatio:false,
-      interaction:{mode:'index', intersect:false},
-      plugins:{legend:{labels:{color:tickColor}}, tooltip:{titleColor:'#fff',bodyColor:'#fff'}},
-      scales:{
-        x:{grid:{color:gridColor}, ticks:{color:tickColor}},
-        y:{grid:{color:gridColor}, ticks:{color:tickColor}, title:{display:!!yTitle, text:yTitle, color:tickColor}}
-      }
-    };
-    if(min!=null) opts.scales.y.min=min; if(max!=null) opts.scales.y.max=max;
-    if(rightAxis){ opts.scales.y1={position:'right',grid:{color:'rgba(255,255,255,.03)'},ticks:{color:tickColor}}; }
-    return opts;
-  }
-
-  function drawCharts(){
-    // Guards
-    const showMiss=(id,show)=>{ const el=$(id); if(el) el.hidden=!show; };
-    if(!hasChart()){
-      ['miss-comp','miss-bmi','miss-bmro','miss-ecw','miss-w-forecast','miss-smi-forecast','miss-pbf-forecast'].forEach(id=>showMiss(id,true));
-      return;
-    }
-    ['miss-comp','miss-bmi','miss-bmro','miss-ecw','miss-w-forecast','miss-smi-forecast','miss-pbf-forecast'].forEach(id=>showMiss(id,false));
-
-    const labels=scans.map(s=>s.label);
-    const weight=scans.map(s=>s.metrics.weight);
-    const smm=scans.map(s=>s.metrics.smm);
-    const fat=scans.map(s=>s.metrics.fat);
-    const bmi=scans.map(s=>s.metrics.bmi);
-    const pbf=scans.map(s=>s.metrics.pbf);
-    const bmr=scans.map(s=>s.metrics.bmr);
-    const obesity=scans.map(s=>s.metrics.obesity);
-    const ecw=scans.map(s=>s.metrics.ecwtbw);
-
-    // Comp line
-    charts.push(makeLine($('chart-comp').getContext('2d'),{
-      labels,
-      datasets:[
-        {label:'Weight (kg)', data:weight, borderColor:'#22d3ee', backgroundColor:'rgba(34,211,238,.2)', tension:.35},
-        {label:'SMM (kg)', data:smm, borderColor:'#34d399', backgroundColor:'rgba(52,211,153,.2)', tension:.35},
-        {label:'Fat (kg)', data:fat, borderColor:'#a78bfa', backgroundColor:'rgba(167,139,250,.2)', tension:.35}
-      ]
-    }, baseOpts('kg')));
-
-    // BMI vs PBF scatter
-    charts.push(new Chart($('chart-bmi').getContext('2d'),{
-      type:'scatter',
-      data:{datasets:[{label:'BMI vs PBF', data:bmi.map((x,i)=>({x, y:pbf[i], label:labels[i]})), borderColor:'#a78bfa', backgroundColor:'rgba(167,139,250,.35)'}]},
-      options:{responsive:true,maintainAspectRatio:false,plugins:{tooltip:{callbacks:{label:ctx=>`${ctx.raw.label}: BMI ${ctx.raw.x.toFixed(1)} | PBF ${ctx.raw.y.toFixed(1)}%`}}},scales:{x:{title:{display:true,text:'BMI'}},y:{title:{display:true,text:'PBF %'}}}}
-    }));
-
-    // BMR + Obesity dual
-    charts.push(makeLine($('chart-bmr-obesity').getContext('2d'),{
-      labels,
-      datasets:[
-        {label:'BMR (kcal)', data:bmr, yAxisID:'y', borderColor:'#f59e0b', backgroundColor:'rgba(245,158,11,.25)', tension:.35},
-        {label:'Obesity (%)', data:obesity, yAxisID:'y1', borderColor:'#f87171', backgroundColor:'rgba(248,113,113,.25)', tension:.35}
-      ]
-    }, baseOpts('kcal',null,null,true)));
-
-    // ECW/TBW line
-    charts.push(makeLine($('chart-ecw').getContext('2d'),{
-      labels,
-      datasets:[{label:'ECW/TBW', data:ecw, borderColor:'#60a5fa', backgroundColor:'rgba(96,165,250,.25)', tension:.35}]
-    }, baseOpts('',0.36,0.40)));
-
-    // Forecast charts
-    const {table, models, base, last} = forecastAll();
-    const lastDate = new Date(last+'T00:00:00').getTime();
-    const future=[14,28,84].map(d=> new Date(lastDate + d*86400000).toISOString().slice(0,10));
-    const fLabels=labels.concat(['+2w','+4w','+12w']);
-
-    // Helper to build forecast series with bands
-    function buildForecastSeries(hist, model, std, clampFn){
-      const xs=scans.map((_,i)=>i);
-      const histPred=xs.map(x=>model.a+model.b*x);
-      const ext=[hist.length-1+14/14, hist.length-1+28/14, hist.length-1+84/14]; // extend indexes
-      const proj=ext.map(x=>model.a+model.b*x);
-      const upper=hist.concat(proj).map(v=> (clampFn?clampFn(v+std):v+std));
-      const lower=hist.concat(proj).map(v=> (clampFn?clampFn(v-std):v-std));
-      return {proj, upper, lower};
-    }
-
-    // Weight
-    const wSer=buildForecastSeries(weight, models.rw, models.rw.std);
-    charts.push(makeLine($('chart-w-forecast').getContext('2d'),{
-      labels:fLabels,
-      datasets:[
-        {label:'Weight (hist)', data:weight, borderColor:'#22d3ee', backgroundColor:'rgba(34,211,238,.15)', tension:.35},
-        {label:'Weight (proj)', data:weight.concat(wSer.proj), borderColor:'#06b6d4', borderDash:[6,4], tension:.35},
-        {label:'Upper', data:wSer.upper, borderColor:'transparent', backgroundColor:'rgba(34,211,238,.10)', fill:'+1'},
-        {label:'Lower', data:wSer.lower, borderColor:'transparent'}
-      ]
-    }, baseOpts('kg')));
-
-    // SMI
-    const heights=scans.map(s=>Math.sqrt(s.metrics.weight/ s.metrics.bmi));
-    const medH=[...heights].sort((a,b)=>a-b)[Math.floor(heights.length/2)]||1.7;
-    const smi=scans.map(s=> s.metrics.smm/(medH*medH));
-    const sSer=buildForecastSeries(smi, models.rs, models.rs.std);
-    charts.push(makeLine($('chart-smi-forecast').getContext('2d'),{
-      labels:fLabels,
-      datasets:[
-        {label:'SMI (hist)', data:smi, borderColor:'#34d399', backgroundColor:'rgba(52,211,153,.15)', tension:.35},
-        {label:'SMI (proj)', data:smi.concat(sSer.proj), borderColor:'#10b981', borderDash:[6,4], tension:.35},
-        {label:'Upper', data:sSer.upper, borderColor:'transparent', backgroundColor:'rgba(16,185,129,.10)', fill:'+1'},
-        {label:'Lower', data:sSer.lower, borderColor:'transparent'}
-      ]
-    }, baseOpts('kg/m^2')));
-
-    // PBF
-    const clampP=v=>clamp(v,8,60);
-    const pSer=buildForecastSeries(pbf, models.rp, models.rp.std, clampP);
-    charts.push(makeLine($('chart-pbf-forecast').getContext('2d'),{
-      labels:fLabels,
-      datasets:[
-        {label:'PBF (hist)', data:pbf, borderColor:'#a78bfa', backgroundColor:'rgba(167,139,250,.15)', tension:.35},
-        {label:'PBF (proj)', data:pbf.concat(pSer.proj.map(clampP)), borderColor:'#8b5cf6', borderDash:[6,4], tension:.35},
-        {label:'Upper', data:pSer.upper, borderColor:'transparent', backgroundColor:'rgba(139,92,246,.10)', fill:'+1'},
-        {label:'Lower', data:pSer.lower, borderColor:'transparent'}
-      ]
-    }, baseOpts('%',8,60)));
-  }
-
-  function renderAll(idx){
-    const s=scans[idx];
-    applyKPI(idx);
-    renderCompare(idx);
-    renderIOR(s);
-    renderSegments(s);
-    renderForecast();
-    mealPlan();
-    renderDataSource();
-    destroyCharts();
-    drawCharts();
-  }
-
-  function updateDebug(){
-    $('debug').textContent=`- Loaded ${scans.length} scans (source: ${source}) | options: ${sel.options.length}`;
-  }
-
-  // Menu overlay
-  const menuBtn=$('btn-menu');
-  const menu=document.createElement('div');
-  menu.className='menu';
-  menu.innerHTML=`<div class="inner"><button class="close" id="menu-close" aria-label="Close">Close</button><div class="content"><h3>Menu</h3><p class="small">Quick links</p><div>
-    <button class="pill" data-target="sec-composition">Composition</button>
-    <button class="pill" data-target="sec-metabolic">Metabolic</button>
-    <button class="pill" data-target="sec-segments">Segments</button>
-    <button class="pill" data-target="sec-forecast">Forecast</button>
-    <button class="pill" data-target="sec-meal">Meal Plan</button>
-    <button class="pill" data-target="sec-repo">Repository</button>
-    <button class="pill" data-target="sec-ds">Data Source</button>
-  </div></div></div>`;
-  document.body.appendChild(menu);
-  const closeMenu=()=>{menu.style.display='none';document.body.style.overflow='';menuBtn.focus();};
-  const openMenu=()=>{menu.style.display='block';document.body.style.overflow='hidden';$('menu-close')?.focus();};
-  menuBtn.addEventListener('click',openMenu);
-  menu.addEventListener('click',(e)=>{ 
-    if(e.target.id==='menu-close'||e.target===menu) return closeMenu();
-    const t=e.target.closest('.pill'); if(t){ const id=t.getAttribute('data-target'); const el=$(id); if(el){ el.scrollIntoView({behavior:'smooth', block:'start'}); setTimeout(closeMenu,300);} }
+/* -------------------- Build Header / Overlay -------------------- */
+(function initHeader(){
+  const sel = el('#scanSelect');
+  // populate scans; default to last
+  DATA.scans.forEach((s, i)=>{
+    const opt = make('option');
+    opt.value = i; opt.textContent = `${s.label} — ${s.date}`;
+    sel.appendChild(opt);
   });
-  document.addEventListener('keydown',e=>{ if(menu.style.display==='block' && e.key==='Escape') closeMenu(); });
+  sel.value = (DATA.scans.length-1).toString();
+  el('#lastScanTxt').textContent = `${DATA.scans[DATA.scans.length-1].label} (${DATA.scans[DATA.scans.length-1].date})`;
+  el('#recCount').textContent = DATA.scans.length.toString();
+  el('#rawJson').textContent = JSON.stringify(DATA, null, 2);
+
+  const overlay = el('#overlay');
+  el('#openMenu').onclick = ()=> overlay.classList.add('open');
+  el('#closeMenu').onclick = ()=> overlay.classList.remove('open');
+  overlay.querySelectorAll('[data-link]').forEach(a=>{
+    a.addEventListener('click', (e)=>{
+      e.preventDefault();
+      overlay.classList.remove('open');
+      const id = a.getAttribute('href').replace('#','');
+      setTimeout(()=>scrollToId(id), 60);
+    });
+  });
 
   // Up button
-  const up=$('btn-up');
-  window.addEventListener('scroll',()=>{ up.style.display = (window.scrollY>200)?'block':'none'; }, {passive:true});
-  up.addEventListener('click',()=>{ window.scrollTo({top:0,behavior:'smooth'}); });
-
-  // Init
-  (function init(){
-    // Compare mode persist
-    const cm=getCompareMode();
-    [...compareFieldset.querySelectorAll('input[name="compareMode"]')].forEach(r=>{ r.checked=(r.value===cm); });
-    compareBaselineLabel.textContent = cm==='baseline' ? `(${scans[0]?.label||'Baseline'})` : '';
-
-    // Repo and select
-    renderRepo(scans);
-    mountSelect(scans);
-  })();
-
-  // Events
-  sel.addEventListener('change',()=>{ renderAll(Number(sel.value)); });
-  compareFieldset.addEventListener('change',(e)=>{ if(e.target.name==='compareMode'){ setCompareMode(e.target.value); compareBaselineLabel.textContent = e.target.value==='baseline' ? `(${scans[0]?.label||'Baseline'})` : ''; renderCompare(Number(sel.value)); }});
-
-  // Load Chart.js (robust)
-  function loadChart(){
-    return new Promise((resolve)=>{
-      if(window.Chart) return resolve(true);
-      const s=document.createElement('script');
-      s.src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js";
-      s.onload=()=>resolve(true);
-      s.onerror=()=>{
-        const f=document.createElement('script');
-        f.src="https://unpkg.com/chart.js@4.4.3/dist/chart.umd.min.js";
-        f.onload=()=>resolve(true);
-        f.onerror=()=>resolve(false);
-        document.head.appendChild(f);
-      };
-      document.head.appendChild(s);
-    });
-  }
-  loadChart().then(()=>{ destroyCharts(); drawCharts(); });
-
+  const up = el('#toTop');
+  window.addEventListener('scroll', ()=>{
+    if (window.scrollY > 400) up.classList.add('show'); else up.classList.remove('show');
+  });
+  up.onclick = ()=> window.scrollTo({top:0, behavior:'smooth'});
 })();
+
+/* -------------------- KPIs -------------------- */
+const KPI_LIST = [
+  {key:'weight', name:'Weight', unit:'kg', color:'var(--cyan)', good:'down'},
+  {key:'smm', name:'SMM', unit:'kg', color:'var(--green)', good:'up'},
+  {key:'pbf', name:'PBF', unit:'%', color:'var(--purple)', good:'down'},
+  {key:'obesity', name:'Obesity Degree', unit:'%', color:'var(--red)', good:'down'},
+  {key:'visceral', name:'Visceral Fat', unit:'', color:'var(--red)', good:'down'},
+  {key:'bmr', name:'BMR', unit:'kcal', color:'var(--amber)', good:'flatUp'},
+  {key:'score', name:'InBody Score', unit:'', color:'var(--cyan)', good:'up'},
+  {key:'deficit', name:'Calorie Deficit Target', unit:'kcal', color:'var(--amber)', derived:true}
+];
+
+function getMetricSeries(key){
+  return DATA.scans.map(s => key==='deficit' ? 500 : (s.metrics[key]));
+}
+
+function buildKPIs(idx){
+  const grid = el('#kpiGrid'); grid.innerHTML='';
+  const curr = DATA.scans[idx].metrics;
+  const prev = DATA.scans[Math.max(0, idx-1)].metrics;
+  KPI_LIST.forEach(k=>{
+    const card = make('div','kpi');
+    const n = make('div','name'); n.textContent = k.name; card.appendChild(n);
+
+    const v = (k.derived ? 500 : curr[k.key]);
+    const u = k.unit;
+    const val = make('div','val'); val.innerHTML = `${fmt(v, k.key==='pbf'||k.key==='obesity'||k.key==='ecwtbw'?1:1)} <span class="muted">${u}</span>`;
+    const delta = (k.derived ? 0 : (v - prev[k.key]));
+    const good = (k.good==='down' && delta<0) || (k.good==='up' && delta>0) || (k.good==='flatUp' && delta>=0);
+    const dspan = make('span','delta '+(good?'good':'bad'));
+    dspan.textContent = (delta>=0?'+':'') + fmt(delta, 1) + (u?(' '+u):'');
+    val.appendChild(dspan);
+    card.appendChild(val);
+
+    // mini bar "gauge"
+    const mini = make('div','mini');
+    const track = make('div','bar-track');
+    const fill = make('div','bar-fill');
+    fill.style.background = k.color;
+    const series = getMetricSeries(k.key);
+    const min = Math.min(...series); const max = Math.max(...series);
+    const pct = max>min ? ((v - min)/(max - min))*100 : 100;
+    fill.style.width = pct + '%';
+    track.appendChild(fill); mini.appendChild(track); card.appendChild(mini);
+
+    // small sparkline (CSS canvas via Chart.js if available)
+    const spark = make('canvas','spark'); card.appendChild(spark);
+    grid.appendChild(card);
+
+    if (window.Chart){
+      const ctx = spark.getContext('2d');
+      new Chart(ctx,{
+        type:'line',
+        data:{ labels: series.map((_,i)=>i+1), datasets:[{
+          data: series, borderColor:k.color, borderWidth:1.5, pointRadius:0, tension:.35,
+          fill:false
+        }]},
+        options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false},tooltip:{enabled:false}}, scales:{x:{display:false}, y:{display:false}}}
+      });
+    }
+  });
+}
+
+/* -------------------- Comparison -------------------- */
+let compareTo = 'previous'; // or 'baseline'
+function buildComparison(idx){
+  el('#cmpLabel').textContent = compareTo==='previous' ? 'Previous' : 'Baseline';
+  const baseIdx = compareTo==='previous' ? Math.max(0, idx-1) : 0;
+  const wrap = el('#cmpCards'); wrap.innerHTML='';
+  const curr = DATA.scans[idx].metrics;
+  const base = DATA.scans[baseIdx].metrics;
+  ['weight','smm','pbf','visceral','bmr','obesity','score','fat'].forEach(k=>{
+    const c = make('div','card');
+    c.innerHTML = `<div class="muted">${k.toUpperCase()}</div>
+      <div style="font-size:18px; font-weight:700">${fmt(curr[k],1)} <span class="muted">${k==='bmr'?'kcal':(k==='pbf'||k==='obesity'?'%':'')}</span>
+      <span class="delta ${curr[k]-base[k] < 0 ? 'good':'bad'}">${(curr[k]-base[k] >=0?'+':'')+fmt(curr[k]-base[k],1)}</span></div>`;
+    wrap.appendChild(c);
+  });
+}
+
+/* -------------------- Insights (Overall + I-O-R) -------------------- */
+function buildInsights(idx){
+  const row = el('#insightsRow'); row.innerHTML='';
+  const s = DATA.scans[idx];
+  const order = ['overall','composition','bmi_pbf','bmr_obesity','ecwtbw','segmental_lean','segmental_fat'];
+  order.forEach(key=>{
+    const ior = s.ior[key];
+    const card = make('div','card');
+    card.innerHTML = `<div class="pill">🤖 ${key.replace('_','/').toUpperCase()}</div>
+      <div style="margin-top:6px"><strong>${ior.insight}</strong></div>
+      <div class="muted">${ior.observation}</div>
+      <div class="muted"><em>${ior.recommendation}</em></div>`;
+    row.appendChild(card);
+  });
+}
+
+/* -------------------- Charts -------------------- */
+let charts = {};
+function destroyCharts(){
+  if (!window.Chart) return;
+  Object.values(charts).forEach(ch=>{ try{ ch.destroy(); }catch(e){} });
+  charts = {};
+}
+
+/* Helpers: labels and series */
+function getLabels(){ return DATA.scans.map(s=>s.label); }
+function seriesOf(key){ return DATA.scans.map(s=>s.metrics[key]); }
+function seriesBMI(){ return DATA.scans.map(s=>({x:s.metrics.bmi, y:s.metrics.pbf})); }
+function seriesECW(){ return DATA.scans.map(s=>s.metrics.ecwtbw); }
+
+/* Build all charts (guarded) */
+function buildCharts(){
+  const hasChart = !!window.Chart;
+  const toggle = (id, showChart)=>{ el('#'+id).style.display = showChart?'block':'none'; el('#'+id+'Fallback').style.display = showChart?'none':'block'; };
+
+  // Composition
+  toggle('chartComp', hasChart);
+  toggle('chartScatter', hasChart);
+  toggle('chartBmrOb', hasChart);
+  toggle('chartECW', hasChart);
+  toggle('fcWeight', hasChart);
+  toggle('fcSMI', hasChart);
+  toggle('fcPBF', hasChart);
+  if (!hasChart) return;
+
+  const labels = getLabels();
+  const ctxComp = el('#chartComp').getContext('2d');
+  charts.comp = new Chart(ctxComp, {
+    type:'line',
+    data:{ labels, datasets:[
+      {label:'Weight', data: seriesOf('weight'), borderColor:COLORS.weight, tension:.35, pointRadius:3},
+      {label:'SMM', data: seriesOf('smm'), borderColor:COLORS.smm, tension:.35, pointRadius:3},
+      {label:'Fat Mass', data: seriesOf('fat'), borderColor:COLORS.fat, borderDash:[4,3], tension:.35, pointRadius:3}
+    ]},
+    options:{ plugins:{legend:{position:'bottom'}}, scales:{x:{grid:{color:'rgba(255,255,255,0.06)'}}, y:{grid:{color:'rgba(255,255,255,0.06)'}}} }
+  });
+
+  const ctxSc = el('#chartScatter').getContext('2d');
+  charts.scat = new Chart(ctxSc, {
+    type:'scatter',
+    data:{ datasets:[{label:'BMI vs PBF', data: seriesBMI(), borderColor:COLORS.pbf, backgroundColor:'rgba(161,107,255,0.25)'}] },
+    options:{ plugins:{legend:{display:false}}, scales:{x:{title:{text:'BMI', display:true}}, y:{title:{text:'PBF %', display:true}}} }
+  });
+
+  const ctxBO = el('#chartBmrOb').getContext('2d');
+  charts.bmr = new Chart(ctxBO, {
+    type:'line',
+    data:{ labels, datasets:[
+      {label:'BMR (kcal)', data: seriesOf('bmr'), borderColor:COLORS.bmr, yAxisID:'y', tension:.35},
+      {label:'Obesity Degree (%)', data: seriesOf('obesity'), borderColor:COLORS.obesity, yAxisID:'y1', tension:.35}
+    ]},
+    options:{ plugins:{legend:{position:'bottom'}}, scales:{y:{position:'left', grid:{color:'rgba(255,255,255,0.06)'}}, y1:{position:'right', grid:{drawOnChartArea:false}}} }
+  });
+
+  const ctxECW = el('#chartECW').getContext('2d');
+  charts.ecw = new Chart(ctxECW, {
+    type:'line',
+    data:{ labels, datasets:[{label:'ECW/TBW', data: seriesECW(), borderColor:'#7bdcff', tension:.35}] },
+    options:{ plugins:{legend:{position:'bottom'}}, scales:{y:{suggestedMin:0.36, suggestedMax:0.40}} }
+  });
+
+  // Forecasts
+  buildForecastCharts();
+}
+
+/* Forecast builders */
+function buildForecastCharts(){
+  const labels = getLabels();
+  // map dates to numeric x (days since first)
+  const dates = DATA.scans.map(s => new Date(s.date));
+  const day0 = dates[0].getTime();
+  const xs = dates.map(d => (d.getTime()-day0)/(1000*60*60*24));
+
+  // Weight
+  makeForecastChart('fcWeight', seriesOf('weight'), xs, 'kg', COLORS.weight, 12, v=>v);
+
+  // SMI (from smm)
+  const smiHist = seriesOf('smm').map(v => deriveSMI(v));
+  makeForecastChart('fcSMI', smiHist, xs, '', COLORS.smm, 12, v=>v);
+
+  // PBF with clamp [8,60]
+  makeForecastChart('fcPBF', seriesOf('pbf'), xs, '%', COLORS.pbf, 12, v=>Math.min(60, Math.max(8, v)));
+}
+
+function makeForecastChart(canvasId, hist, xs, unit, color, weeks, clampFn){
+  const ctx = el('#'+canvasId)?.getContext('2d'); if (!ctx) return;
+  const {fxs, fys, upper, lower, slope, sigma} = olsForecast(xs, hist, weeks);
+  const labels = [...hist.map((_,i)=>`H${i+1}`), ...fys.map((_,i)=>`+${(i+1)}w`)];
+  const histData = hist.map(v => clampFn(v));
+  const fData = fys.map(v => clampFn(v));
+  const upData = upper.map(v => clampFn(v));
+  const loData = lower.map(v => clampFn(v));
+
+  // band fill between upper and lower
+  charts[canvasId] = new Chart(ctx, {
+    type:'line',
+    data:{ labels, datasets:[
+      {label:'History', data: histData, borderColor:color, pointRadius:2, tension:.35},
+      {label:'Forecast Upper', data:[...Array(hist.length).fill(null), ...upData], borderColor:'rgba(0,0,0,0)', pointRadius:0},
+      {label:'Forecast Lower', data:[...Array(hist.length).fill(null), ...loData], borderColor:'rgba(0,0,0,0)', pointRadius:0, fill:'-1', backgroundColor:'rgba(0, 229, 255, 0.10)'},
+      {label:'Forecast', data:[...Array(hist.length).fill(null), ...fData], borderColor:color, borderDash:[5,3], pointRadius:2, tension:.35}
+    ]},
+    options:{ plugins:{legend:{position:'bottom'}, tooltip:{ callbacks:{ label:(ctx)=> `${fmt(ctx.parsed.y,1)} ${unit}` } }}, scales:{x:{}, y:{}} }
+  });
+
+  // Milestones table (Today, +2w, +4w, +12w)
+  if (canvasId === 'fcPBF'){ // compute once after all
+    buildMilestones(fData, smiHist=null, histData, unit);
+  }
+}
+
+function buildMilestones(weightF, smiHist, pbfHist, unit){
+  // We rebuild for Weight, SMI, PBF after all charts exist, so pull from charts directly
+  const w = charts.fcWeight?.data?.datasets?.[3]?.data.filter(x=>x!=null) || [];
+  const s = charts.fcSMI?.data?.datasets?.[3]?.data.filter(x=>x!=null) || [];
+  const p = charts.fcPBF?.data?.datasets?.[3]?.data.filter(x=>x!=null) || [];
+  const todayW = DATA.scans[DATA.scans.length-1].metrics.weight;
+  const todaySMI = deriveSMI(DATA.scans[DATA.scans.length-1].metrics.smm);
+  const todayPBF = DATA.scans[DATA.scans.length-1].metrics.pbf;
+
+  function at(weeks){ return {
+      W: weeks===0 ? todayW : (w[weeks-1] ?? w[w.length-1]),
+      S: weeks===0 ? todaySMI: (s[weeks-1] ?? s[s.length-1]),
+      P: weeks===0 ? todayPBF: (p[weeks-1] ?? p[p.length-1]),
+  };}
+
+  const rows = [
+    ['Today', at(0)],
+    ['+2w',   at(2)],
+    ['+4w',   at(4)],
+    ['+12w',  at(12)]
+  ];
+  const tbody = el('#milestonesTbl tbody'); tbody.innerHTML='';
+  rows.forEach(r=>{
+    const tr = make('tr');
+    tr.innerHTML = `<td>${r[0]}</td><td>${fmt(r[1].W,1)} kg</td><td>${fmt(r[1].S,2)}</td><td>${fmt(r[1].P,1)} %</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+/* -------------------- Segmental bars -------------------- */
+const SEG_KEYS = [['la','LA'],['ra','RA'],['tr','TR'],['ll','LL'],['rl','RL']];
+function buildSegments(idx){
+  const s = DATA.scans[idx];
+  const lean = s.segments_lean, fat = s.segments_fat;
+
+  const leanWrap = el('#segLean'); leanWrap.innerHTML='';
+  const fatWrap = el('#segFat'); fatWrap.innerHTML='';
+
+  SEG_KEYS.forEach(([k, label])=>{
+    const rowL = make('div','seg-row');
+    rowL.innerHTML = `<span class="seg-name">${label}</span><div class="seg-track"><div class="seg-fill" style="background:var(--green); width:${Math.min(100, lean[k].pct)}%"></div></div><span class="muted">${fmt(lean[k].kg,2)} kg | ${fmt(lean[k].pct,1)}%</span>`;
+    leanWrap.appendChild(rowL);
+
+    const rowF = make('div','seg-row');
+    // Normalize fat % visualization (cap to 100 for bar display but keep numbers)
+    const barPct = Math.min(100, fat[k].pct);
+    rowF.innerHTML = `<span class="seg-name">${label}</span><div class="seg-track"><div class="seg-fill" style="background:var(--purple); width:${barPct}%"></div></div><span class="muted">${fmt(fat[k].kg,2)} kg | ${fmt(fat[k].pct,1)}%</span>`;
+    fatWrap.appendChild(rowF);
+  });
+}
+
+/* -------------------- Repository Table (metrics + 7 IOR columns) -------------------- */
+function buildRepo(){
+  const tbl = el('#repoTbl'); tbl.innerHTML='';
+  const head = make('thead'); const htr = make('tr');
+  const cols = [
+    'date','label','weight','smm','fat','pbf','bmi','bmr','score','visceral','tbw','protein','minerals','ffm','obesity','ecwtbw',
+    'ior_composition','ior_bmi_pbf','ior_bmr_obesity','ior_ecwtbw','ior_segmental_lean','ior_segmental_fat','ior_overall'
+  ];
+  cols.forEach(c=>{ const th=make('th'); th.textContent=c; htr.appendChild(th); }); head.appendChild(htr); tbl.appendChild(head);
+  const body = make('tbody');
+  DATA.scans.forEach(s=>{
+    const tr = make('tr');
+    const m = s.metrics;
+    const i = s.ior;
+    const map = {
+      date:s.date, label:s.label, weight:m.weight, smm:m.smm, fat:m.fat, pbf:m.pbf, bmi:m.bmi, bmr:m.bmr, score:m.score, visceral:m.visceral,
+      tbw:m.tbw, protein:m.protein, minerals:m.minerals, ffm:m.ffm, obesity:m.obesity, ecwtbw:m.ecwtbw,
+      ior_composition: `${i.composition.insight} — ${i.composition.observation}`,
+      ior_bmi_pbf: `${i.bmi_pbf.insight} — ${i.bmi_pbf.observation}`,
+      ior_bmr_obesity: `${i.bmr_obesity.insight} — ${i.bmr_obesity.observation}`,
+      ior_ecwtbw: `${i.ecwtbw.insight} — ${i.ecwtbw.observation}`,
+      ior_segmental_lean: `${i.segmental_lean.insight} — ${i.segmental_lean.observation}`,
+      ior_segmental_fat: `${i.segmental_fat.insight} — ${i.segmental_fat.observation}`,
+      ior_overall: `${i.overall.insight} — ${i.overall.observation}`
+    };
+    cols.forEach(c=>{ const td=make('td'); td.textContent = map[c]; tr.appendChild(td); });
+    body.appendChild(tr);
+  });
+  tbl.appendChild(body);
+}
+
+/* -------------------- Scan Change Handling -------------------- */
+function refreshAll(){
+  const idx = parseInt(el('#scanSelect').value,10);
+  el('#lastScanTxt').textContent = `${DATA.scans[idx].label} (${DATA.scans[idx].date})`;
+  destroyCharts();
+  buildKPIs(idx);
+  buildComparison(idx);
+  buildInsights(idx);
+  buildCharts();
+  buildSegments(idx);
+}
+el('#scanSelect').addEventListener('change', refreshAll);
+
+/* Comparison toggle */
+el('#cmpPrev').onclick = ()=>{ compareTo='previous'; el('#cmpPrev').classList.add('active'); el('#cmpBase').classList.remove('active'); refreshAll(); };
+el('#cmpBase').onclick = ()=>{ compareTo='baseline'; el('#cmpBase').classList.add('active'); el('#cmpPrev').classList.remove('active'); refreshAll(); };
+
+/* -------------------- Init -------------------- */
+document.addEventListener('DOMContentLoaded', ()=>{
+  refreshAll();
+});
 </script>
 </body>
 </html>
