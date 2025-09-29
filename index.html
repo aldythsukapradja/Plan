@@ -10,7 +10,7 @@
   --bg:#0b0f17; --panel:#0c1322; --panel-2:#0c1526; --text:#e5e7eb; --muted:#9ca3af;
   --border:rgba(255,255,255,0.08);
   --neon-cyan:#22d3ee; --neon-purple:#a78bfa; --neon-amber:#f59e0b; --neon-green:#34d399; --neon-red:#f87171;
-  --radius:16px; --radius-sm:12px; --shadow:0 10px 30px rgba(0,0,0,.35), 0 0 0 1px var(--border) inset;
+  --radius:16px; --shadow:0 10px 30px rgba(0,0,0,.35), 0 0 0 1px var(--border) inset;
 }
 *{box-sizing:border-box}
 html{height:100%;-webkit-text-size-adjust:100%}
@@ -83,12 +83,6 @@ select#scan-select{
 .kpi-cluster::after{content:"";position:absolute;right:-6px;top:8%;bottom:8%;width:1px;background:linear-gradient(transparent, rgba(255,255,255,.06), transparent);display:none}
 @media(min-width:1024px){ .kpi-cluster::after{display:block} }
 
-.data-source-grid{display:grid;gap:8px}
-@media(min-width:680px){.data-source-grid{grid-template-columns:1fr 1fr}}
-.ds-table{width:100%;border-collapse:collapse;font-size:.9rem}
-.ds-table th,.ds-table td{padding:8px 10px;border-bottom:1px solid var(--border);text-align:left}
-.ds-table th{color:var(--muted);font-weight:600;width:160px}
-
 .charts{display:grid;grid-template-columns:1fr;gap:10px}
 @media(min-width:900px){.charts{grid-template-columns:1fr 1fr}}
 .chart-card canvas{width:100% !important;height:48vw !important;max-height:320px;min-height:180px;display:block}
@@ -145,32 +139,6 @@ table.master th{position:sticky;top:0;background:#0d1424;z-index:1}
       <button class="hamburger" id="btn-menu" aria-label="Open menu"><span aria-hidden="true"></span></button>
     </div>
   </header>
-
-  <!-- Data Source -->
-  <section class="card" id="data-source">
-    <h3 style="margin:0 0 8px 0;font-size:.98rem">Data Source</h3>
-    <div class="data-source-grid">
-      <div class="card" style="padding:8px">
-        <table class="ds-table" id="ds-table">
-          <tbody>
-            <tr><th>Source</th><td id="ds-source">-</td></tr>
-            <tr><th>Loaded</th><td id="ds-loaded">-</td></tr>
-            <tr><th>Records</th><td id="ds-records">-</td></tr>
-            <tr><th>Latest Label</th><td id="ds-latest-label">-</td></tr>
-            <tr><th>Latest Date</th><td id="ds-latest-date">-</td></tr>
-            <tr><th>Notes</th><td id="ds-notes">-</td></tr>
-          </tbody>
-        </table>
-        <div class="small" id="ds-debug" style="margin-top:6px">-</div>
-      </div>
-      <div class="card" style="padding:8px">
-        <details>
-          <summary style="cursor:pointer;font-weight:700">Raw Data (JSON)</summary>
-          <pre id="raw-json" style="max-height:300px;overflow:auto;margin:8px 0 0;border:1px solid var(--border);border-radius:8px;padding:8px;background:#0a0f1a;color:#dfe3ea;font-size:.82rem"></pre>
-        </details>
-      </div>
-    </div>
-  </section>
 
   <!-- KPI Row (8 cards by similarity) -->
   <section class="grid kpis" id="kpi-row">
@@ -273,9 +241,7 @@ table.master th{position:sticky;top:0;background:#0d1424;z-index:1}
 
   <!-- Comparison Mini-Cards -->
   <h3 class="section-title">Changes Compared With Previous Scan</h3>
-  <section class="compare" id="compare-strip">
-    <!-- mini-cards inserted by JS -->
-  </section>
+  <section class="compare" id="compare-strip"></section>
 
   <!-- Overall I-O-R -->
   <section class="card big-ior" style="margin-top:10px">
@@ -405,108 +371,52 @@ table.master th{position:sticky;top:0;background:#0d1424;z-index:1}
     </div>
   </details>
 
+  <!-- Data Source (BOTTOM) -->
+  <section class="card" id="data-source" style="margin-top:12px">
+    <h3 style="margin:0 0 8px 0;font-size:.98rem">Data Source</h3>
+    <div class="grid" style="grid-template-columns:1fr;gap:8px">
+      <div class="card" style="padding:8px">
+        <table class="ds-table" style="width:100%;border-collapse:collapse;font-size:.9rem">
+          <tbody>
+            <tr><th style="text-align:left;color:var(--muted);width:160px;padding:8px 10px;border-bottom:1px solid var(--border)">Source</th><td id="ds-source" style="padding:8px 10px;border-bottom:1px solid var(--border)">-</td></tr>
+            <tr><th style="text-align:left;color:var(--muted);padding:8px 10px;border-bottom:1px solid var(--border)">Loaded</th><td id="ds-loaded" style="padding:8px 10px;border-bottom:1px solid var(--border)">-</td></tr>
+            <tr><th style="text-align:left;color:var(--muted);padding:8px 10px;border-bottom:1px solid var(--border)">Records</th><td id="ds-records" style="padding:8px 10px;border-bottom:1px solid var(--border)">-</td></tr>
+            <tr><th style="text-align:left;color:var(--muted);padding:8px 10px;border-bottom:1px solid var(--border)">Latest Label</th><td id="ds-latest-label" style="padding:8px 10px;border-bottom:1px solid var(--border)">-</td></tr>
+            <tr><th style="text-align:left;color:var(--muted);padding:8px 10px;border-bottom:1px solid var(--border)">Latest Date</th><td id="ds-latest-date" style="padding:8px 10px;border-bottom:1px solid var(--border)">-</td></tr>
+            <tr><th style="text-align:left;color:var(--muted);padding:8px 10px;border-bottom:1px solid var(--border)">Notes</th><td id="ds-notes" style="padding:8px 10px;border-bottom:1px solid var(--border)">-</td></tr>
+          </tbody>
+        </table>
+        <div class="small" id="ds-debug" style="margin-top:6px">-</div>
+      </div>
+      <div class="card" style="padding:8px">
+        <details>
+          <summary style="cursor:pointer;font-weight:700">Raw Data (JSON)</summary>
+          <pre id="raw-json" style="max-height:300px;overflow:auto;margin:8px 0 0;border:1px solid var(--border);border-radius:8px;padding:8px;background:#0a0f1a;color:#dfe3ea;font-size:.82rem"></pre>
+        </details>
+      </div>
+    </div>
+  </section>
+
 </div>
 
-<!-- Embedded JSON (primary source) -->
-<script type="application/json" id="scans-json">
-{
-  "scans": [
-    {
-      "date": "2025-03-01",
-      "label": "Mar 2025 (est.)",
-      "metrics": {"weight":90.0,"pbf":42.0,"bmi":31.9,"score":62,"visceral":15,"smm":32.0,"fat":38.0,"bmr":1750,"tbw":42.5,"protein":11.2,"minerals":3.8,"ffm":52.0,"obesity":145.0,"ecwtbw":0.390},
-      "segments_lean": {"la":{"kg":3.00,"pct":98.0},"ra":{"kg":3.10,"pct":98.5},"tr":{"kg":21.0,"pct":99.0},"ll":{"kg":9.40,"pct":97.5},"rl":{"kg":9.50,"pct":98.0}},
-      "segments_fat":  {"la":{"kg":3.04,"pct":8.0},"ra":{"kg":3.04,"pct":8.0},"tr":{"kg":19.0,"pct":50.0},"ll":{"kg":6.46,"pct":17.0},"rl":{"kg":6.46,"pct":17.0}},
-      "ior": {
-        "composition":{"insight":"Fat dominant","observation":"High fat, lower muscle relative","recommendation":"Deficit + protein >= 1.6 g/kg"},
-        "bmi_pbf":{"insight":"BMI and PBF high","observation":"BMI 31.9, PBF 42%","recommendation":"Add waist/hip tracking"},
-        "bmr_obesity":{"insight":"BMR high due to mass","observation":"1750 kcal baseline","recommendation":"Moderate deficit 300-500"},
-        "ecwtbw":{"insight":"Hydration high side","observation":"ECW/TBW 0.390","recommendation":"Control sodium"},
-        "segmental_lean":{"insight":"Balanced limbs, trunk heavy","observation":"~97-99% of standard","recommendation":"Balanced training"},
-        "segmental_fat":{"insight":"Central fat heavy (est)","observation":"Trunk 50% share","recommendation":"Prioritize trunk fat loss"},
-        "overall":{"insight":"Obese baseline","observation":"VF 15, obesity 145%","recommendation":"Initiate fat-loss"}
-      }
-    },
-    {
-      "date": "2025-04-15",
-      "label": "Mid-Apr 2025 (est.)",
-      "metrics": {"weight":84.7,"pbf":39.6,"bmi":30.0,"score":63,"visceral":14,"smm":31.2,"fat":33.5,"bmr":1700,"tbw":41.0,"protein":10.9,"minerals":3.7,"ffm":51.2,"obesity":139.0,"ecwtbw":0.389},
-      "segments_lean": {"la":{"kg":2.90,"pct":97.8},"ra":{"kg":3.00,"pct":98.2},"tr":{"kg":20.5,"pct":98.5},"ll":{"kg":9.20,"pct":97.2},"rl":{"kg":9.30,"pct":97.6}},
-      "segments_fat":  {"la":{"kg":2.68,"pct":8.0},"ra":{"kg":2.68,"pct":8.0},"tr":{"kg":16.75,"pct":50.0},"ll":{"kg":5.70,"pct":17.0},"rl":{"kg":5.70,"pct":17.0}},
-      "ior": {
-        "composition":{"insight":"Early fat drop","observation":"~5 kg fat loss","recommendation":"Add resistance training"},
-        "bmi_pbf":{"insight":"PBF down faster than BMI","observation":"PBF 39.6, BMI 30.0","recommendation":"Loss <= 0.7% BW/week"},
-        "bmr_obesity":{"insight":"BMR slightly down","observation":"1700 kcal","recommendation":"Avoid aggressive cuts"},
-        "ecwtbw":{"insight":"Hydration stable","observation":"0.389","recommendation":"35-40 ml/kg"},
-        "segmental_lean":{"insight":"Balanced limbs","observation":"Arms 98%, legs 97%","recommendation":"Add squats/deadlifts"},
-        "segmental_fat":{"insight":"Fat down modest","observation":"VF down 1","recommendation":"2-3 cardio/week"},
-        "overall":{"insight":"Good start","observation":"-5.3 kg total","recommendation":"Sustain momentum"}
-      }
-    },
-    {
-      "date": "2025-06-13",
-      "label": "13 Jun 2025 (scan)",
-      "metrics": {"weight":80.6,"pbf":32.6,"bmi":28.6,"score":65,"visceral":12,"smm":30.4,"fat":26.2,"bmr":1544,"tbw":39.9,"protein":10.7,"minerals":3.75,"ffm":54.4,"obesity":130.0,"ecwtbw":0.388},
-      "segments_lean": {"la":{"kg":3.05,"pct":95.7},"ra":{"kg":3.12,"pct":97.9},"tr":{"kg":24.8,"pct":97.6},"ll":{"kg":8.09,"pct":91.3},"rl":{"kg":8.16,"pct":92.0}},
-      "segments_fat":  {"la":{"kg":1.90,"pct":333.8},"ra":{"kg":1.90,"pct":323.6},"tr":{"kg":14.10,"pct":358.4},"ll":{"kg":3.50,"pct":223.9},"rl":{"kg":3.60,"pct":225.8}},
-      "ior": {
-        "composition":{"insight":"Strong fat loss","observation":"Fat -11.8, SMM -1.6","recommendation":"Keep deficit; carbs pre-workout"},
-        "bmi_pbf":{"insight":"PBF dropping faster","observation":"BMI 28.6, PBF 32.6%","recommendation":"Use tape and photos"},
-        "bmr_obesity":{"insight":"BMR stable","observation":"1544 kcal","recommendation":"Deficit 300-500 kcal"},
-        "ecwtbw":{"insight":"Hydration healthy","observation":"0.388","recommendation":"Maintain electrolytes"},
-        "segmental_lean":{"insight":"Legs weak","observation":"LL 91%, RL 92%","recommendation":"Unilateral work"},
-        "segmental_fat":{"insight":"Central fat high","observation":"Trunk 14.1 kg (358%)","recommendation":"Aerobic + core stability"},
-        "overall":{"insight":"Overfat improving","observation":"VF 12","recommendation":"Push to VF < 10"}
-      }
-    },
-    {
-      "date": "2025-09-11",
-      "label": "11 Sep 2025 (scan)",
-      "metrics": {"weight":79.0,"pbf":31.3,"bmi":28.0,"score":66,"visceral":10,"smm":30.4,"fat":24.8,"bmr":1542,"tbw":39.8,"protein":10.6,"minerals":3.75,"ffm":54.2,"obesity":127.9,"ecwtbw":0.388},
-      "segments_lean": {"la":{"kg":3.00,"pct":94.6},"ra":{"kg":3.03,"pct":95.6},"tr":{"kg":24.4,"pct":96.6},"ll":{"kg":8.15,"pct":92.6},"rl":{"kg":8.19,"pct":92.9}},
-      "segments_fat":  {"la":{"kg":1.70,"pct":303.4},"ra":{"kg":1.70,"pct":298.3},"tr":{"kg":13.20,"pct":334.8},"ll":{"kg":3.50,"pct":217.6},"rl":{"kg":3.50,"pct":218.5}},
-      "ior": {
-        "composition":{"insight":"Progress steady","observation":"Muscle stable, fat down","recommendation":"Lift 2-3x/week"},
-        "bmi_pbf":{"insight":"PBF steady drop","observation":"BMI 28.0, PBF 31.3%","recommendation":"~0.5% BW loss/week"},
-        "bmr_obesity":{"insight":"BMR stable","observation":"1542 kcal","recommendation":"Avoid further drop"},
-        "ecwtbw":{"insight":"Hydration steady","observation":"0.388","recommendation":"~3 L/day"},
-        "segmental_lean":{"insight":"Arms/trunk solid, legs lag","observation":"Legs ~92%","recommendation":"Leg hypertrophy focus"},
-        "segmental_fat":{"insight":"Central fat dropping","observation":"VF 10","recommendation":"Add HIIT block"},
-        "overall":{"insight":"Near overweight","observation":"VF 10","recommendation":"Push to VF <= 9"}
-      }
-    },
-    {
-      "date": "2025-09-24",
-      "label": "24 Sep 2025 (scan)",
-      "metrics": {"weight":76.8,"pbf":29.7,"bmi":27.2,"score":68,"visceral":9,"smm":30.2,"fat":22.8,"bmr":1536,"tbw":39.6,"protein":10.6,"minerals":3.75,"ffm":54.0,"obesity":124.8,"ecwtbw":0.387},
-      "segments_lean": {"la":{"kg":3.01,"pct":96.6},"ra":{"kg":3.08,"pct":98.2},"tr":{"kg":24.4,"pct":97.4},"ll":{"kg":7.87,"pct":90.9},"rl":{"kg":7.94,"pct":90.9}},
-      "segments_fat":  {"la":{"kg":1.50,"pct":274.2},"ra":{"kg":1.50,"pct":271.7},"tr":{"kg":12.30,"pct":314.1},"ll":{"kg":3.10,"pct":192.5},"rl":{"kg":3.10,"pct":194.0}},
-      "ior": {
-        "composition":{"insight":"Milestone","observation":"Fat -15.2, muscle stable","recommendation":"Start recomposition"},
-        "bmi_pbf":{"insight":"BMI vs PBF gap","observation":"BMI 27.2, PBF 29.7%","recommendation":"Aim PBF <= 25%"},
-        "bmr_obesity":{"insight":"BMR stable","observation":"1536 kcal","recommendation":"Preserve strength"},
-        "ecwtbw":{"insight":"Hydration optimal","observation":"0.387","recommendation":"Maintain intake"},
-        "segmental_lean":{"insight":"Legs lag","observation":"~91%","recommendation":"Lower-body overload"},
-        "segmental_fat":{"insight":"Abdominal fat down","observation":"VF 9","recommendation":"Transition to recomp + diet breaks"},
-        "overall":{"insight":"Obese to overweight","observation":"-13.2 kg; ~85% fat loss; VF 9","recommendation":"Next: 72 kg, PBF <= 25%, VF <= 7"}
-      }
-    }
-  ]
-}
-</script>
+<!-- Embedded JSON -->
+<script type="application/json" id="scans-json">{"scans":[{"date":"2025-03-01","label":"Mar 2025 (est.)","metrics":{"weight":90.0,"pbf":42.0,"bmi":31.9,"score":62,"visceral":15,"smm":32.0,"fat":38.0,"bmr":1750,"tbw":42.5,"protein":11.2,"minerals":3.8,"ffm":52.0,"obesity":145.0,"ecwtbw":0.390},"segments_lean":{"la":{"kg":3.00,"pct":98.0},"ra":{"kg":3.10,"pct":98.5},"tr":{"kg":21.0,"pct":99.0},"ll":{"kg":9.40,"pct":97.5},"rl":{"kg":9.50,"pct":98.0}},"segments_fat":{"la":{"kg":3.04,"pct":8.0},"ra":{"kg":3.04,"pct":8.0},"tr":{"kg":19.0,"pct":50.0},"ll":{"kg":6.46,"pct":17.0},"rl":{"kg":6.46,"pct":17.0}},"ior":{"composition":{"insight":"Fat dominant","observation":"High fat, lower muscle relative","recommendation":"Deficit + protein >= 1.6 g/kg"},"bmi_pbf":{"insight":"BMI and PBF high","observation":"BMI 31.9, PBF 42%","recommendation":"Add waist/hip tracking"},"bmr_obesity":{"insight":"BMR high due to mass","observation":"1750 kcal baseline","recommendation":"Moderate deficit 300-500"},"ecwtbw":{"insight":"Hydration high side","observation":"ECW/TBW 0.390","recommendation":"Control sodium"},"segmental_lean":{"insight":"Balanced limbs, trunk heavy","observation":"~97-99% of standard","recommendation":"Balanced training"},"segmental_fat":{"insight":"Central fat heavy (est)","observation":"Trunk 50% share","recommendation":"Prioritize trunk fat loss"},"overall":{"insight":"Obese baseline","observation":"VF 15, obesity 145%","recommendation":"Initiate fat-loss"}}},{"date":"2025-04-15","label":"Mid-Apr 2025 (est.)","metrics":{"weight":84.7,"pbf":39.6,"bmi":30.0,"score":63,"visceral":14,"smm":31.2,"fat":33.5,"bmr":1700,"tbw":41.0,"protein":10.9,"minerals":3.7,"ffm":51.2,"obesity":139.0,"ecwtbw":0.389},"segments_lean":{"la":{"kg":2.90,"pct":97.8},"ra":{"kg":3.00,"pct":98.2},"tr":{"kg":20.5,"pct":98.5},"ll":{"kg":9.20,"pct":97.2},"rl":{"kg":9.30,"pct":97.6}},"segments_fat":{"la":{"kg":2.68,"pct":8.0},"ra":{"kg":2.68,"pct":8.0},"tr":{"kg":16.75,"pct":50.0},"ll":{"kg":5.70,"pct":17.0},"rl":{"kg":5.70,"pct":17.0}},"ior":{"composition":{"insight":"Early fat drop","observation":"~5 kg fat loss","recommendation":"Add resistance training"},"bmi_pbf":{"insight":"PBF down faster than BMI","observation":"PBF 39.6, BMI 30.0","recommendation":"Loss <= 0.7% BW/week"},"bmr_obesity":{"insight":"BMR slightly down","observation":"1700 kcal","recommendation":"Avoid aggressive cuts"},"ecwtbw":{"insight":"Hydration stable","observation":"0.389","recommendation":"35-40 ml/kg"},"segmental_lean":{"insight":"Balanced limbs","observation":"Arms 98%, legs 97%","recommendation":"Add squats/deadlifts"},"segmental_fat":{"insight":"Fat down modest","observation":"VF down 1","recommendation":"2-3 cardio/week"},"overall":{"insight":"Good start","observation":"-5.3 kg total","recommendation":"Sustain momentum"}}},{"date":"2025-06-13","label":"13 Jun 2025 (scan)","metrics":{"weight":80.6,"pbf":32.6,"bmi":28.6,"score":65,"visceral":12,"smm":30.4,"fat":26.2,"bmr":1544,"tbw":39.9,"protein":10.7,"minerals":3.75,"ffm":54.4,"obesity":130.0,"ecwtbw":0.388},"segments_lean":{"la":{"kg":3.05,"pct":95.7},"ra":{"kg":3.12,"pct":97.9},"tr":{"kg":24.8,"pct":97.6},"ll":{"kg":8.09,"pct":91.3},"rl":{"kg":8.16,"pct":92.0}},"segments_fat":{"la":{"kg":1.90,"pct":333.8},"ra":{"kg":1.90,"pct":323.6},"tr":{"kg":14.10,"pct":358.4},"ll":{"kg":3.50,"pct":223.9},"rl":{"kg":3.60,"pct":225.8}},"ior":{"composition":{"insight":"Strong fat loss","observation":"Fat -11.8, SMM -1.6","recommendation":"Keep deficit; carbs pre-workout"},"bmi_pbf":{"insight":"PBF dropping faster","observation":"BMI 28.6, PBF 32.6%","recommendation":"Use tape and photos"},"bmr_obesity":{"insight":"BMR stable","observation":"1544 kcal","recommendation":"Deficit 300-500 kcal"},"ecwtbw":{"insight":"Hydration healthy","observation":"0.388","recommendation":"Maintain electrolytes"},"segmental_lean":{"insight":"Legs weak","observation":"LL 91%, RL 92%","recommendation":"Unilateral work"},"segmental_fat":{"insight":"Central fat high","observation":"Trunk 14.1 kg (358%)","recommendation":"Aerobic + core stability"},"overall":{"insight":"Overfat improving","observation":"VF 12","recommendation":"Push to VF < 10"}}},{"date":"2025-09-11","label":"11 Sep 2025 (scan)","metrics":{"weight":79.0,"pbf":31.3,"bmi":28.0,"score":66,"visceral":10,"smm":30.4,"fat":24.8,"bmr":1542,"tbw":39.8,"protein":10.6,"minerals":3.75,"ffm":54.2,"obesity":127.9,"ecwtbw":0.388},"segments_lean":{"la":{"kg":3.00,"pct":94.6},"ra":{"kg":3.03,"pct":95.6},"tr":{"kg":24.4,"pct":96.6},"ll":{"kg":8.15,"pct":92.6},"rl":{"kg":8.19,"pct":92.9}},"segments_fat":{"la":{"kg":1.70,"pct":303.4},"ra":{"kg":1.70,"pct":298.3},"tr":{"kg":13.20,"pct":334.8},"ll":{"kg":3.50,"pct":217.6},"rl":{"kg":3.50,"pct":218.5}},"ior":{"composition":{"insight":"Progress steady","observation":"Muscle stable, fat down","recommendation":"Lift 2-3x/week"},"bmi_pbf":{"insight":"PBF steady drop","observation":"BMI 28.0, PBF 31.3%","recommendation":"~0.5% BW loss/week"},"bmr_obesity":{"insight":"BMR stable","observation":"1542 kcal","recommendation":"Avoid further drop"},"ecwtbw":{"insight":"Hydration steady","observation":"0.388","recommendation":"~3 L/day"},"segmental_lean":{"insight":"Arms/trunk solid, legs lag","observation":"Legs ~92%","recommendation":"Leg hypertrophy focus"},"segmental_fat":{"insight":"Central fat dropping","observation":"VF 10","recommendation":"Add HIIT block"},"overall":{"insight":"Near overweight","observation":"VF 10","recommendation":"Push to VF <= 9"}}},{"date":"2025-09-24","label":"24 Sep 2025 (scan)","metrics":{"weight":76.8,"pbf":29.7,"bmi":27.2,"score":68,"visceral":9,"smm":30.2,"fat":22.8,"bmr":1536,"tbw":39.6,"protein":10.6,"minerals":3.75,"ffm":54.0,"obesity":124.8,"ecwtbw":0.387},"segments_lean":{"la":{"kg":3.01,"pct":96.6},"ra":{"kg":3.08,"pct":98.2},"tr":{"kg":24.4,"pct":97.4},"ll":{"kg":7.87,"pct":90.9},"rl":{"kg":7.94,"pct":90.9}},"segments_fat":{"la":{"kg":1.50,"pct":274.2},"ra":{"kg":1.50,"pct":271.7},"tr":{"kg":12.30,"pct":314.1},"ll":{"kg":3.10,"pct":192.5},"rl":{"kg":3.10,"pct":194.0}},"ior":{"composition":{"insight":"Milestone","observation":"Fat -15.2, muscle stable","recommendation":"Start recomposition"},"bmi_pbf":{"insight":"BMI vs PBF gap","observation":"BMI 27.2, PBF 29.7%","recommendation":"Aim PBF <= 25%"},"bmr_obesity":{"insight":"BMR stable","observation":"1536 kcal","recommendation":"Preserve strength"},"ecwtbw":{"insight":"Hydration optimal","observation":"0.387","recommendation":"Maintain intake"},"segmental_lean":{"insight":"Legs lag","observation":"~91%","recommendation":"Lower-body overload"},"segmental_fat":{"insight":"Abdominal fat down","observation":"VF 9","recommendation":"Transition to recomp + diet breaks"},"overall":{"insight":"Obese to overweight","observation":"-13.2 kg; ~85% fat loss; VF 9","recommendation":"Next: 72 kg, PBF <= 25%, VF <= 7"}}}]}</script>
 
-<!-- Chart.js loader with multi-CDN fallback -->
+<!-- Chart.js multi-CDN loader -->
 <script>
 function ensureChartJs(init){
-  if(window.Chart){ init(); return; }
+  if(window.Chart){ window.__chartReady__=true; init(); return; }
   const urls=[
-    "https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js",
-    "https://unpkg.com/chart.js@4.4.4/dist/chart.umd.js",
-    "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"
+    "https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js?v=1",
+    "https://unpkg.com/chart.js@4.4.4/dist/chart.umd.js?v=1",
+    "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js?v=1"
   ];
   (function next(){
-    const url=urls.shift(); if(!url){ init(); return; }
-    const s=document.createElement('script'); s.src=url; s.onload=()=>init(); s.onerror=()=>next(); document.head.appendChild(s);
+    const url=urls.shift(); if(!url){ window.__chartReady__=false; init(); return; }
+    const s=document.createElement('script'); s.src=url;
+    s.onload=()=>{ window.__chartReady__=true; init(); };
+    s.onerror=()=>next();
+    document.head.appendChild(s);
   })();
 }
 </script>
@@ -527,7 +437,7 @@ function ensureChartJs(init){
     if(!scans.length) throw new Error('empty');
   }catch(_){
     dataSource = 'fallback';
-    scans = (function(){ return JSON.parse(jsonText).scans; })();
+    try { scans = JSON.parse(jsonText).scans || []; } catch(e){ scans = []; }
   }
 
   // helpers
@@ -542,9 +452,7 @@ function ensureChartJs(init){
     updateDebug();
     renderAll(sel.selectedIndex);
   }
-
   function previousIndex(i){ return i>0 ? i-1 : -1; }
-
   function parseRangeFromText(t){
     const m = (t||'').match(/(\d+)\s*-\s*(\d+)/);
     if(m){ let a=+m[1], b=+m[2]; if(a>b){ const x=a;a=b;b=x; } return [a,b]; }
@@ -566,7 +474,6 @@ function ensureChartJs(init){
     return {range, mid};
   }
 
-  // Delta rules
   const goodWhenDown = new Set(["Body Weight","Percent Body Fat","Visceral Fat Level","Obesity Degree","Fat Mass"]);
   const goodWhenUp   = new Set(["Skeletal Muscle Mass","Basal Metabolic Rate","InBody Score"]);
   function delta(curr, prev, name, unit){
@@ -591,7 +498,7 @@ function ensureChartJs(init){
     byId('ds-records').textContent = String(scans.length);
     byId('ds-latest-label').textContent = latest.label || '-';
     byId('ds-latest-date').textContent = latest.date || '-';
-    byId('ds-notes').textContent = window.Chart ? 'Chart.js loaded' : 'Chart.js not loaded';
+    byId('ds-notes').textContent = (window.__chartReady__ ? 'Chart.js loaded' : 'Chart.js not loaded');
     const dbg = `- Loaded ${scans.length} scans (source: ${dataSource}) | options: ${sel.options.length}`;
     byId('ds-debug').textContent = dbg;
     byId('debug').textContent = dbg;
@@ -666,9 +573,9 @@ function ensureChartJs(init){
     };
   }
   function renderCharts(items){
-    if(!window.Chart){
+    if(!window.__chartReady__){
       ['chart-comp','chart-bmi','chart-bmr','chart-ecw'].forEach(id=>{
-        const cv=byId(id); if(cv){ const note=document.createElement('div'); note.style.color='var(--muted)'; note.style.fontSize='.85rem'; note.style.marginTop='8px'; note.textContent='Chart.js not loaded. Data is still available in cards and table.'; cv.parentElement.appendChild(note); }
+        const cv=byId(id); if(cv && !cv.dataset.note){ const note=document.createElement('div'); note.style.color='var(--muted)'; note.style.fontSize='.85rem'; note.style.marginTop='8px'; note.textContent='Chart.js not loaded. Data is still available in cards and table.'; cv.parentElement.appendChild(note); cv.dataset.note='1'; }
       });
       return;
     }
@@ -703,7 +610,6 @@ function ensureChartJs(init){
     const s = scans[index], prevI = previousIndex(index), p = prevI>=0 ? scans[prevI] : null;
     byId('last-scan').textContent = `Last scan: ${s.label} - ${s.date}`;
 
-    // gauges and values
     setGauge(byId('g-weight'), s.metrics.weight, 120, fmt(s.metrics.weight,1)); byId('m-weight').textContent = fmt(s.metrics.weight,1);
     setGauge(byId('g-smm'), s.metrics.smm, 45, fmt(s.metrics.smm,1)); byId('m-smm').textContent = fmt(s.metrics.smm,1);
     setGauge(byId('g-pbf'), s.metrics.pbf, 60, fmt(s.metrics.pbf,1)); byId('m-pbf').textContent = fmt(s.metrics.pbf,1);
@@ -712,13 +618,11 @@ function ensureChartJs(init){
     setGauge(byId('g-bmr'), s.metrics.bmr, 2200, String(Math.round(s.metrics.bmr))); byId('m-bmr').textContent = String(Math.round(s.metrics.bmr));
     setGauge(byId('g-score'), s.metrics.score, 100, String(Math.round(s.metrics.score))); byId('m-score').textContent = String(Math.round(s.metrics.score));
 
-    // deficit target
     const def = computeDeficit(s);
     byId('badge-deficit').textContent = `${def.mid}`;
     byId('m-deficit').textContent = `${def.mid}`;
     byId('m-deficit-range').textContent = `range ${def.range[0]}-${def.range[1]}`;
 
-    // deltas
     const d = (name, unit, curr, prev)=>{ const res = delta(curr, prev, name, unit); const el=byId('d-'+name.toLowerCase().replaceAll(' ','').replaceAll('/100','score')); el.className='delta '+res.cls; el.textContent=res.text; };
     if(p){
       d('Body Weight','kg',s.metrics.weight,p.metrics.weight);
@@ -727,7 +631,6 @@ function ensureChartJs(init){
       d('Obesity Degree','%',s.metrics.obesity,p.metrics.obesity);
       d('Visceral Fat Level','level',s.metrics.visceral,p.metrics.visceral);
       d('Basal Metabolic Rate','kcal',s.metrics.bmr,p.metrics.bmr);
-      // deficit change (neutral)
       const prevDef = computeDeficit(p);
       const el=byId('d-deficit'); el.className='delta neutral';
       const change = def.mid - prevDef.mid; const arrow = change>0?'▲':change<0?'▼':'•'; const sign = change>0?'+':change<0?'-':''; el.textContent = `${arrow} ${sign}${Math.abs(change)} kcal since previous`;
@@ -754,8 +657,6 @@ function ensureChartJs(init){
     ];
     cont.innerHTML = items.map(it=>{
       const dd = delta(it.cur,it.prev,it.name,it.unit||'');
-      const decimals = (it.unit==='level'||it.unit==='/ 100')?0:1;
-      const abs = Math.abs((it.cur??0) - (it.prev??0)).toFixed(decimals);
       const prevT = (it.unit==='kcal'||it.unit==='level'||it.unit==='/ 100')? Math.round(it.prev) : fmt(it.prev,1);
       const curT  = (it.unit==='kcal'||it.unit==='level'||it.unit==='/ 100')? Math.round(it.cur)  : fmt(it.cur,1);
       return `<div class="card mini">
@@ -788,11 +689,16 @@ function ensureChartJs(init){
   menuBtn.addEventListener('click',()=>menu.classList.add('open'));
   menu.addEventListener('click',(e)=>{ if(e.target.id==='menu-close'||e.target===menu) menu.classList.remove('open'); });
 
-  // Init
+  // Init with multi-CDN loader that re-runs after load
   ensureChartJs(function(){
     renderRepo(scans);
     mountSelect(scans);
+    if(window.__chartReady__){
+      renderCharts(scans);
+      renderDataSource();
+    }
   });
+
   sel.addEventListener('change',()=>renderAll(Number(sel.value)));
 
 })();
