@@ -47,9 +47,7 @@
     padding:12px 16px; backdrop-filter:blur(10px);
     background:rgba(10,16,24,0.6); border-bottom:1px solid var(--border); z-index:50;
   }
-  .brand{
-    display:flex; align-items:center; gap:12px;
-  }
+  .brand{display:flex; align-items:center; gap:12px}
   .brand h1{margin:0; font-size:18px; letter-spacing:.4px}
   .last-scan{font-size:12px; color:var(--muted)}
   .debug{font-size:11px; color:#7bdcff}
@@ -114,9 +112,7 @@
   /* Silhouettes (segmental) */
   .segs{display:grid; grid-template-columns:1fr; gap:12px}
   @media(min-width:900px){ .segs{grid-template-columns:1fr 1fr} }
-  .sil{
-    display:grid; grid-template-columns:90px 1fr; gap:12px; align-items:center
-  }
+  .sil{display:grid; grid-template-columns:90px 1fr; gap:12px; align-items:center}
   .human{
     width:90px; height:160px; border-radius:50px/90px; background:linear-gradient(180deg,#17243a,#0e1a2d);
     border:1px solid var(--border); position:relative; box-shadow:var(--shadow)
@@ -153,15 +149,23 @@
   }
   .up.show{display:block}
 
-  /* Helper pills */
   .pill{display:inline-flex; gap:6px; align-items:center}
   .pill.cyan{box-shadow:0 0 24px rgba(0,229,255,0.25)}
   .pill.green{box-shadow:0 0 24px rgba(33,243,163,0.22)}
   .pill.purple{box-shadow:0 0 24px rgba(161,107,255,0.22)}
   .pill.amber{box-shadow:0 0 24px rgba(255,207,102,0.22)}
   .pill.red{box-shadow:0 0 24px rgba(255,107,107,0.22)}
-
   .muted{color:var(--muted)}
+
+  /* === FIX: stable canvas sizing on mobile (prevents giant empty area/diagonal artifacts) === */
+  .card canvas{
+    width:100% !important;
+    height:260px !important;   /* tweak 220–300 as desired */
+    display:block;
+  }
+  @media (min-width:900px){
+    .card canvas{ height:240px !important; }
+  }
 </style>
 </head>
 <body>
@@ -425,7 +429,6 @@ const COLORS = { weight:'var(--cyan)', smm:'var(--green)', pbf:'var(--purple)', 
 
 /* Simple OLS regression with band; enforces negative slope if observed slope < 0 */
 function olsForecast(xs, ys, futureCount=12){
-  // xs, ys = numeric arrays; xs in days since first
   const n = xs.length;
   const xbar = xs.reduce((a,b)=>a+b,0)/n;
   const ybar = ys.reduce((a,b)=>a+b,0)/n;
@@ -445,10 +448,9 @@ function olsForecast(xs, ys, futureCount=12){
 
   let fxs = [], fys = [], upper=[], lower=[];
   for(let i=1;i<=futureCount;i++){
-    const x = lastX + i*7; // weekly steps for projection
+    const x = lastX + i*7; // weekly projection
     let y = intercept + slope*x;
     if (slope < 0) {
-      // ensure monotonic decrease
       y = Math.min(y, fxs.length ? fys[fys.length-1]-Math.abs(slope)*7 : lastY - Math.abs(slope)*7);
     }
     fxs.push(x); fys.push(y);
@@ -457,8 +459,8 @@ function olsForecast(xs, ys, futureCount=12){
   return {fxs, fys, upper, lower, slope, intercept, sigma};
 }
 
-/* Derived SMI (simple proxy): SMM / (height^2). If height unknown, scale to index-like score. */
-const HEIGHT_M = 1.74; // assumption for index derivation
+/* Derived SMI: SMM / height^2 */
+const HEIGHT_M = 1.74;
 function deriveSMI(smm){ return smm / (HEIGHT_M*HEIGHT_M); }
 
 /* Smooth scroll with sticky header offset */
@@ -469,10 +471,9 @@ function scrollToId(id){
   window.scrollTo({top:y, behavior:'smooth'});
 }
 
-/* -------------------- Build Header / Overlay -------------------- */
+/* -------------------- Header / Overlay -------------------- */
 (function initHeader(){
   const sel = el('#scanSelect');
-  // populate scans; default to last
   DATA.scans.forEach((s, i)=>{
     const opt = make('option');
     opt.value = i; opt.textContent = `${s.label} — ${s.date}`;
@@ -495,7 +496,6 @@ function scrollToId(id){
     });
   });
 
-  // Up button
   const up = el('#toTop');
   window.addEventListener('scroll', ()=>{
     if (window.scrollY > 400) up.classList.add('show'); else up.classList.remove('show');
@@ -537,7 +537,6 @@ function buildKPIs(idx){
     val.appendChild(dspan);
     card.appendChild(val);
 
-    // mini bar "gauge"
     const mini = make('div','mini');
     const track = make('div','bar-track');
     const fill = make('div','bar-fill');
@@ -548,7 +547,6 @@ function buildKPIs(idx){
     fill.style.width = pct + '%';
     track.appendChild(fill); mini.appendChild(track); card.appendChild(mini);
 
-    // small sparkline (CSS canvas via Chart.js if available)
     const spark = make('canvas','spark'); card.appendChild(spark);
     grid.appendChild(card);
 
@@ -557,8 +555,7 @@ function buildKPIs(idx){
       new Chart(ctx,{
         type:'line',
         data:{ labels: series.map((_,i)=>i+1), datasets:[{
-          data: series, borderColor:k.color, borderWidth:1.5, pointRadius:0, tension:.35,
-          fill:false
+          data: series, borderColor:k.color, borderWidth:1.5, pointRadius:0, tension:.35, fill:false
         }]},
         options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false},tooltip:{enabled:false}}, scales:{x:{display:false}, y:{display:false}}}
       });
@@ -567,7 +564,7 @@ function buildKPIs(idx){
 }
 
 /* -------------------- Comparison -------------------- */
-let compareTo = 'previous'; // or 'baseline'
+let compareTo = 'previous';
 function buildComparison(idx){
   el('#cmpLabel').textContent = compareTo==='previous' ? 'Previous' : 'Baseline';
   const baseIdx = compareTo==='previous' ? Math.max(0, idx-1) : 0;
@@ -583,7 +580,7 @@ function buildComparison(idx){
   });
 }
 
-/* -------------------- Insights (Overall + I-O-R) -------------------- */
+/* -------------------- Insights -------------------- */
 function buildInsights(idx){
   const row = el('#insightsRow'); row.innerHTML='';
   const s = DATA.scans[idx];
@@ -607,18 +604,15 @@ function destroyCharts(){
   charts = {};
 }
 
-/* Helpers: labels and series */
 function getLabels(){ return DATA.scans.map(s=>s.label); }
 function seriesOf(key){ return DATA.scans.map(s=>s.metrics[key]); }
 function seriesBMI(){ return DATA.scans.map(s=>({x:s.metrics.bmi, y:s.metrics.pbf})); }
 function seriesECW(){ return DATA.scans.map(s=>s.metrics.ecwtbw); }
 
-/* Build all charts (guarded) */
 function buildCharts(){
   const hasChart = !!window.Chart;
   const toggle = (id, showChart)=>{ el('#'+id).style.display = showChart?'block':'none'; el('#'+id+'Fallback').style.display = showChart?'none':'block'; };
 
-  // Composition
   toggle('chartComp', hasChart);
   toggle('chartScatter', hasChart);
   toggle('chartBmrOb', hasChart);
@@ -629,8 +623,7 @@ function buildCharts(){
   if (!hasChart) return;
 
   const labels = getLabels();
-  const ctxComp = el('#chartComp').getContext('2d');
-  charts.comp = new Chart(ctxComp, {
+  charts.comp = new Chart(el('#chartComp').getContext('2d'), {
     type:'line',
     data:{ labels, datasets:[
       {label:'Weight', data: seriesOf('weight'), borderColor:COLORS.weight, tension:.35, pointRadius:3},
@@ -640,15 +633,13 @@ function buildCharts(){
     options:{ plugins:{legend:{position:'bottom'}}, scales:{x:{grid:{color:'rgba(255,255,255,0.06)'}}, y:{grid:{color:'rgba(255,255,255,0.06)'}}} }
   });
 
-  const ctxSc = el('#chartScatter').getContext('2d');
-  charts.scat = new Chart(ctxSc, {
+  charts.scat = new Chart(el('#chartScatter').getContext('2d'), {
     type:'scatter',
     data:{ datasets:[{label:'BMI vs PBF', data: seriesBMI(), borderColor:COLORS.pbf, backgroundColor:'rgba(161,107,255,0.25)'}] },
     options:{ plugins:{legend:{display:false}}, scales:{x:{title:{text:'BMI', display:true}}, y:{title:{text:'PBF %', display:true}}} }
   });
 
-  const ctxBO = el('#chartBmrOb').getContext('2d');
-  charts.bmr = new Chart(ctxBO, {
+  charts.bmr = new Chart(el('#chartBmrOb').getContext('2d'), {
     type:'line',
     data:{ labels, datasets:[
       {label:'BMR (kcal)', data: seriesOf('bmr'), borderColor:COLORS.bmr, yAxisID:'y', tension:.35},
@@ -657,8 +648,7 @@ function buildCharts(){
     options:{ plugins:{legend:{position:'bottom'}}, scales:{y:{position:'left', grid:{color:'rgba(255,255,255,0.06)'}}, y1:{position:'right', grid:{drawOnChartArea:false}}} }
   });
 
-  const ctxECW = el('#chartECW').getContext('2d');
-  charts.ecw = new Chart(ctxECW, {
+  charts.ecw = new Chart(el('#chartECW').getContext('2d'), {
     type:'line',
     data:{ labels, datasets:[{label:'ECW/TBW', data: seriesECW(), borderColor:'#7bdcff', tension:.35}] },
     options:{ plugins:{legend:{position:'bottom'}}, scales:{y:{suggestedMin:0.36, suggestedMax:0.40}} }
@@ -668,82 +658,91 @@ function buildCharts(){
   buildForecastCharts();
 }
 
-/* Forecast builders */
+/* --------- Forecasts (FIXED band fill: upper -> lower, no diagonal) --------- */
 function buildForecastCharts(){
-  const labels = getLabels();
-  // map dates to numeric x (days since first)
   const dates = DATA.scans.map(s => new Date(s.date));
   const day0 = dates[0].getTime();
   const xs = dates.map(d => (d.getTime()-day0)/(1000*60*60*24));
 
-  // Weight
   makeForecastChart('fcWeight', seriesOf('weight'), xs, 'kg', COLORS.weight, 12, v=>v);
-
-  // SMI (from smm)
   const smiHist = seriesOf('smm').map(v => deriveSMI(v));
   makeForecastChart('fcSMI', smiHist, xs, '', COLORS.smm, 12, v=>v);
-
-  // PBF with clamp [8,60]
   makeForecastChart('fcPBF', seriesOf('pbf'), xs, '%', COLORS.pbf, 12, v=>Math.min(60, Math.max(8, v)));
 }
 
 function makeForecastChart(canvasId, hist, xs, unit, color, weeks, clampFn){
-  const ctx = el('#'+canvasId)?.getContext('2d'); if (!ctx) return;
-  const {fxs, fys, upper, lower, slope, sigma} = olsForecast(xs, hist, weeks);
-  const labels = [...hist.map((_,i)=>`H${i+1}`), ...fys.map((_,i)=>`+${(i+1)}w`)];
-  const histData = hist.map(v => clampFn(v));
-  const fData = fys.map(v => clampFn(v));
-  const upData = upper.map(v => clampFn(v));
-  const loData = lower.map(v => clampFn(v));
+  const ctx = document.getElementById(canvasId)?.getContext('2d'); if (!ctx) return;
 
-  // band fill between upper and lower
+  const {fys, upper, lower} = olsForecast(xs, hist, weeks);
+  const labels = [...hist.map((_,i)=>`H${i+1}`), ...fys.map((_,i)=>`+${i+1}w`)];
+  const pad = hist.length;
+
+  const histData = hist.map(v => clampFn(v));
+  const fData   = Array(pad).fill(null).concat(fys.map(v => clampFn(v)));
+  const upData  = Array(pad).fill(null).concat(upper.map(v => clampFn(v)));
+  const loData  = Array(pad).fill(null).concat(lower.map(v => clampFn(v)));
+
+  if (charts[canvasId]) { try{ charts[canvasId].destroy(); }catch(e){} }
+
   charts[canvasId] = new Chart(ctx, {
     type:'line',
-    data:{ labels, datasets:[
-      {label:'History', data: histData, borderColor:color, pointRadius:2, tension:.35},
-      {label:'Forecast Upper', data:[...Array(hist.length).fill(null), ...upData], borderColor:'rgba(0,0,0,0)', pointRadius:0},
-      {label:'Forecast Lower', data:[...Array(hist.length).fill(null), ...loData], borderColor:'rgba(0,0,0,0)', pointRadius:0, fill:'-1', backgroundColor:'rgba(0, 229, 255, 0.10)'},
-      {label:'Forecast', data:[...Array(hist.length).fill(null), ...fData], borderColor:color, borderDash:[5,3], pointRadius:2, tension:.35}
-    ]},
-    options:{ plugins:{legend:{position:'bottom'}, tooltip:{ callbacks:{ label:(ctx)=> `${fmt(ctx.parsed.y,1)} ${unit}` } }}, scales:{x:{}, y:{}} }
+    data:{
+      labels,
+      datasets:[
+        {
+          id:'upper', label:'Conf. Upper', data: upData,
+          borderWidth:0, pointRadius:0, spanGaps:true,
+          fill:{ target:'lower', above:'rgba(0,229,255,0.10)' }
+        },
+        {
+          id:'lower', label:'Conf. Lower', data: loData,
+          borderWidth:0, pointRadius:0, spanGaps:true
+        },
+        { label:'History', data: histData, borderColor: color, pointRadius:2, tension:.35, fill:false },
+        { label:'Forecast', data: fData, borderColor: color, borderDash:[6,4], pointRadius:2, tension:.35, fill:false }
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false, animation:false,
+      plugins:{
+        legend:{ position:'bottom' },
+        tooltip:{ callbacks:{ label:(ctx)=> `${ctx.dataset.label}: ${typeof ctx.parsed.y==='number' ? ctx.parsed.y.toFixed(1) : '-'} ${unit}` } }
+      },
+      scales:{ x:{ grid:{color:'rgba(255,255,255,0.06)'} }, y:{ grid:{color:'rgba(255,255,255,0.06)'} } }
+    }
   });
 
-  // Milestones table (Today, +2w, +4w, +12w)
-  if (canvasId === 'fcPBF'){ // compute once after all
-    buildMilestones(fData, smiHist=null, histData, unit);
-  }
+  if (canvasId === 'fcPBF'){ buildMilestones(); }
 }
 
-function buildMilestones(weightF, smiHist, pbfHist, unit){
-  // We rebuild for Weight, SMI, PBF after all charts exist, so pull from charts directly
-  const w = charts.fcWeight?.data?.datasets?.[3]?.data.filter(x=>x!=null) || [];
-  const s = charts.fcSMI?.data?.datasets?.[3]?.data.filter(x=>x!=null) || [];
-  const p = charts.fcPBF?.data?.datasets?.[3]?.data.filter(x=>x!=null) || [];
-  const todayW = DATA.scans[DATA.scans.length-1].metrics.weight;
-  const todaySMI = deriveSMI(DATA.scans[DATA.scans.length-1].metrics.smm);
-  const todayPBF = DATA.scans[DATA.scans.length-1].metrics.pbf;
+/* Milestones table based on forecast datasets (index 3) */
+function buildMilestones(){
+  const wF = charts.fcWeight?.data?.datasets?.[3]?.data?.filter(v=>v!=null) || [];
+  const sF = charts.fcSMI?.data?.datasets?.[3]?.data?.filter(v=>v!=null) || [];
+  const pF = charts.fcPBF?.data?.datasets?.[3]?.data?.filter(v=>v!=null) || [];
 
-  function at(weeks){ return {
-      W: weeks===0 ? todayW : (w[weeks-1] ?? w[w.length-1]),
-      S: weeks===0 ? todaySMI: (s[weeks-1] ?? s[s.length-1]),
-      P: weeks===0 ? todayPBF: (p[weeks-1] ?? p[p.length-1]),
-  };}
+  const today = DATA.scans[DATA.scans.length-1].metrics;
+  const todayW = today.weight;
+  const todaySMI = deriveSMI(today.smm);
+  const todayPBF = today.pbf;
 
-  const rows = [
-    ['Today', at(0)],
-    ['+2w',   at(2)],
-    ['+4w',   at(4)],
-    ['+12w',  at(12)]
-  ];
-  const tbody = el('#milestonesTbl tbody'); tbody.innerHTML='';
-  rows.forEach(r=>{
-    const tr = make('tr');
-    tr.innerHTML = `<td>${r[0]}</td><td>${fmt(r[1].W,1)} kg</td><td>${fmt(r[1].S,2)}</td><td>${fmt(r[1].P,1)} %</td>`;
+  const at = (w)=>({
+    W: w===0 ? todayW : (wF[w-1] ?? wF[wF.length-1]),
+    S: w===0 ? todaySMI: (sF[w-1] ?? sF[sF.length-1]),
+    P: w===0 ? todayPBF: (pF[w-1] ?? pF[pF.length-1]),
+  });
+
+  const rows = [['Today',0],['+2w',2],['+4w',4],['+12w',12]];
+  const tbody = document.querySelector('#milestonesTbl tbody'); tbody.innerHTML='';
+  rows.forEach(([label, w])=>{
+    const r = at(w);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${label}</td><td>${r.W.toFixed(1)} kg</td><td>${r.S.toFixed(2)}</td><td>${r.P.toFixed(1)} %</td>`;
     tbody.appendChild(tr);
   });
 }
 
-/* -------------------- Segmental bars -------------------- */
+/* -------------------- Segments -------------------- */
 const SEG_KEYS = [['la','LA'],['ra','RA'],['tr','TR'],['ll','LL'],['rl','RL']];
 function buildSegments(idx){
   const s = DATA.scans[idx];
@@ -758,14 +757,13 @@ function buildSegments(idx){
     leanWrap.appendChild(rowL);
 
     const rowF = make('div','seg-row');
-    // Normalize fat % visualization (cap to 100 for bar display but keep numbers)
     const barPct = Math.min(100, fat[k].pct);
     rowF.innerHTML = `<span class="seg-name">${label}</span><div class="seg-track"><div class="seg-fill" style="background:var(--purple); width:${barPct}%"></div></div><span class="muted">${fmt(fat[k].kg,2)} kg | ${fmt(fat[k].pct,1)}%</span>`;
     fatWrap.appendChild(rowF);
   });
 }
 
-/* -------------------- Repository Table (metrics + 7 IOR columns) -------------------- */
+/* -------------------- Repository Table -------------------- */
 function buildRepo(){
   const tbl = el('#repoTbl'); tbl.innerHTML='';
   const head = make('thead'); const htr = make('tr');
@@ -808,13 +806,12 @@ function refreshAll(){
   buildSegments(idx);
 }
 el('#scanSelect').addEventListener('change', refreshAll);
-
-/* Comparison toggle */
 el('#cmpPrev').onclick = ()=>{ compareTo='previous'; el('#cmpPrev').classList.add('active'); el('#cmpBase').classList.remove('active'); refreshAll(); };
 el('#cmpBase').onclick = ()=>{ compareTo='baseline'; el('#cmpBase').classList.add('active'); el('#cmpPrev').classList.remove('active'); refreshAll(); };
 
 /* -------------------- Init -------------------- */
 document.addEventListener('DOMContentLoaded', ()=>{
+  buildRepo();
   refreshAll();
 });
 </script>
