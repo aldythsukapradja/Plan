@@ -3,13 +3,14 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Line-Drive Waterflood (Long Horizontal Wells, ~30k ft drains) — For Dummies</title>
+<title>Line-Drive Waterflood — Long Horizontals (~30k ft) • Producer in Green</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" />
 <style>
   :root{
     /* seaborn-like palette */
-    --blue:#4C72B0; --orange:#DD8452; --green:#55A868; --red:#C44E52;
-    --purple:#8172B3; --brown:#937860; --pink:#DA8BC3; --gray:#8C8C8C;
+    --blue:#4C72B0;   /* injectors & water */
+    --green:#55A868;  /* producers & oil */
+    --orange:#DD8452; --red:#C44E52; --purple:#8172B3; --brown:#937860; --gray:#8C8C8C;
     /* theme */
     --bg:#0f1320; --panel:#151b2e; --text:#e7edf7; --muted:#b9c3d6; --accent:#3ad1c7;
   }
@@ -35,7 +36,8 @@
   .sim{position:relative;width:100%;height:320px;border-radius:12px;background:linear-gradient(#1a1f33,#10162a);overflow:hidden}
   .label{position:absolute;font-size:.85rem;color:var(--muted);text-shadow:0 1px 0 rgba(0,0,0,.5)}
   .injector{position:absolute;width:6px;height:160px;background:var(--blue);top:70px;border-radius:3px;box-shadow:0 0 10px rgba(76,114,176,.35)}
-  .wellH{position:absolute;height:10px;width:55%;background:var(--orange);border-radius:6px;box-shadow:0 0 12px rgba(221,132,82,.25)}
+  /* Producer well now GREEN */
+  .wellH{position:absolute;height:10px;width:55%;background:var(--green);border-radius:6px;box-shadow:0 0 12px rgba(85,168,104,.25)}
   .front{position:absolute;top:28px;bottom:28px;width:0;background:rgba(76,114,176,.22);
          border-left:2px solid var(--blue);box-shadow:inset 0 0 20px rgba(76,114,176,.35), 0 0 18px rgba(76,114,176,.25)}
   /* front “wiggle” overlay (mobility effect) */
@@ -55,7 +57,7 @@
     <div>
       <div class="pill">Reservoir Management: Line-Drive Flood</div>
       <h1>Waterflooding for Long Horizontal Wells (~30,000 ft drains)</h1>
-      <p class="lead">Think of a <b>blue curtain</b> (injected water) moving in a straight line to push oil into very long producers. First oil bumps up, later water shows up (water cut rises).</p>
+      <p class="lead">A <b>blue curtain</b> of injected water pushes oil toward very long producers. Oil bumps up first; later the produced liquid has more water (WC rises).</p>
       <div class="badges" style="margin-top:8px">
         <span class="badge">Pattern: Line-Drive</span>
         <span class="badge">Drains: ~30k ft (each)</span>
@@ -76,8 +78,7 @@
       <div class="content">
         <div class="legend">
           <span><span class="dot" style="background:var(--blue)"></span> Injectors (left fence)</span>
-          <span><span class="dot" style="background:var(--orange)"></span> Long horizontal producers (~30k ft)</span>
-          <span><span class="dot" style="background:var(--green)"></span> Pressure support & early oil bump</span>
+          <span><span class="dot" style="background:var(--green)"></span> Producer horizontals (oil out)</span>
         </div>
 
         <div class="sim" id="sim">
@@ -85,16 +86,16 @@
           <div class="injector" style="left:24px;"></div>
           <div class="injector" style="left:48px;"></div>
           <div class="injector" style="left:72px;"></div>
-          <div class="label" style="left:14px; top:8px;">Injectors</div>
+          <div class="label" style="left:14px; top:8px;">Injectors (water in)</div>
 
           <!-- moving water front (blue curtain) -->
           <div class="front"  id="front"></div>
           <div class="wiggle" id="wiggle"></div>
 
-          <!-- two long horizontals (right half) -->
+          <!-- two long horizontals (right half) — NOW GREEN -->
           <div class="wellH" style="left:46%; top:135px;"></div>
           <div class="wellH" style="left:46%; top:185px;"></div>
-          <div class="label" style="right:14px; top:8px;">Producers (30k ft drains)</div>
+          <div class="label" style="right:14px; top:8px;">Producers (oil out)</div>
 
           <!-- status labels -->
           <div class="label" id="lblStatus" style="left:14px; bottom:8px;">Status: BEFORE (front far; low WC)</div>
@@ -126,31 +127,31 @@
               <li><b>Pattern spacing:</b> tighter lines = shorter travel → quicker front arrival.</li>
               <li><b>Mobility ratio:</b> worse (water “too mobile”) = fingering/wiggle → earlier local breakthrough.</li>
             </ul>
-            <div class="tiny" style="margin-top:8px">Targets: keep <b>VRR ≈ 1</b> (balanced), watch for WC rising after breakthrough, and align pattern with rock fabric (fracture-aligned sweep) when possible.</div>
+            <div class="tiny" style="margin-top:8px">Targets: keep <b>VRR ≈ 1</b> (balanced), watch WC post-BT, and align pattern with rock fabric when possible.</div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- RIGHT: Glossary + “What to watch” -->
+    <!-- RIGHT: Glossary + Watchouts -->
     <section class="card">
       <h2>For Dummies — What’s Happening?</h2>
       <div class="content">
-        <p class="tiny"><b>Push:</b> Water acts like a <i>blue conveyor belt</i> pushing oil toward the long wells.</p>
+        <p class="tiny"><b>Push:</b> Water acts like a <i>blue conveyor belt</i> pushing oil toward long green wells.</p>
         <p class="tiny"><b>Pressure:</b> Injection props up pressure so oil flows (aim for VRR ≈ 1 = balanced in vs out).</p>
-        <p class="tiny"><b>Timing:</b> Oil rate bumps up first; later the produced liquid has more water (WC ↑).</p>
+        <p class="tiny"><b>Timing:</b> Oil rate bumps up first; later WC increases after breakthrough.</p>
 
         <h3 style="margin:12px 0 6px;font-size:1rem">Mini Glossary</h3>
         <ul class="tiny">
-          <li><b>VRR:</b> Voidage Replacement Ratio (injected volume / produced volume @ reservoir conditions). Target ≈ 1.</li>
+          <li><b>VRR:</b> Injected / Produced volume @ reservoir conditions. Target ≈ 1.</li>
           <li><b>Water cut (WC):</b> Fraction of water in produced liquids. 0% → all oil; 100% → all water.</li>
           <li><b>Breakthrough (BT):</b> First arrival of injected water at a producer (WC starts rising).</li>
-          <li><b>Sweep:</b> How much of the reservoir the water curtain touches (areal × vertical × displacement).</li>
+          <li><b>Sweep:</b> Portion of reservoir contacted by the water curtain.</li>
         </ul>
 
         <h3 style="margin:12px 0 6px;font-size:1rem">What to Watch</h3>
         <ul class="tiny">
-          <li><b>Heel vs toe:</b> Horizontals may see earlier water at the heel (closest to injectors).</li>
+          <li><b>Heel vs toe:</b> Horizontals may see earlier water at the heel.</li>
           <li><b>Spacing:</b> Tighter line-drive = quicker response but potentially earlier WC.</li>
           <li><b>Mobility:</b> Poor mobility control = “wiggly” front → earlier localized BT.</li>
         </ul>
@@ -159,7 +160,7 @@
 
     <!-- BOTTOM: Charts -->
     <section class="card" style="grid-column:1/-1">
-      <h2>Beginner Charts (auto-updates as the animation runs)</h2>
+      <h2>Beginner Charts (auto-updates as it runs)</h2>
       <div class="content two-col">
         <div>
           <canvas id="chartOWC"></canvas>
@@ -182,43 +183,38 @@
           </div>
         </div>
         <div class="tiny">
-          The math here is intentionally simple and illustrative (not a reservoir simulator): the blue curtain travels faster with
-          higher injection rate and tighter spacing; poor mobility creates a “wiggle” and earlier local breakthrough; oil rate rises early
-          then declines as WC grows; VRR trends toward balance near ~1 depending on injection settings.
+          This is an illustrative toy model (not a simulator): front moves faster with higher injection and tighter spacing; worse mobility makes the front “wiggly” and can trigger earlier local BT; oil rises early then falls as WC grows; VRR tends toward a setting-driven balance near 1.
         </div>
       </div>
     </section>
   </div>
 
-  <footer>Made simple on purpose. Colors follow a seaborn-style palette for familiarity.</footer>
+  <footer>Producer well & arrows are GREEN. Colors follow a seaborn-style palette.</footer>
 </div>
 
-<!-- Chart.js (lightweight, no build step) -->
+<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
-/* ----------- Parameters & State (toy model for teaching) ----------- */
+/* ----------- Parameters & State ----------- */
 const colors = {
-  blue:"#4C72B0", orange:"#DD8452", green:"#55A868", red:"#C44E52",
+  blue:"#4C72B0", green:"#55A868", orange:"#DD8452", red:"#C44E52",
   purple:"#8172B3", brown:"#937860", gray:"#8C8C8C"
 };
 
-let t    = 0;            // time (arbitrary units ~ months)
-let dt   = 0.25;         // timestep
-let play = false;        // animation state
+let t    = 0;            // time (arb.)
+let dt   = 0.25;         // step
+let play = false;
 
-// User knobs (default values)
-let injRate  = 1.0;      // 0.5..1.8 (× speed)
-let spacing  = 1.0;      // 0.7 tight .. 1.5 wide (wider = longer distance)
-let mobility = 1.0;      // 0.6 better .. 1.8 worse (worse = earlier local BT / wiggle)
+let injRate  = 1.0;      // 0.5..1.8
+let spacing  = 1.0;      // 0.7..1.5
+let mobility = 1.0;      // 0.6..1.8
 
-// Derived & tracked
-let frontPos = 5;        // % across domain (starts near injectors)
-let breakthroughAt = 55; // % where producers start seeing water (approx distance to horizontals)
-let wc = 0.0;            // water cut (0..1)
-let qo = 0.0;            // oil rate (relative)
-let vrr = 0.8;           // VRR starting slightly < 1
+let frontPos = 5;        // %
+let breakthroughAt = 55; // %
+let wc = 0.0;            // 0..1
+let qo = 0.0;            // rel
+let vrr = 0.8;
 
-// DOM
 const btnPlay  = document.getElementById('btnPlay');
 const btnReset = document.getElementById('btnReset');
 const frontEl  = document.getElementById('front');
@@ -232,7 +228,6 @@ const sInjVal  = document.getElementById('sInjVal');
 const sSpaceVal= document.getElementById('sSpaceVal');
 const sMobVal  = document.getElementById('sMobVal');
 
-// Update slider text
 function updateSliderLabels(){
   sInjVal.textContent = (Number(sInj.value)).toFixed(1) + '×';
   const sp = Number(sSpace.value);
@@ -242,62 +237,43 @@ function updateSliderLabels(){
 }
 updateSliderLabels();
 
-// Listen sliders
 sInj.addEventListener('input', ()=>{ injRate = Number(sInj.value); updateSliderLabels(); });
 sSpace.addEventListener('input', ()=>{ spacing = Number(sSpace.value); updateSliderLabels(); recalcBreakthrough(); });
 sMob.addEventListener('input', ()=>{ mobility = Number(sMob.value); updateSliderLabels(); });
 
-// Reset sim
 function resetSim(){
-  t = 0;
-  frontPos = 5;
-  wc = 0;
-  qo = 0;
-  vrr = 0.8;
-  frontEl.style.left = frontPos + '%';
-  frontEl.style.width = '0%';
-  wiggleEl.style.left = frontPos + '%';
-  wiggleEl.style.width = '0%';
+  t = 0; frontPos = 5; wc = 0; qo = 0; vrr = 0.8;
+  frontEl.style.left = frontPos + '%'; frontEl.style.width = '0%';
+  wiggleEl.style.left = frontPos + '%'; wiggleEl.style.width = '0%';
   lblWC.textContent = 'Water Cut: ~0%';
   lblStatus.textContent = 'Status: BEFORE (front far; low WC)';
   play = false; btnPlay.textContent='▶ Play';
-  owcChart.data.labels = [];
-  owcChart.data.datasets[0].data = [];
-  owcChart.data.datasets[1].data = [];
-  vrrChart.data.labels = [];
-  vrrChart.data.datasets[0].data = [];
-  frontChart.data.labels = [];
-  frontChart.data.datasets[0].data = [];
+  owcChart.data.labels = []; owcChart.data.datasets[0].data = []; owcChart.data.datasets[1].data = [];
+  vrrChart.data.labels = []; vrrChart.data.datasets[0].data = [];
+  frontChart.data.labels = []; frontChart.data.datasets[0].data = [];
   owcChart.update(); vrrChart.update(); frontChart.update();
 }
 btnReset.addEventListener('click', resetSim);
 
-// Recompute distance to producers when spacing changes
 function recalcBreakthrough(){
-  // Tighter spacing -> shorter distance to producer (front threshold lower)
-  breakthroughAt = 55 * spacing; // 55% at medium; 38.5% at tight(0.7); 82.5% at wide(1.5)
+  breakthroughAt = 55 * spacing; // medium 55%, tight ~38.5%, wide ~82.5%
 }
 recalcBreakthrough();
 
-// Play/Pause
 btnPlay.addEventListener('click', ()=>{
   play = !play;
   btnPlay.textContent = play ? '⏸ Pause' : '▶ Play';
   if(play) requestAnimationFrame(step);
 });
 
-// Simple “physics” for the curtain
 function step(){
   if(!play) return;
 
-  // front speed: base * injRate / spacing; mobility worsens “effective” speed shape
-  const baseSpeed = 0.9; // arbitrary
+  const baseSpeed = 0.9;
   let speed = baseSpeed * injRate / spacing;
-  // small stochastic boost if mobility is worse (fingering → earlier local BT feeling)
-  const wiggleAmp = Math.max(0, (mobility - 1.0)) * 0.6; // 0..0.48
+  const wiggleAmp = Math.max(0, (mobility - 1.0)) * 0.6;
   speed *= (1 + (Math.random()-0.5) * wiggleAmp);
 
-  // advance front
   frontPos = Math.min(98, frontPos + speed);
   frontEl.style.left = frontPos + '%';
   frontEl.style.width = Math.max(0, frontPos - 5) + '%';
@@ -305,33 +281,26 @@ function step(){
   wiggleEl.style.width = Math.max(0, frontPos - 5) + '%';
   wiggleEl.style.opacity = 0.18 + Math.min(0.35, Math.max(0, (mobility-1)*0.25));
 
-  // Water cut response (kicks in after breakthroughAt)
-  const BT = breakthroughAt - Math.min(12, (mobility-1)*12); // worse mobility → earlier local BT
+  const BT = breakthroughAt - Math.min(12, (mobility-1)*12);
   let wcTarget = 0;
   if(frontPos >= BT){
-    // logistic rise: start near BT, slope affected by mobility (worse → faster rise)
     const slope = 0.25 + Math.max(0, mobility-1)*0.35;
-    wcTarget = 1/(1+Math.exp(-(frontPos - BT)*slope)); // 0..1
+    wcTarget = 1/(1+Math.exp(-(frontPos - BT)*slope));
   }
-  // smooth WC toward target
   wc += (wcTarget - wc) * 0.12;
 
-  // Oil rate: rises early with pressure support, then declines as WC grows
-  const earlyBoost = Math.min(1, (frontPos/BT));               // 0..1 pre-BT
-  const decline = (1 - 0.7*wc);                                // diminish with WC
+  const earlyBoost = Math.min(1, (frontPos/BT));
+  const decline = (1 - 0.7*wc);
   qo = Math.max(0, 1.2 * earlyBoost * decline);
 
-  // VRR: tends toward ≈1.0, pulled by injection rate (too low → <1, too high → >1)
   const vrrTarget = Math.min(1.3, Math.max(0.6, 0.95 + (injRate-1)*0.35));
   vrr += (vrrTarget - vrr) * 0.08;
 
-  // Labels
   lblWC.textContent = 'Water Cut: ~' + Math.round(wc*100) + '%';
   lblStatus.textContent = frontPos < BT
     ? 'Status: BEFORE (pressure support building; oil rising soon)'
     : 'Status: AFTER (breakthrough; manage WC & conformance)';
 
-  // Charts update
   t += dt;
   const tlab = t.toFixed(1);
   owcChart.data.labels.push(tlab);
@@ -342,13 +311,11 @@ function step(){
   frontChart.data.labels.push(tlab);
   frontChart.data.datasets[0].data.push(frontPos/100);
 
-  // keep last 200 points
   [owcChart, vrrChart, frontChart].forEach(ch=>{
     if(ch.data.labels.length>200){ ch.data.labels.shift(); ch.data.datasets.forEach(ds=>ds.data.shift()); }
     ch.update('none');
   });
 
-  // continue
   requestAnimationFrame(step);
 }
 
@@ -390,12 +357,7 @@ const vrrChart = new Chart(vrrCtx, {
       y:{title:{text:'VRR',display:true,color:labelCol}, min:0.6, max:1.3, ticks:{color:tickCol},
          grid:{...commonGrid, borderDash:[4,4]} }
     },
-    elements:{point:{radius:0}},
-    plugins:{
-      annotation:{
-        annotations:{}
-      }
-    }
+    elements:{point:{radius:0}}
   }
 });
 
