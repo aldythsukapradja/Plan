@@ -1,307 +1,111 @@
+<!-- PREVIEW-ONLY SNIPPET (not final) -->
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Waterflooding — Simple Visual Explanation</title>
-<link rel="preconnect" href="https://cdn.jsdelivr.net" />
+<meta charset="utf-8">
+<title>Line-Drive Waterflood — Preview</title>
 <style>
-  :root{
-    /* seaborn-like palette */
-    --blue:#4C72B0; --orange:#DD8452; --green:#55A868; --red:#C44E52;
-    --purple:#8172B3; --brown:#937860; --pink:#DA8BC3; --gray:#8C8C8C;
-    --bg:#0f1320; --panel:#151b2e; --text:#e7edf7; --muted:#b9c3d6; --accent:#3ad1c7;
-  }
-  html,body{margin:0;background:var(--bg);color:var(--text);font:16px/1.55 system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
-  .wrap{max-width:1100px;margin:auto;padding:28px}
-  header{display:grid;gap:10px;margin-bottom:22px}
-  h1{margin:0;font-size:2rem;letter-spacing:.2px}
-  p.lead{margin:.2rem 0 0;color:var(--muted)}
-  .grid{display:grid;gap:18px}
-  @media(min-width:960px){ .grid{grid-template-columns:1.1fr 1fr} }
-  .card{background:var(--panel);border:1px solid rgba(255,255,255,.06);border-radius:14px;box-shadow:0 10px 24px rgba(0,0,0,.25)}
-  .card h2{margin:0;padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.06);font-size:1.1rem}
-  .card .content{padding:16px 18px}
-  .pill{display:inline-block;padding:4px 10px;border-radius:999px;background:rgba(58,209,199,.12);border:1px solid rgba(58,209,199,.45);color:var(--accent);font-size:.8rem;margin-right:6px}
-  ul.check{list-style:none;padding-left:0;margin:0}
-  ul.check li{margin:.35rem 0;padding-left:26px;position:relative}
-  ul.check li:before{content:"✓";position:absolute;left:0;top:0;color:var(--green)}
-  .schematic{width:100%;height:auto;display:block}
-  footer{opacity:.8;margin-top:18px;font-size:.9rem}
-  .tiny{font-size:.85rem;color:var(--muted)}
-  .legend-dot{display:inline-flex;align-items:center;margin-right:10px}
-  .legend-dot i{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:6px}
-  .badge{font-size:.75rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);padding:2px 8px;border-radius:7px;margin-left:8px;color:var(--muted)}
-  .two-col{display:grid;gap:16px}
-  @media(min-width:800px){ .two-col{grid-template-columns:1fr 1fr} }
-  a.button{display:inline-block;padding:10px 14px;border-radius:10px;background:linear-gradient(135deg,var(--blue),var(--purple));color:white;text-decoration:none;border:1px solid rgba(255,255,255,.2)}
-  .hero{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;align-items:center}
-  .hero b{color:var(--accent)}
+  :root{--bg:#0f1320;--panel:#151b2e;--text:#e7edf7;--muted:#b9c3d6;
+        --blue:#4C72B0;--orange:#DD8452;--green:#55A868;}
+  html,body{margin:0;background:var(--bg);color:var(--text);font:16px system-ui}
+  .wrap{max-width:1100px;margin:auto;padding:22px}
+  .panel{background:var(--panel);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:16px}
+  .hero{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+  .btn{background:linear-gradient(135deg,var(--blue),#6b8ad6);color:#fff;border:none;padding:10px 14px;border-radius:10px;cursor:pointer}
+  .note{color:var(--muted);font-size:.95rem}
+  .sim{position:relative;width:100%;height:260px;margin-top:12px;border-radius:12px;background:linear-gradient(#1a1f33,#10162a)}
+  .label{position:absolute;font-size:.8rem;color:var(--muted)}
+  .wellH{position:absolute;height:8px;width:70%;background:var(--orange);border-radius:6px;box-shadow:0 0 10px rgba(221,132,82,.25)}
+  .injector{position:absolute;width:6px;height:100px;background:var(--blue);top:70px;border-radius:3px}
+  .front{position:absolute;top:20px;bottom:20px;width:0;background:rgba(76,114,176,.25);backdrop-filter:blur(1px);
+         border-left:2px solid var(--blue);box-shadow:0 0 12px rgba(76,114,176,.4) inset}
+  .meter{margin-top:10px;display:flex;gap:12px;align-items:center}
+  .dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.85rem;color:var(--muted)}
 </style>
-</head>
-<body>
-  <div class="wrap">
-    <header class="hero">
-      <div>
-        <div class="pill">Reservoir Management Primer</div>
-        <h1>Waterflooding — the easiest way to picture it</h1>
-        <p class="lead">Inject water into the reservoir to push oil toward producers, keep pressure up, and improve recovery.</p>
-      </div>
-      <a class="button" href="#charts">Jump to charts</a>
-    </header>
-
-    <div class="grid">
-      <!-- LEFT: Explanations + Schematic -->
-      <section class="card">
-        <h2>How waterflooding works</h2>
-        <div class="content">
-          <ul class="check">
-            <li><b>Pressure support:</b> Injection maintains reservoir pressure as oil is produced.</li>
-            <li><b>Displacement:</b> Water sweeps oil toward producers; the water–oil front advances over time.</li>
-            <li><b>Sweep efficiency:</b> Good patterns + rock quality = more of the reservoir contacted by water.</li>
-            <li><b>Production signal:</b> Initially oil rises at low water cut; later water cut increases as fronts arrive.</li>
-          </ul>
-          <p class="tiny">Tip: Increase <b>voidage replacement ratio (VRR)</b> toward 1.0 to balance outflows with injected volumes (corrected to reservoir conditions).</p>
-        </div>
-      </section>
-
-      <section class="card">
-        <h2>One-look schematic</h2>
-        <div class="content">
-          <!-- Simple pattern schematic (inline SVG) -->
-          <svg class="schematic" viewBox="0 0 720 380" role="img" aria-label="Waterflood schematic">
-            <defs>
-              <linearGradient id="gOil" x1="0" x2="0" y1="0" y2="1">
-                <stop offset="0%" stop-color="#2b2f45"/>
-                <stop offset="100%" stop-color="#1a1f33"/>
-              </linearGradient>
-              <linearGradient id="gWater" x1="0" x2="1" y1="0" y2="0">
-                <stop offset="0%" stop-color="#4C72B0" stop-opacity="0.18"/>
-                <stop offset="100%" stop-color="#4C72B0" stop-opacity="0.05"/>
-              </linearGradient>
-            </defs>
-
-            <!-- Reservoir box -->
-            <rect x="20" y="50" width="680" height="280" rx="14" fill="url(#gOil)" stroke="rgba(255,255,255,.18)" />
-
-            <!-- Streamlines / flood front -->
-            <path d="M70,280 C200,250 340,210 460,170 S640,110 670,90" stroke="#4C72B0" stroke-width="3" fill="none" opacity=".55"/>
-            <path d="M70,300 C210,270 350,235 470,195 S650,145 670,130" stroke="#4C72B0" stroke-width="3" fill="none" opacity=".45"/>
-            <path d="M70,260 C210,230 350,195 470,155 S650,105 670,85"  stroke="#4C72B0" stroke-width="3" fill="none" opacity=".35"/>
-
-            <!-- Water-invaded zone tint -->
-            <polygon points="20,330 20,180 300,180 480,150 700,100 700,330" fill="url(#gWater)"/>
-
-            <!-- Injectors (blue) -->
-            <g>
-              <line x1="110" y1="40" x2="110" y2="330" stroke="#4C72B0" stroke-width="5"/>
-              <circle cx="110" cy="40" r="9" fill="#4C72B0"/>
-              <text x="92" y="30" fill="#b9c3d6" font-size="12">Injector</text>
-            </g>
-            <g>
-              <line x1="260" y1="40" x2="260" y2="330" stroke="#4C72B0" stroke-width="5"/>
-              <circle cx="260" cy="40" r="9" fill="#4C72B0"/>
-            </g>
-            <g>
-              <line x1="410" y1="40" x2="410" y2="330" stroke="#4C72B0" stroke-width="5"/>
-              <circle cx="410" cy="40" r="9" fill="#4C72B0"/>
-            </g>
-
-            <!-- Producers (orange) -->
-            <g>
-              <line x1="560" y1="40" x2="560" y2="330" stroke="#DD8452" stroke-width="5"/>
-              <rect x="553" y="30" width="14" height="14" fill="#DD8452"/>
-              <text x="540" y="28" fill="#b9c3d6" font-size="12">Producer</text>
-            </g>
-            <g>
-              <line x1="660" y1="40" x2="660" y2="330" stroke="#DD8452" stroke-width="5"/>
-              <rect x="653" y="30" width="14" height="14" fill="#DD8452"/>
-            </g>
-
-            <!-- Labels -->
-            <text x="34" y="72" fill="#e7edf7" font-size="13">Water front advancing →</text>
-            <text x="24" y="350" fill="#8C8C8C" font-size="12">Top seal</text>
-            <text x="650" y="350" fill="#8C8C8C" font-size="12">Base</text>
-          </svg>
-        </div>
-      </section>
-
-      <!-- RIGHT: Charts -->
-      <section id="charts" class="card">
-        <h2>Key plots you’ll see in waterfloods<span class="badge">seaborn-style colors</span></h2>
-        <div class="content two-col">
-          <div>
-            <canvas id="chartFractional"></canvas>
-            <div class="tiny" style="margin-top:6px">
-              <span class="legend-dot"><i style="background:var(--blue)"></i> fractional flow of water, <b>f<sub>w</sub>(S<sub>w</sub>)</b></span>
-              <span class="legend-dot"><i style="background:var(--orange)"></i> water saturation S<sub>w</sub> axis</span>
-              <p>Classic S-curve from Corey relative permeability: low f<sub>w</sub> at low S<sub>w</sub>, rising sharply near breakthrough.</p>
-            </div>
-          </div>
-          <div>
-            <canvas id="chartWatercut"></canvas>
-            <div class="tiny" style="margin-top:6px">
-              <span class="legend-dot"><i style="background:var(--orange)"></i> water cut (WC)</span>
-              <span class="legend-dot"><i style="background:var(--green)"></i> oil rate</span>
-              <p>After breakthrough, WC climbs while oil rate peaks then declines unless conformance or pattern tweaks are made.</p>
-            </div>
-          </div>
-          <div>
-            <canvas id="chartVRR"></canvas>
-            <div class="tiny" style="margin-top:6px">
-              <span class="legend-dot"><i style="background:var(--green)"></i> VRR (target ≈ 1.0)</span>
-              <p>Voidage replacement ratio trending toward 1.0 indicates balanced injection vs production at reservoir conditions.</p>
-            </div>
-          </div>
-          <div>
-            <canvas id="chartSweep"></canvas>
-            <div class="tiny" style="margin-top:6px">
-              <span class="legend-dot"><i style="background:var(--purple)"></i> areal sweep ↑ with pattern density</span>
-              <span class="legend-dot"><i style="background:var(--red)"></i> vertical sweep ↓ with stratification</span>
-              <p>Composite sweep improves with better patterns and mobility control, but heterogeneity can limit vertical sweep.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- LEFT: Practical levers -->
-      <section class="card">
-        <h2>Practical levers to improve a flood</h2>
-        <div class="content">
-          <ul class="check">
-            <li><b>Pattern & spacing:</b> 5-spot, 9-spot, line drive; align with permeability trends and fracture directions.</li>
-            <li><b>Mobility control:</b> Adjust rates; consider polymer/low-salinity where applicable.</li>
-            <li><b>Conformance:</b> Gels/selective completions to reduce channeling or thief zones.</li>
-            <li><b>Surveillance:</b> Tracers, PLT, pressure interference, 4D seismic; respond quickly to rising water cut.</li>
-            <li><b>Balancing VRR:</b> Track injected vs produced volumes (reservoir conditions) and tune targets ≈ 1.0.</li>
-          </ul>
-        </div>
-      </section>
-
-      <section class="card">
-        <h2>Glossary (fast)</h2>
-        <div class="content">
-          <p><b>Water cut (WC)</b>: fraction of water in produced liquids.</p>
-          <p><b>Breakthrough (BT)</b>: first arrival of injected water at a producer; WC > 0.</p>
-          <p><b>Fractional flow, f<sub>w</sub></b>: ratio of water flow to total flow at a given saturation.</p>
-          <p><b>Sweep efficiency</b>: portion of reservoir contacted by injected water (areal × vertical × displacement).</p>
-        </div>
-      </section>
+<div class="wrap">
+  <div class="hero">
+    <div>
+      <h1 style="margin:.2rem 0;">Line-Drive Waterflood (Horizontal Wells)</h1>
+      <div class="note">Think of a <b>blue curtain</b> (water) gently pushing oil toward two very long horizontal producers (~30k ft each).</div>
     </div>
-
-    <footer>Made for quick teaching & reviews. Colors follow a seaborn-like palette for familiarity.</footer>
+    <button class="btn" id="toggle">▶ Play: Before → After</button>
   </div>
 
-  <!-- Chart.js (lightweight, no build step) -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <script>
-    // seaborn-like colors
-    const c = {
-      blue:"#4C72B0", orange:"#DD8452", green:"#55A868", red:"#C44E52",
-      purple:"#8172B3", brown:"#937860", gray:"#8C8C8C"
-    };
+  <div class="panel">
+    <div class="legend">
+      <span><span class="dot" style="background:var(--blue)"></span> Injectors (line-drive, left)</span>
+      <span><span class="dot" style="background:var(--orange)"></span> Long horizontal producers (~30k ft)</span>
+      <span><span class="dot" style="background:var(--green)"></span> Rising pressure & early oil bump</span>
+    </div>
 
-    // -------- Fractional flow (Corey-style illustrative) --------
-    // Sw array 0.2..1.0, simple Corey exponents for illustration
-    const Sw = Array.from({length:41}, (_,i)=>0.2 + i*(0.8/40)); // 0.2 to 1.0
-    function coreyRelPerm(Sw, Sor=0.2, Swc=0.2, nw=3, no=2){
-      // normalized water saturation
-      const Snw = Sw.map(s => Math.max(0, Math.min(1, (s - Swc)/(1 - Swc - Sor))));
-      const krw = Snw.map(x => Math.pow(x, nw));
-      const kro = Snw.map(x => Math.pow(1 - x, no));
-      return {krw, kro};
+    <div class="sim" id="sim">
+      <!-- injectors fence (left) -->
+      <div class="injector" style="left:24px;"></div>
+      <div class="injector" style="left:48px;"></div>
+      <div class="injector" style="left:72px;"></div>
+
+      <!-- moving water front (blue curtain) -->
+      <div class="front" id="front"></div>
+
+      <!-- two long horizontals (right half) -->
+      <div class="wellH" style="left:42%; top:120px;"></div>
+      <div class="wellH" style="left:42%; top:170px;"></div>
+
+      <div class="label" style="left:14px; top:12px;">Injectors</div>
+      <div class="label" style="right:14px; top:12px;">Producers (30k ft drains)</div>
+      <div class="label" id="status" style="left:14px; bottom:8px;">Status: BEFORE (low pressure, front far)</div>
+    </div>
+
+    <div class="meter">
+      <div class="note">Water front position</div>
+      <div style="flex:1; height:10px; background:#0c1122; border-radius:999px; overflow:hidden">
+        <div id="bar" style="height:100%; width:4%; background:var(--blue)"></div>
+      </div>
+      <div class="note" id="wc">WC: ~0%</div>
+    </div>
+  </div>
+
+  <p class="note" style="margin-top:10px">
+    Next step in the full build: add a Play/Pause timeline, beginner charts (oil & water cut vs time, VRR ~1 target),
+    and sliders for injection rate / spacing / mobility. This preview only shows the “moving curtain” idea.
+  </p>
+</div>
+
+<script>
+  const btn = document.getElementById('toggle');
+  const front = document.getElementById('front');
+  const bar = document.getElementById('bar');
+  const wc = document.getElementById('wc');
+  const status = document.getElementById('status');
+
+  let playing = false, x = 0, raf;
+
+  function frame(){
+    // move front from ~5% (before) toward ~80% (after)
+    x = Math.min(80, x + 0.5);
+    front.style.left = x + '%';
+    front.style.width = (x - 5) + '%';
+    bar.style.width = Math.max(4, x) + '%';
+
+    // simple “water cut” feel: near 55%+ the WC starts climbing
+    let wcVal = Math.max(0, (x - 55) * 2); // 0..50-ish
+    wc.innerText = 'WC: ~' + Math.max(0, Math.min(90, Math.round(wcVal))) + '%';
+
+    if(x < 80 && playing){ raf = requestAnimationFrame(frame); }
+    else { playing = false; btn.textContent = '↺ Replay'; status.textContent='Status: AFTER (front reached producers; WC rising)'; }
+  }
+
+  btn.addEventListener('click', ()=>{
+    if(!playing){
+      // reset
+      cancelAnimationFrame(raf);
+      x = 5; front.style.left = x + '%'; front.style.width = '0%';
+      bar.style.width = '4%'; wc.innerText = 'WC: ~0%';
+      status.textContent='Status: BEFORE (low pressure, front far)';
+      playing = true; btn.textContent = '⏸ Pause'; raf = requestAnimationFrame(frame);
+    } else {
+      // pause
+      playing = false; btn.textContent = '▶ Resume';
+      cancelAnimationFrame(raf);
     }
-    const {krw, kro} = coreyRelPerm(Sw);
-    const muw = 1.0, muo = 3.0; // cP, illustrative
-    const fw = Sw.map((s, i) => (krw[i]/muw)/((krw[i]/muw)+(kro[i]/muo)));
-
-    new Chart(document.getElementById('chartFractional'), {
-      type: 'line',
-      data: {
-        labels: Sw.map(s=>s.toFixed(2)),
-        datasets: [{
-          label: 'f_w(S_w)',
-          data: fw,
-          borderColor: c.blue,
-          fill: false,
-          tension: .25
-        }]
-      },
-      options: {
-        plugins:{ legend:{labels:{color:'#e7edf7'}}, tooltip:{mode:'index'} },
-        scales:{
-          x:{ title:{text:'Water saturation S_w',display:true,color:'#e7edf7'}, ticks:{color:'#b9c3d6'}, grid:{color:'rgba(255,255,255,.06)'} },
-          y:{ title:{text:'Fractional flow of water',display:true,color:'#e7edf7'}, min:0, max:1, ticks:{color:'#b9c3d6'}, grid:{color:'rgba(255,255,255,.06)'} }
-        }
-      }
-    });
-
-    // -------- Water cut and oil rate vs time (illustrative) --------
-    const t = Array.from({length:50}, (_,i)=>i);
-    const watercut = t.map(x => 1/(1+Math.exp(-(x-20)/4)));  // logistic-like rise after BT
-    const qo = t.map((x,i) => 1.2*Math.exp(-x/60)*(1 - 0.7*watercut[i])); // simple peak then decline
-
-    new Chart(document.getElementById('chartWatercut'), {
-      type: 'line',
-      data: {
-        labels: t,
-        datasets: [
-          {label:'Water cut (WC)', data: watercut, borderColor: c.orange, tension:.25, yAxisID:'y1'},
-          {label:'Oil rate (arb.)', data: qo, borderColor: c.green, borderDash:[6,4], tension:.25, yAxisID:'y2'}
-        ]
-      },
-      options: {
-        plugins:{ legend:{labels:{color:'#e7edf7'}} },
-        scales:{
-          x:{ title:{text:'Time (months)',display:true,color:'#e7edf7'}, ticks:{color:'#b9c3d6'}, grid:{color:'rgba(255,255,255,.06)'} },
-          y1:{ position:'left', min:0, max:1, title:{text:'Water cut',display:true,color:'#e7edf7'}, ticks:{color:'#b9c3d6'}, grid:{color:'rgba(255,255,255,.06)'} },
-          y2:{ position:'right', title:{text:'Oil rate (arb.)',display:true,color:'#e7edf7'}, ticks:{color:'#b9c3d6'}, grid:{display:false} }
-        }
-      }
-    });
-
-    // -------- VRR trend (illustrative) --------
-    const vrr = t.map(x => 0.7 + 0.4*(1 - Math.exp(-x/15))); // approaches ~1.1 then stabilize
-    new Chart(document.getElementById('chartVRR'), {
-      type: 'line',
-      data: { labels: t, datasets: [{label:'VRR', data: vrr, borderColor: c.green, tension:.25}] },
-      options: {
-        plugins:{ legend:{labels:{color:'#e7edf7'}} },
-        scales:{
-          x:{ title:{text:'Time (months)',display:true,color:'#e7edf7'}, ticks:{color:'#b9c3d6'}, grid:{color:'rgba(255,255,255,.06)'} },
-          y:{ min:0, max:1.6, title:{text:'VRR (—)',display:true,color:'#e7edf7'}, ticks:{color:'#b9c3d6'}, grid:{color:'rgba(255,255,255,.06)'} }
-        },
-        elements:{ point:{radius:0} }
-      }
-    });
-
-    // -------- Sweep efficiency components (illustrative stacked area) --------
-    const x = Array.from({length:21}, (_,i)=>i/20);
-    const areal = x.map(v => 0.4 + 0.5*v);        // increases with pattern density
-    const vertical = x.map(v => 0.7 - 0.25*v);    // decreases with stratification
-    const displacement = x.map(v => 0.55 + 0.2*v);// better mobility control
-    // composite: product of components (normalized for display)
-    const composite = x.map((_,i)=> Math.min(1, areal[i]*vertical[i]*displacement[i]));
-
-    new Chart(document.getElementById('chartSweep'), {
-      type: 'line',
-      data: {
-        labels: x.map(v=> (v*100).toFixed(0)),
-        datasets: [
-          {label:'Areal', data: areal, borderColor:c.purple, tension:.25},
-          {label:'Vertical', data: vertical, borderColor:c.red, tension:.25},
-          {label:'Displacement', data: displacement, borderColor:c.blue, tension:.25},
-          {label:'Composite (≈ product)', data: composite, borderColor:c.brown, borderDash:[6,4], tension:.25}
-        ]
-      },
-      options: {
-        plugins:{ legend:{labels:{color:'#e7edf7'}} },
-        scales:{
-          x:{ title:{text:'Design knob (← low  ·  high →)',display:true,color:'#e7edf7'}, ticks:{color:'#b9c3d6'}, grid:{color:'rgba(255,255,255,.06)'} },
-          y:{ min:0, max:1.2, title:{text:'Efficiency (relative)',display:true,color:'#e7edf7'}, ticks:{color:'#b9c3d6'}, grid:{color:'rgba(255,255,255,.06)'} }
-        }
-      }
-    });
-  </script>
-</body>
-</html>
+  });
+</script>
