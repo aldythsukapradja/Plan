@@ -1,380 +1,488 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Line-Drive Waterflood — Long Horizontals (~30k ft) • Producer in Green</title>
-<link rel="preconnect" href="https://cdn.jsdelivr.net" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RMO Line-Drive Waterflood Simulator (3D Perspective)</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
 <style>
-  :root{
-    /* seaborn-like palette */
-    --blue:#4C72B0;   /* injectors & water */
-    --green:#55A868;  /* producers & oil */
-    --orange:#DD8452; --red:#C44E52; --purple:#8172B3; --brown:#937860; --gray:#8C8C8C;
-    /* theme */
-    --bg:#0f1320; --panel:#151b2e; --text:#e7edf7; --muted:#b9c3d6; --accent:#3ad1c7;
-  }
-  html,body{margin:0;background:var(--bg);color:var(--text);font:16px/1.55 system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
-  .wrap{max-width:1200px;margin:auto;padding:28px}
-  h1{margin:.2rem 0 0;font-size:1.9rem}
-  p.lead{margin:.25rem 0 0;color:var(--muted)}
-  .grid{display:grid;gap:18px}
-  @media(min-width:1000px){ .grid{grid-template-columns:1.15fr .85fr} }
-  .card{background:var(--panel);border:1px solid rgba(255,255,255,.06);border-radius:14px;box-shadow:0 10px 24px rgba(0,0,0,.25)}
-  .card h2{margin:0;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.06);font-size:1.1rem}
-  .card .content{padding:14px 16px}
-  .pill{display:inline-block;padding:4px 10px;border-radius:999px;background:rgba(58,209,199,.12);border:1px solid rgba(58,209,199,.45);color:var(--accent);font-size:.8rem;margin-right:6px}
-  .hero{display:flex;gap:16px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
-  .button{background:linear-gradient(135deg,var(--blue),#6b8ad6);color:#fff;border:none;padding:10px 14px;border-radius:10px;cursor:pointer}
-  .muted{color:var(--muted)}
-  .tiny{color:var(--muted);font-size:.88rem}
-  .controls{display:grid;gap:14px}
-  .slider{display:grid;grid-template-columns:140px 1fr 54px;gap:10px;align-items:center}
-  input[type="range"]{width:100%}
-  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:.9rem;color:var(--muted);margin-bottom:8px}
-  .dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:6px}
-  .sim{position:relative;width:100%;height:320px;border-radius:12px;background:linear-gradient(#1a1f33,#10162a);overflow:hidden}
-  .label{position:absolute;font-size:.85rem;color:var(--muted);text-shadow:0 1px 0 rgba(0,0,0,.5)}
-  .injector{position:absolute;width:6px;height:160px;background:var(--blue);top:70px;border-radius:3px;box-shadow:0 0 10px rgba(76,114,176,.35)}
-  /* Producer well now GREEN */
-  .wellH{position:absolute;height:10px;width:55%;background:var(--green);border-radius:6px;box-shadow:0 0 12px rgba(85,168,104,.25)}
-  .front{position:absolute;top:28px;bottom:28px;width:0;background:rgba(76,114,176,.22);
-         border-left:2px solid var(--blue);box-shadow:inset 0 0 20px rgba(76,114,176,.35), 0 0 18px rgba(76,114,176,.25)}
-  /* front “wiggle” overlay (mobility effect) */
-  .wiggle{position:absolute;top:28px;bottom:28px;left:0;width:0;opacity:.28;background:
-           repeating-linear-gradient(135deg, rgba(76,114,176,.6), rgba(76,114,176,.6) 6px, rgba(76,114,176,0) 6px, rgba(76,114,176,0) 12px);
-           mix-blend-mode:screen;filter:blur(0.6px)}
-  .badges{display:flex;gap:8px;flex-wrap:wrap}
-  .badge{font-size:.75rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);padding:2px 8px;border-radius:7px;color:var(--muted)}
-  .two-col{display:grid;gap:16px}
-  @media(min-width:900px){ .two-col{grid-template-columns:1fr 1fr} }
-  footer{opacity:.8;margin-top:18px;font-size:.9rem}
+:root{
+  --bg1:#0F1320; --bg2:#16223A;
+  --text:#E7EDF7; --muted:#AEB8CC; --accent:#3AD1C7;
+  --blue:#4C72B0; --green:#55A868; --orange:#DD8452; --gray:#8C8C8C; --red:#C44E52;
+  --panel:#151B2E; --panelBd:rgba(255,255,255,.08);
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:linear-gradient(140deg,var(--bg1),var(--bg2));color:var(--text);font:16px/1.45 system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:1200px;margin:0 auto;padding:24px}
+header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:54px;height:54px;border-radius:12px;background:radial-gradient(ellipse at 50% 35%, rgba(58,209,199,.8), rgba(58,209,199,.1) 60%), #0a121f;border:1px solid rgba(58,209,199,.4);box-shadow:0 0 20px rgba(58,209,199,.35) inset, 0 0 12px rgba(58,209,199,.35)}
+.logo:before{content:"RMO";display:flex;align-items:center;justify-content:center;width:100%;height:100%;letter-spacing:.5px;color:#bffff6;font-weight:700}
+.hgroup h1{margin:0;font-size:1.6rem}
+.hgroup p{margin:.25rem 0 0;color:var(--muted)}
+.controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.btn{background:linear-gradient(135deg,var(--accent),#79e7e0);color:#021018;border:0;padding:10px 14px;border-radius:10px;font-weight:600;cursor:pointer}
+.btn.secondary{background:linear-gradient(135deg,#7f84d9,#b0b2ff);color:#0b0f1a}
+.grid{display:grid;gap:16px;margin-top:16px}
+@media(min-width:1000px){ .grid{grid-template-columns:1.2fr .8fr} }
+.card{background:var(--panel);border:1px solid var(--panelBd);border-radius:14px;box-shadow:0 10px 24px rgba(0,0,0,.25)}
+.card h2{margin:0;padding:12px 14px;border-bottom:1px solid var(--panelBd);font-size:1.05rem}
+.card .content{padding:14px}
+.row{display:grid;gap:12px}
+@media(min-width:860px){ .row{grid-template-columns:1fr 1fr} }
+.canvasWrap{position:relative}
+#scene{width:100%;height:420px;display:block;background:transparent;border-radius:12px}
+.tag{position:absolute;top:8px;padding:4px 8px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);color:var(--muted);font-size:.8rem}
+#tagInj{left:8px}
+#tagProd{right:8px}
+#tagStatus{left:8px;bottom:8px}
+#tagWC{right:8px;bottom:8px}
+.sliders{display:grid;gap:12px}
+.slider{display:grid;grid-template-columns:160px 1fr 58px;gap:10px;align-items:center}
+input[type="range"]{width:100%}
+.small{color:var(--muted);font-size:.9rem}
+.tiles{display:grid;gap:12px}
+@media(min-width:860px){ .tiles{grid-template-columns:repeat(5,1fr)} }
+.tile{background:#0f1628;border:1px solid rgba(255,255,255,.08);padding:12px 12px;border-radius:12px}
+.tile h3{margin:0 0 6px 0;font-size:.9rem;color:var(--muted)}
+.big{font-size:1.35rem;font-weight:700}
+.unit{font-size:.95rem;color:var(--muted);margin-left:6px}
+.gaugeRow{display:flex;align-items:center;gap:8px}
+.bar{position:relative;height:12px;border-radius:999px;background:#0b1122;border:1px solid rgba(255,255,255,.08);flex:1;overflow:hidden}
+.marker{position:absolute;top:-4px;width:2px;height:20px;background:#fff;border-radius:2px;box-shadow:0 0 8px rgba(255,255,255,.3)}
+.band{position:absolute;top:0;bottom:0;border-radius:999px;background:rgba(85,168,104,.18);border:1px dashed rgba(85,168,104,.4)}
+.wcGauge{--val:0; width:110px;height:110px;border-radius:50%;background:conic-gradient(var(--orange) calc(var(--val)*1%), rgba(255,255,255,.08) 0);display:grid;place-items:center;border:1px solid rgba(255,255,255,.1)}
+.wcGauge .knob{background:#0a1120;border:1px solid rgba(255,255,255,.12);width:70px;height:70px;border-radius:50%;display:grid;place-items:center;color:var(--orange);font-weight:700}
+.sense{display:grid;gap:12px}
+@media(min-width:860px){ .sense{grid-template-columns:1fr 1fr} }
+.sCard{background:#0f1628;border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px}
+.sCard h3{margin:0 0 8px 0;font-size:.95rem;color:var(--muted)}
+.barMini{height:10px;background:#0b1122;border:1px solid rgba(255,255,255,.08);border-radius:999px;overflow:hidden}
+.fillGood{height:100%;width:0;background:linear-gradient(90deg,var(--accent),#7cefe8)}
+.fillNeutral{height:100%;width:0;background:#6b7280}
+.fillBad{height:100%;width:0;background:#c65f5f}
+.arrowRow{display:flex;gap:12px;flex-wrap:wrap}
+.arrow{display:flex;align-items:center;gap:8px;background:#0b1122;border:1px solid rgba(255,255,255,.08);padding:8px 10px;border-radius:10px}
+.arrow i{display:inline-block;width:12px;height:12px;border-right:3px solid var(--text);border-bottom:3px solid var(--text);transform:rotate(45deg)}
+.arrow.flat i{transform:rotate(0deg);border-right-width:4px;border-bottom:0;width:16px}
+.arrow.up{color:#ffc7c7}
+.arrow.up i{border-right-color:#ff9a9a}
+.arrow.wiggle{animation:wiggle 0.9s ease-in-out infinite}
+@keyframes wiggle{0%{transform:rotate(40deg)}50%{transform:rotate(60deg)}100%{transform:rotate(40deg)}}
+footer{margin:16px 0 40px 0;color:var(--muted);font-size:.9rem;position:relative}
+.watermark{position:fixed;right:16px;bottom:16px;opacity:.75}
+.wmark{width:70px;height:70px;border-radius:50%;background:radial-gradient(ellipse at center, rgba(58,209,199,.9), rgba(58,209,199,.12) 60%), #07101b;border:1px solid rgba(58,209,199,.45);box-shadow:0 0 20px rgba(58,209,199,.5), inset 0 0 24px rgba(58,209,199,.35);display:grid;place-items:center}
+.wmark span{color:#bffff6;font-weight:800;letter-spacing:.5px}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header class="hero">
-    <div>
-      <div class="pill">Reservoir Management: Line-Drive Flood</div>
-      <h1>Waterflooding for Long Horizontal Wells (~30,000 ft drains)</h1>
-      <p class="lead">A <b>blue curtain</b> of injected water pushes oil toward very long producers. Oil bumps up first; later the produced liquid has more water (WC rises).</p>
-      <div class="badges" style="margin-top:8px">
-        <span class="badge">Pattern: Line-Drive</span>
-        <span class="badge">Drains: ~30k ft (each)</span>
-        <span class="badge">Goal: VRR ≈ 1 (balanced)</span>
+  <header>
+    <div class="brand">
+      <div class="logo"></div>
+      <div class="hgroup">
+        <h1>RMO Line-Drive Waterflood Simulator</h1>
+        <p>Reservoir Management Opportunities — Educational Visualization (3D Perspective)</p>
       </div>
     </div>
-    <div>
-      <button id="btnPlay" class="button" style="margin-right:6px">▶ Play</button>
-      <button id="btnReset" class="button" style="background:linear-gradient(135deg,var(--purple),#9ea0e0)">↺ Reset</button>
-      <div class="tiny" style="margin-top:6px">“Before → After” animation (blue curtain advances)</div>
+    <div class="controls">
+      <button id="playBtn" class="btn">▶ Play</button>
+      <button id="resetBtn" class="btn secondary">↺ Reset</button>
     </div>
   </header>
 
   <div class="grid">
-    <!-- LEFT: Simulation + Controls -->
     <section class="card">
-      <h2>Simulation — Before → After (beginner-friendly)</h2>
+      <h2>3D Reservoir Scene — 1 Injector (Blue) · 1 Producer (Green)</h2>
       <div class="content">
-        <div class="legend">
-          <span><span class="dot" style="background:var(--blue)"></span> Injectors (left fence)</span>
-          <span><span class="dot" style="background:var(--green)"></span> Producer horizontals (oil out)</span>
+        <div class="canvasWrap">
+          <canvas id="scene"></canvas>
+          <div id="tagInj" class="tag">Injector (water in) • qᵢ <span id="qiLbl">18.0</span>k bbl/d</div>
+          <div id="tagProd" class="tag">Producer (oil out) • qₒ <span id="qoLbl">12.0</span>k bbl/d</div>
+          <div id="tagStatus" class="tag">Status: BEFORE — pressure support building</div>
+          <div id="tagWC" class="tag">WC: <span id="wcLbl">0</span>%</div>
         </div>
 
-        <div class="sim" id="sim">
-          <!-- injectors fence (left) -->
-          <div class="injector" style="left:24px;"></div>
-          <div class="injector" style="left:48px;"></div>
-          <div class="injector" style="left:72px;"></div>
-          <div class="label" style="left:14px; top:8px;">Injectors (water in)</div>
-
-          <!-- moving water front (blue curtain) -->
-          <div class="front"  id="front"></div>
-          <div class="wiggle" id="wiggle"></div>
-
-          <!-- two long horizontals (right half) — NOW GREEN -->
-          <div class="wellH" style="left:46%; top:135px;"></div>
-          <div class="wellH" style="left:46%; top:185px;"></div>
-          <div class="label" style="right:14px; top:8px;">Producers (oil out)</div>
-
-          <!-- status labels -->
-          <div class="label" id="lblStatus" style="left:14px; bottom:8px;">Status: BEFORE (front far; low WC)</div>
-          <div class="label" id="lblWC" style="right:14px; bottom:8px;">Water Cut: ~0%</div>
-        </div>
-
-        <div class="two-col" style="margin-top:14px">
-          <div class="controls">
+        <div class="row" style="margin-top:12px">
+          <div class="sliders">
             <div class="slider">
-              <div>Injection rate</div>
-              <input id="sInj" type="range" min="0.5" max="1.8" value="1.0" step="0.1">
-              <div class="tiny" id="sInjVal">1.0×</div>
+              <div>Injection Rate (qᵢ)</div>
+              <input id="sInj" type="range" min="0.5" max="1.8" step="0.1" value="1.0">
+              <div class="small" id="sInjVal">1.0×</div>
             </div>
             <div class="slider">
-              <div>Pattern spacing</div>
-              <input id="sSpace" type="range" min="0.7" max="1.5" value="1.0" step="0.1">
-              <div class="tiny" id="sSpaceVal">Medium</div>
+              <div>Pattern Spacing</div>
+              <input id="sSpace" type="range" min="0.7" max="1.5" step="0.1" value="1.0">
+              <div class="small" id="sSpaceVal">Medium</div>
             </div>
             <div class="slider">
-              <div>Mobility ratio</div>
-              <input id="sMob" type="range" min="0.6" max="1.8" value="1.0" step="0.1">
-              <div class="tiny" id="sMobVal">Balanced</div>
+              <div>Mobility Ratio</div>
+              <input id="sMob" type="range" min="0.6" max="1.8" step="0.1" value="1.0">
+              <div class="small" id="sMobVal">Balanced</div>
             </div>
           </div>
-          <div>
-            <div class="tiny"><b>Plain English:</b></div>
-            <ul class="tiny" style="margin-top:6px">
-              <li><b>Injection rate:</b> higher = faster blue curtain → earlier response (and earlier water at wells).</li>
-              <li><b>Pattern spacing:</b> tighter lines = shorter travel → quicker front arrival.</li>
-              <li><b>Mobility ratio:</b> worse (water “too mobile”) = fingering/wiggle → earlier local breakthrough.</li>
+          <div class="small">
+            <b>How to read this:</b>
+            <ul>
+              <li>Blue “curtain” sweeps right from injector; wraps the curved bay; wiggle = mobility.</li>
+              <li>Breakthrough at the green well → WC jumps from ~0% and keeps rising.</li>
+              <li>Keep <b>VRR ≈ 1</b> for steady pressure and calmer GOR.</li>
             </ul>
-            <div class="tiny" style="margin-top:8px">Targets: keep <b>VRR ≈ 1</b> (balanced), watch WC post-BT, and align pattern with rock fabric when possible.</div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- RIGHT: Glossary + Watchouts -->
     <section class="card">
-      <h2>For Dummies — What’s Happening?</h2>
+      <h2>Frozen-Axis Indicators</h2>
       <div class="content">
-        <p class="tiny"><b>Push:</b> Water acts like a <i>blue conveyor belt</i> pushing oil toward long green wells.</p>
-        <p class="tiny"><b>Pressure:</b> Injection props up pressure so oil flows (aim for VRR ≈ 1 = balanced in vs out).</p>
-        <p class="tiny"><b>Timing:</b> Oil rate bumps up first; later WC increases after breakthrough.</p>
-
-        <h3 style="margin:12px 0 6px;font-size:1rem">Mini Glossary</h3>
-        <ul class="tiny">
-          <li><b>VRR:</b> Injected / Produced volume @ reservoir conditions. Target ≈ 1.</li>
-          <li><b>Water cut (WC):</b> Fraction of water in produced liquids. 0% → all oil; 100% → all water.</li>
-          <li><b>Breakthrough (BT):</b> First arrival of injected water at a producer (WC starts rising).</li>
-          <li><b>Sweep:</b> Portion of reservoir contacted by the water curtain.</li>
-        </ul>
-
-        <h3 style="margin:12px 0 6px;font-size:1rem">What to Watch</h3>
-        <ul class="tiny">
-          <li><b>Heel vs toe:</b> Horizontals may see earlier water at the heel.</li>
-          <li><b>Spacing:</b> Tighter line-drive = quicker response but potentially earlier WC.</li>
-          <li><b>Mobility:</b> Poor mobility control = “wiggly” front → earlier localized BT.</li>
-        </ul>
+        <div class="tiles">
+          <div class="tile">
+            <h3>Injection (qᵢ)</h3>
+            <div><span id="qiVal" class="big">18.0</span><span class="unit">k bbl/d</span></div>
+          </div>
+          <div class="tile">
+            <h3>Oil Rate (qₒ)</h3>
+            <div><span id="qoVal" class="big">12.0</span><span class="unit">k bbl/d</span></div>
+          </div>
+          <div class="tile">
+            <h3>Water Cut</h3>
+            <div class="wcGauge" id="wcGauge" style="--val:0">
+              <div class="knob"><span id="wcPct">0%</span></div>
+            </div>
+          </div>
+          <div class="tile">
+            <h3>VRR</h3>
+            <div class="gaugeRow">
+              <span class="small">0.6</span>
+              <div class="bar" id="vrrBar">
+                <div class="band" style="left:40%;right:40%"></div>
+                <div class="marker" id="vrrMarker" style="left:0%"></div>
+              </div>
+              <span class="small">1.4</span>
+            </div>
+            <div class="small">Target band ~0.95–1.05</div>
+          </div>
+          <div class="tile">
+            <h3>GOR</h3>
+            <div class="gaugeRow">
+              <span class="small">0.2</span>
+              <div class="bar" id="gorBar">
+                <div class="marker" id="gorMarker" style="left:0%"></div>
+              </div>
+              <span class="small">1.2</span>
+            </div>
+            <div><span id="gorVal" class="big">0.70</span><span class="unit">k scf/bbl</span></div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <!-- BOTTOM: Charts -->
     <section class="card" style="grid-column:1/-1">
-      <h2>Beginner Charts (auto-updates as it runs)</h2>
-      <div class="content two-col">
-        <div>
-          <canvas id="chartOWC"></canvas>
-          <div class="tiny" style="margin-top:6px">
-            <span class="dot" style="background:var(--green)"></span> Oil Rate (relative)
-            &nbsp; &nbsp;
-            <span class="dot" style="background:var(--orange)"></span> Water Cut (0–1)
-          </div>
+      <h2>Sensitivities — ΔRF (%) and GOR Trend</h2>
+      <div class="content sense">
+        <div class="sCard">
+          <h3>Recovery Factor ΔRF (after fixed window)</h3>
+          <div class="small" style="margin-bottom:8px">Relative lift vs. “Before Flood” baseline</div>
+          <div class="small">Injection rate</div>
+          <div class="barMini"><div id="rfInj" class="fillGood"></div></div>
+          <div class="small" style="margin-top:8px">Pattern spacing</div>
+          <div class="barMini"><div id="rfSpace" class="fillNeutral"></div></div>
+          <div class="small" style="margin-top:8px">Mobility ratio</div>
+          <div class="barMini"><div id="rfMob" class="fillBad"></div></div>
+          <div class="small" style="margin-top:8px">ΔRF now: <b><span id="rfNow">0.0</span>%</b></div>
         </div>
-        <div>
-          <canvas id="chartVRR"></canvas>
-          <div class="tiny" style="margin-top:6px">
-            <span class="dot" style="background:var(--green)"></span> VRR (aim ≈ 1.0)
+
+        <div class="sCard">
+          <h3>GOR Trend Sensitivity</h3>
+          <div class="arrowRow">
+            <div class="arrow flat" id="gorArrowVRR"><i></i><span class="small">VRR effect</span></div>
+            <div class="arrow" id="gorArrowMob"><i></i><span class="small">Mobility effect</span></div>
+            <div class="arrow flat" id="gorArrowSpace"><i></i><span class="small">Spacing effect</span></div>
           </div>
-        </div>
-        <div>
-          <canvas id="chartFront"></canvas>
-          <div class="tiny" style="margin-top:6px">
-            <span class="dot" style="background:var(--blue)"></span> Front position (% distance across pattern)
-          </div>
-        </div>
-        <div class="tiny">
-          This is an illustrative toy model (not a simulator): front moves faster with higher injection and tighter spacing; worse mobility makes the front “wiggly” and can trigger earlier local BT; oil rises early then falls as WC grows; VRR tends toward a setting-driven balance near 1.
+          <div class="small" style="margin-top:8px">Stable VRR≈1 → steadier GOR; poor mobility → fluctuations; wider spacing → steadier longer (pre-BT).</div>
         </div>
       </div>
     </section>
   </div>
 
-  <footer>Producer well & arrows are GREEN. Colors follow a seaborn-style palette.</footer>
+  <footer>
+    Part of the <b>RMO Digital Academy</b>. Visualizing line-drive waterflooding: push with water → oil up early → later WC up. Aim VRR ≈ 1 for healthy pressure and steadier GOR.
+  </footer>
 </div>
 
-<!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<!-- RMO watermark -->
+<div class="watermark">
+  <div class="wmark"><span>RMO</span></div>
+</div>
+
 <script>
-/* ----------- Parameters & State ----------- */
-const colors = {
-  blue:"#4C72B0", green:"#55A868", orange:"#DD8452", red:"#C44E52",
-  purple:"#8172B3", brown:"#937860", gray:"#8C8C8C"
-};
+/* ====== State & knobs ====== */
+const canvas = document.getElementById('scene');
+const ctx = canvas.getContext('2d');
 
-let t    = 0;            // time (arb.)
-let dt   = 0.25;         // step
-let play = false;
+let W=canvas.clientWidth, H=canvas.clientHeight;
+function resize(){ canvas.width = canvas.clientWidth*2; canvas.height = canvas.clientHeight*2; ctx.setTransform(2,0,0,2,0,0); W=canvas.clientWidth; H=canvas.clientHeight; drawStatic(); }
+addEventListener('resize', resize);
+resize();
 
-let injRate  = 1.0;      // 0.5..1.8
-let spacing  = 1.0;      // 0.7..1.5
-let mobility = 1.0;      // 0.6..1.8
+let playing=false, t=0, dt=0.016; // ~60FPS
+let front=0.05;     // 0..1
+let inj=1.0;        // 0.5..1.8
+let space=1.0;      // 0.7..1.5
+let mob=1.0;        // 0.6..1.8
 
-let frontPos = 5;        // %
-let breakthroughAt = 55; // %
-let wc = 0.0;            // 0..1
-let qo = 0.0;            // rel
-let vrr = 0.8;
+// thresholds & derived
+let BT=0.62;        // baseline BT in normalized distance (adjusted by spacing)
+const baseQi=18.0;  // k bbl/d
+const baseQo=12.0;  // k bbl/d
+let qi=baseQi, qo=baseQo, wc=0, vrr=0.9, gor=0.70; // gor in k scf/bbl
+let cumOil=0; const OOIP=1000_000; // teaching placeholder (k-bbl); RF = cumOil/OOIP*100
 
-const btnPlay  = document.getElementById('btnPlay');
-const btnReset = document.getElementById('btnReset');
-const frontEl  = document.getElementById('front');
-const wiggleEl = document.getElementById('wiggle');
-const lblStatus= document.getElementById('lblStatus');
-const lblWC    = document.getElementById('lblWC');
-const sInj     = document.getElementById('sInj');
-const sSpace   = document.getElementById('sSpace');
-const sMob     = document.getElementById('sMob');
-const sInjVal  = document.getElementById('sInjVal');
-const sSpaceVal= document.getElementById('sSpaceVal');
-const sMobVal  = document.getElementById('sMobVal');
+/* ====== UI Elements ====== */
+const playBtn = document.getElementById('playBtn');
+const resetBtn= document.getElementById('resetBtn');
+const sInj    = document.getElementById('sInj');
+const sSpace  = document.getElementById('sSpace');
+const sMob    = document.getElementById('sMob');
+const sInjVal = document.getElementById('sInjVal');
+const sSpaceVal=document.getElementById('sSpaceVal');
+const sMobVal = document.getElementById('sMobVal');
 
+const qiLbl=document.getElementById('qiLbl'), qoLbl=document.getElementById('qoLbl'), wcLbl=document.getElementById('wcLbl');
+const tagStatus=document.getElementById('tagStatus');
+
+const qiVal=document.getElementById('qiVal'), qoVal=document.getElementById('qoVal');
+const wcGauge=document.getElementById('wcGauge'), wcPct=document.getElementById('wcPct');
+const vrrMarker=document.getElementById('vrrMarker'), vrrBar=document.getElementById('vrrBar');
+const gorMarker=document.getElementById('gorMarker'), gorVal=document.getElementById('gorVal');
+
+const rfInj=document.getElementById('rfInj'), rfSpace=document.getElementById('rfSpace'), rfMob=document.getElementById('rfMob'), rfNow=document.getElementById('rfNow');
+
+const gorArrowVRR=document.getElementById('gorArrowVRR');
+const gorArrowMob=document.getElementById('gorArrowMob');
+const gorArrowSpace=document.getElementById('gorArrowSpace');
+
+/* ====== Slider handling ====== */
 function updateSliderLabels(){
-  sInjVal.textContent = (Number(sInj.value)).toFixed(1) + '×';
-  const sp = Number(sSpace.value);
-  sSpaceVal.textContent = sp<0.9 ? 'Tight' : sp>1.2 ? 'Wide' : 'Medium';
-  const mr = Number(sMob.value);
-  sMobVal.textContent = mr<0.9 ? 'Better' : mr>1.2 ? 'Worse' : 'Balanced';
+  sInjVal.textContent = (+sInj.value).toFixed(1)+'×';
+  const sp=+sSpace.value; sSpaceVal.textContent = sp<0.9?'Tight':(sp>1.2?'Wide':'Medium');
+  const mr=+sMob.value; sMobVal.textContent = mr<0.9?'Better':(mr>1.2?'Worse':'Balanced');
 }
-updateSliderLabels();
+function recalcBT(){ BT = 0.55 * +sSpace.value; } // tighter spacing => earlier BT
+updateSliderLabels(); recalcBT();
 
-sInj.addEventListener('input', ()=>{ injRate = Number(sInj.value); updateSliderLabels(); });
-sSpace.addEventListener('input', ()=>{ spacing = Number(sSpace.value); updateSliderLabels(); recalcBreakthrough(); });
-sMob.addEventListener('input', ()=>{ mobility = Number(sMob.value); updateSliderLabels(); });
+sInj.addEventListener('input',()=>{ inj=+sInj.value; updateSliderLabels(); });
+sSpace.addEventListener('input',()=>{ space=+sSpace.value; updateSliderLabels(); recalcBT(); });
+sMob.addEventListener('input',()=>{ mob=+sMob.value; updateSliderLabels(); });
 
-function resetSim(){
-  t = 0; frontPos = 5; wc = 0; qo = 0; vrr = 0.8;
-  frontEl.style.left = frontPos + '%'; frontEl.style.width = '0%';
-  wiggleEl.style.left = frontPos + '%'; wiggleEl.style.width = '0%';
-  lblWC.textContent = 'Water Cut: ~0%';
-  lblStatus.textContent = 'Status: BEFORE (front far; low WC)';
-  play = false; btnPlay.textContent='▶ Play';
-  owcChart.data.labels = []; owcChart.data.datasets[0].data = []; owcChart.data.datasets[1].data = [];
-  vrrChart.data.labels = []; vrrChart.data.datasets[0].data = [];
-  frontChart.data.labels = []; frontChart.data.datasets[0].data = [];
-  owcChart.update(); vrrChart.update(); frontChart.update();
-}
-btnReset.addEventListener('click', resetSim);
-
-function recalcBreakthrough(){
-  breakthroughAt = 55 * spacing; // medium 55%, tight ~38.5%, wide ~82.5%
-}
-recalcBreakthrough();
-
-btnPlay.addEventListener('click', ()=>{
-  play = !play;
-  btnPlay.textContent = play ? '⏸ Pause' : '▶ Play';
-  if(play) requestAnimationFrame(step);
+/* ====== Buttons ====== */
+playBtn.addEventListener('click',()=>{
+  playing=!playing; playBtn.textContent = playing?'⏸ Pause':'▶ Play';
+  if(playing) requestAnimationFrame(loop);
 });
+resetBtn.addEventListener('click', reset);
+function reset(){
+  playing=false; playBtn.textContent='▶ Play';
+  t=0; front=0.05; wc=0; vrr=0.9; gor=0.70; qi=baseQi*inj; qo=baseQo; cumOil=0;
+  qiLbl.textContent=qi.toFixed(1); qoLbl.textContent=qo.toFixed(1); wcLbl.textContent=(wc*100|0);
+  qiVal.textContent=qi.toFixed(1); qoVal.textContent=qo.toFixed(1); gorVal.textContent=gor.toFixed(2);
+  wcGauge.style.setProperty('--val', 0); wcPct.textContent='0%';
+  setMarker(vrrMarker, vrrToPct(vrr)); setMarker(gorMarker, gorToPct(gor));
+  rfInj.style.width='0%'; rfSpace.style.width='0%'; rfMob.style.width='0%'; rfNow.textContent='0.0';
+  tagStatus.textContent='Status: BEFORE — pressure support building';
+  drawStatic(); drawFront(front);
+}
 
-function step(){
-  if(!play) return;
+/* ====== Drawing ====== */
+function drawStatic(){
+  ctx.clearRect(0,0,W,H);
+  // Perspective slab coordinates
+  const pad=40, topY=80, botY=H-60, leftX=60, rightX=W-60;
+  // Curved bay on top edge
+  const bayMidX = W*0.55, bayDepth=28;
 
-  const baseSpeed = 0.9;
-  let speed = baseSpeed * injRate / spacing;
-  const wiggleAmp = Math.max(0, (mobility - 1.0)) * 0.6;
-  speed *= (1 + (Math.random()-0.5) * wiggleAmp);
+  // Slab top face (beige)
+  ctx.save();
+  const gradTop = ctx.createLinearGradient(0,topY,0,botY);
+  gradTop.addColorStop(0,'#e2d3b8'); gradTop.addColorStop(1,'#b9a88a');
+  ctx.fillStyle=gradTop; ctx.strokeStyle='rgba(0,0,0,.2)';
+  ctx.beginPath();
+  ctx.moveTo(leftX, topY+20);
+  ctx.quadraticCurveTo(bayMidX-80, topY-10, bayMidX, topY-10-bayDepth); // bay dip
+  ctx.quadraticCurveTo(bayMidX+80, topY-10, rightX, topY+20);
+  ctx.lineTo(rightX, botY); ctx.lineTo(leftX, botY); ctx.closePath();
+  ctx.fill();
+  // subtle top highlight
+  ctx.globalAlpha=.2; ctx.fillStyle='#fff';
+  ctx.fillRect(leftX, topY+18, rightX-leftX, 6);
+  ctx.globalAlpha=1;
+  ctx.restore();
 
-  frontPos = Math.min(98, frontPos + speed);
-  frontEl.style.left = frontPos + '%';
-  frontEl.style.width = Math.max(0, frontPos - 5) + '%';
-  wiggleEl.style.left = frontPos + '%';
-  wiggleEl.style.width = Math.max(0, frontPos - 5) + '%';
-  wiggleEl.style.opacity = 0.18 + Math.min(0.35, Math.max(0, (mobility-1)*0.25));
+  // Injector tube (left, blue) and arrows
+  drawTube(leftX-6, topY+60, 10, botY-topY-70, 'blue');
+  drawArrows(leftX+10, (topY+botY)/2 - 40, 3, 'right', 'blue');
 
-  const BT = breakthroughAt - Math.min(12, (mobility-1)*12);
-  let wcTarget = 0;
-  if(frontPos >= BT){
-    const slope = 0.25 + Math.max(0, mobility-1)*0.35;
-    wcTarget = 1/(1+Math.exp(-(frontPos - BT)*slope));
+  // Producer tube (right, green) and arrows
+  drawTube(rightX-6, topY+60, 10, botY-topY-70, 'green');
+  drawArrows(rightX-24, (topY+botY)/2 - 40, 3, 'left', 'green');
+}
+function drawTube(x,y,w,h,color){
+  const col = color==='blue'?getVar('--blue'):getVar('--green');
+  ctx.save();
+  ctx.fillStyle=col; ctx.shadowColor=col; ctx.shadowBlur=12;
+  roundRect(x,y,w,h,6); ctx.fill();
+  ctx.restore();
+}
+function drawArrows(x,y,count,dir,color){
+  const col = color==='blue'?getVar('--blue'):getVar('--green');
+  ctx.save(); ctx.fillStyle=col; ctx.strokeStyle=col;
+  for(let i=0;i<count;i++){
+    const yy=y+i*40;
+    ctx.beginPath();
+    if(dir==='right'){
+      ctx.moveTo(x,yy); ctx.lineTo(x+22,yy); ctx.lineTo(x+22,yy-6);
+      ctx.lineTo(x+36,yy+6); ctx.lineTo(x+22,yy+18); ctx.lineTo(x+22,yy+12); ctx.lineTo(x,yy+12);
+    }else{
+      ctx.moveTo(x+36,yy); ctx.lineTo(x+14,yy); ctx.lineTo(x+14,yy-6);
+      ctx.lineTo(x,yy+6); ctx.lineTo(x+14,yy+18); ctx.lineTo(x+14,yy+12); ctx.lineTo(x+36,yy+12);
+    }
+    ctx.closePath(); ctx.fill();
   }
-  wc += (wcTarget - wc) * 0.12;
+  ctx.restore();
+}
+function roundRect(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); }
 
-  const earlyBoost = Math.min(1, (frontPos/BT));
-  const decline = (1 - 0.7*wc);
-  qo = Math.max(0, 1.2 * earlyBoost * decline);
+function drawFront(p){ // p: 0..1
+  // overlay blue sheet from left to fraction p
+  const leftX=60, rightX=W-60, topY=80, botY=H-60;
+  const bayMidX=W*0.55, bayDepth=28;
 
-  const vrrTarget = Math.min(1.3, Math.max(0.6, 0.95 + (injRate-1)*0.35));
-  vrr += (vrrTarget - vrr) * 0.08;
+  const xFront = leftX + (rightX-leftX)*p;
 
-  lblWC.textContent = 'Water Cut: ~' + Math.round(wc*100) + '%';
-  lblStatus.textContent = frontPos < BT
-    ? 'Status: BEFORE (pressure support building; oil rising soon)'
-    : 'Status: AFTER (breakthrough; manage WC & conformance)';
+  // shape follows bay: top edge curve
+  ctx.save();
+  ctx.globalAlpha=.22;
+  ctx.fillStyle=getVar('--blue');
+  ctx.beginPath();
+  ctx.moveTo(leftX, botY);
+  ctx.lineTo(leftX, topY+20);
+  // upper curve section limited to xFront
+  const endX = Math.max(leftX, Math.min(xFront, rightX));
+  const frac = (endX-leftX)/(rightX-leftX);
+  // parametric top curve
+  const ctrl1 = bayMidX-80, ctrl2=bayMidX+80;
+  ctx.quadraticCurveTo(ctrl1, topY-10, bayMidX, topY-10-bayDepth*Math.min(1, frac*1.8));
+  ctx.quadraticCurveTo(ctrl2, topY-10, endX, topY+20);
+  ctx.lineTo(endX, botY); ctx.closePath(); ctx.fill();
 
+  // front edge line with slight wiggle
+  ctx.globalAlpha=.8; ctx.strokeStyle=getVar('--blue'); ctx.lineWidth=2;
+  ctx.beginPath();
+  const edgeYTop = topY+20 - bayDepth*Math.min(1, frac*1.8); // wrap around bay
+  const edgeYBot = botY;
+  // wiggle amplitude from mobility
+  const amp = Math.max(0,(mob-1))*6;
+  const wobble = Math.sin(t*3)*amp;
+  ctx.moveTo(endX, edgeYTop + wobble*0.5);
+  ctx.lineTo(endX, (edgeYTop+edgeYBot)/2 + wobble);
+  ctx.lineTo(endX, edgeYBot + wobble*0.3);
+  ctx.stroke();
+  ctx.restore();
+}
+
+/* ====== Helpers ====== */
+function getVar(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+function setMarker(el, pct){ // pct 0..100
+  const barW = vrrBar.getBoundingClientRect().width || 200;
+  el.style.left = `calc(${pct}% - 1px)`;
+}
+function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+function lerp(a,b,t){ return a+(b-a)*t; }
+function vrrToPct(v){ // 0.6..1.4 -> 0..100
+  return clamp(((v-0.6)/(1.4-0.6))*100,0,100);
+}
+function gorToPct(g){ // 0.2..1.2 -> 0..100
+  return clamp(((g-0.2)/(1.2-0.2))*100,0,100);
+}
+
+/* ====== Animation loop ====== */
+function loop(){
+  if(!playing) return;
   t += dt;
-  const tlab = t.toFixed(1);
-  owcChart.data.labels.push(tlab);
-  owcChart.data.datasets[0].data.push(qo);
-  owcChart.data.datasets[1].data.push(wc);
-  vrrChart.data.labels.push(tlab);
-  vrrChart.data.datasets[0].data.push(vrr);
-  frontChart.data.labels.push(tlab);
-  frontChart.data.datasets[0].data.push(frontPos/100);
 
-  [owcChart, vrrChart, frontChart].forEach(ch=>{
-    if(ch.data.labels.length>200){ ch.data.labels.shift(); ch.data.datasets.forEach(ds=>ds.data.shift()); }
-    ch.update('none');
-  });
+  // front speed scaling
+  const baseSpeed = 0.16; // feel speed
+  let speed = baseSpeed * inj / space;
+  // small randomness if mobility worse
+  const jitter = (Math.random()-0.5) * Math.max(0,(mob-1))*0.08;
+  front = clamp(front + speed*dt + jitter, 0.05, 0.98);
 
-  requestAnimationFrame(step);
+  // BT and responses
+  const BTadj = BT - Math.min(0.12,(mob-1)*0.12);
+  // qi & qo (k bbl/d)
+  qi = baseQi * inj;
+  const preBoost = clamp(front/BTadj, 0, 1);
+  // wc (0..1)
+  let wcTarget = 0;
+  if(front>=BTadj){
+    const slope = 8*(0.25 + Math.max(0, mob-1)*0.35);
+    wcTarget = 1/(1+Math.exp(-(front-BTadj)*slope));
+  }
+  wc += (wcTarget - wc) * 0.08;
+
+  const decline = (1 - 0.6*wc);
+  qo = clamp(1.25 * preBoost * decline * baseQo, 0, baseQo*1.25);
+
+  // cum oil & RF (toy)
+  cumOil += qo * (dt*30); // k bbl per ~month
+  const RF = clamp((cumOil/OOIP)*100, 0, 40);
+
+  // VRR tends toward ~1 with injection; too low or high skews
+  const vrrTarget = clamp(0.95 + (inj-1)*0.35, 0.6, 1.3);
+  vrr += (vrrTarget - vrr) * 0.05;
+
+  // GOR reaction (k scf/bbl)
+  const gorBase = 0.70;
+  const gorDrift = (vrr<0.95? (0.95 - vrr)*0.9 : -(vrr-1.0)*0.5);
+  const gorNoise = (Math.random()-0.5)*0.02*Math.max(1, mob);
+  gor = clamp(gorBase + gorDrift + gorNoise, 0.2, 1.2);
+
+  // UI updates (numbers only; axes fixed)
+  qiLbl.textContent=qi.toFixed(1); qoLbl.textContent=qo.toFixed(1); wcLbl.textContent=Math.round(wc*100);
+  qiVal.textContent=qi.toFixed(1); qoVal.textContent=qo.toFixed(1);
+  wcGauge.style.setProperty('--val', Math.round(wc*100));
+  wcPct.textContent = Math.round(wc*100)+'%';
+  setMarker(vrrMarker, vrrToPct(vrr));
+  setMarker(gorMarker, gorToPct(gor));
+  gorVal.textContent=gor.toFixed(2);
+
+  // Status text
+  tagStatus.textContent = (front<BTadj)? 'Status: BEFORE — pressure support building' : 'Status: AFTER — breakthrough; manage WC & conformance';
+
+  // Sensitivities (live, fixed axes → fill widths only)
+  // Normalize to 0..100 fills with simple relationships
+  const rfNowPct = RF;
+  rfNow.textContent = rfNowPct.toFixed(1);
+  rfInj.style.width = clamp((inj-0.5)/(1.8-0.5)*100,0,100)+'%';
+  rfSpace.style.width = clamp((1.5-space)/(1.5-0.7)*100,0,100)+'%';
+  rfMob.style.width = clamp((1.8-mob)/(1.8-0.6)*100,0,100)+'%';
+
+  // GOR arrows
+  gorArrowVRR.className = 'arrow '+ (vrr<0.95? 'up':'flat');
+  gorArrowMob.className = 'arrow '+ (mob>1.2? 'wiggle':'');
+  gorArrowSpace.className = 'arrow '+ (space>1.2? 'flat':'');
+
+  // Redraw scene
+  drawStatic(); drawFront(front);
+
+  requestAnimationFrame(loop);
 }
 
-/* ----------- Charts ----------- */
-const owcCtx   = document.getElementById('chartOWC').getContext('2d');
-const vrrCtx   = document.getElementById('chartVRR').getContext('2d');
-const frontCtx = document.getElementById('chartFront').getContext('2d');
-
-const commonGrid = {color:'rgba(255,255,255,.06)'};
-const labelCol   = '#e7edf7';
-const tickCol    = '#b9c3d6';
-
-const owcChart = new Chart(owcCtx, {
-  type:'line',
-  data:{labels:[], datasets:[
-    {label:'Oil Rate (rel.)', data:[], borderColor:colors.green, tension:.25},
-    {label:'Water Cut (0–1)', data:[], borderColor:colors.orange, borderDash:[6,4], tension:.25, yAxisID:'y2'}
-  ]},
-  options:{
-    plugins:{legend:{labels:{color:labelCol}}},
-    scales:{
-      x:{title:{text:'Time',display:true,color:labelCol}, ticks:{color:tickCol}, grid:commonGrid},
-      y:{title:{text:'Oil Rate (rel.)',display:true,color:labelCol}, min:0, max:1.4, ticks:{color:tickCol}, grid:commonGrid},
-      y2:{title:{text:'Water Cut',display:true,color:labelCol}, position:'right', min:0, max:1, ticks:{color:tickCol}, grid:{display:false}}
-    },
-    elements:{point:{radius:0}}
-  }
-});
-
-const vrrChart = new Chart(vrrCtx, {
-  type:'line',
-  data:{labels:[], datasets:[
-    {label:'VRR', data:[], borderColor:colors.green, tension:.25}
-  ]},
-  options:{
-    plugins:{legend:{labels:{color:labelCol}}},
-    scales:{
-      x:{title:{text:'Time',display:true,color:labelCol}, ticks:{color:tickCol}, grid:commonGrid},
-      y:{title:{text:'VRR',display:true,color:labelCol}, min:0.6, max:1.3, ticks:{color:tickCol},
-         grid:{...commonGrid, borderDash:[4,4]} }
-    },
-    elements:{point:{radius:0}}
-  }
-});
-
-const frontChart = new Chart(frontCtx, {
-  type:'line',
-  data:{labels:[], datasets:[
-    {label:'Front position (0–1)', data:[], borderColor:colors.blue, tension:.25}
-  ]},
-  options:{
-    plugins:{legend:{labels:{color:labelCol}}},
-    scales:{
-      x:{title:{text:'Time',display:true,color:labelCol}, ticks:{color:tickCol}, grid:commonGrid},
-      y:{title:{text:'Front Position',display:true,color:labelCol}, min:0, max:1, ticks:{color:tickCol}, grid:commonGrid}
-    },
-    elements:{point:{radius:0}}
-  }
-});
+/* ====== Kickoff ====== */
+reset();
+drawStatic(); drawFront(front);
 </script>
 </body>
 </html>
